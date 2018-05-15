@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2018</copyright>
-    <lastBuildDate>Wed, 20 Apr 2016 00:00:00 +0200</lastBuildDate>
+    <lastBuildDate>Mon, 14 May 2018 00:00:00 +0200</lastBuildDate>
     
 	<atom:link href="https://gumeo.github.io/home/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title></title>
+      <link>https://gumeo.github.io/home/about/</link>
+      <pubDate>Mon, 14 May 2018 00:00:00 +0200</pubDate>
+      
+      <guid>https://gumeo.github.io/home/about/</guid>
+      <description>Biography I am currently enrolled as a postdoctoral researcher at the Technical University of Denmark. The current focus of my research is Geometric Deep Learning (gdl Journal Club). During my PhD I focused primarily on methods and applications in the domain of statistical learning. My PhD thesis is titled Sparse Classification - Methods and Applications. Beside my interest in ML, DL and Statistics, I also like to broaden my scope as a software engineer &amp;amp; computer scientist.</description>
+    </item>
     
     <item>
       <title>Selected Publications</title>
