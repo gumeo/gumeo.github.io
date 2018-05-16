@@ -10,5 +10,278 @@
     <lastBuildDate>Mon, 14 May 2018 00:00:00 +0200</lastBuildDate>
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
+    <item>
+      <title>Part 1: Deep Learning with Closures in R</title>
+      <link>https://gumeo.github.io/post/part-1-deep-learning/</link>
+      <pubDate>Thu, 14 Dec 2017 13:40:09 +0200</pubDate>
+      
+      <guid>https://gumeo.github.io/post/part-1-deep-learning/</guid>
+      <description>
+
+&lt;h1 id=&#34;start-of-a-small-series&#34;&gt;Start of a small series&lt;/h1&gt;
+
+&lt;p&gt;The gif below is the evolution of the weights from a neural network trained on the mnist dataset. Mnist is a dataset of handwritten digits, and is kind of the &lt;strong&gt;hello world/FizzBuzz&lt;/strong&gt; of machine learning. It is maybe not a very challenging data set, but you can learn a lot from it. This is a 10 by 10 grid of images, where each individual small patch represents weights going to a single neuron in the first hidden layer of the network. After I saw the content by Grant Sanderson, I wanted to inspect by myself what the network is actually learning. This series is going to outline this development, with an angle towards functional programming.&lt;/p&gt;
+
+&lt;p&gt;{::options parse_block_html=&amp;ldquo;false&amp;rdquo; /}
+&lt;div class=&#34;center&#34;&gt;
+&lt;blockquote class=&#34;imgur-embed-pub&#34; lang=&#34;en&#34; data-id=&#34;EgcQgkh&#34;&gt;&lt;a href=&#34;//imgur.com/EgcQgkh&#34;&gt;&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src=&#34;//s.imgur.com/min/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;/div&gt;&lt;/p&gt;
+
+&lt;p&gt;So I received the &lt;a href=&#34;http://www.deeplearningbook.org/&#34; target=&#34;_blank&#34;&gt;Deep Learning book&lt;/a&gt; a little more than a month ago, and I have had time to read parts I and II. I think that overall the authors successfully explain and condense a lot of research into something digestable. The reason why I use the word condense is because how much information the book contains. The bibliography is 55 pages, so I almost feel that the book should be called &lt;em&gt;Introduction to Deep Learning Research&lt;/em&gt;, because it is a gateway to so much good material. Another fascinating thing about this book is the discussion it contains. The authors are quite upfront about some criticisms on deep learning and discuss them to a great extent. All in all I look forward to finish reading the book.&lt;/p&gt;
+
+&lt;p&gt;I have fiddled around with deep learning since I took a summer-school on it in 2014, where &lt;a href=&#34;https://twitter.com/hugo_larochelle?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor&#34; target=&#34;_blank&#34;&gt;Hugo Larochelle&lt;/a&gt; was giving lectures and he joined us for an epic sword fighting competition/LARP session in the countryside of Denmark. I have followed the evolution of deep learning since, and what has been most amazing is by how much the barrier of entry has been lowered. The current software frameworks make it so easy to get started. After reading the DL book I found a strong inner urge to implement some of these things myself. I think that a way to get a better understanding of programming concepts, algorithms and data structures, is just to go for it and implement it. Also talking about data-structures, deep learning is also becoming a part of that:&lt;/p&gt;
+
+&lt;p&gt;{::options parse_block_html=&amp;ldquo;false&amp;rdquo; /}
+&lt;div class=&#34;center&#34;&gt;
+&lt;blockquote class=&#34;twitter-tweet&#34; data-lang=&#34;en&#34;&gt;&lt;p lang=&#34;en&#34; dir=&#34;ltr&#34;&gt;Jeff Dean and co at GOOG just released a paper showing how machine-learned indexes can replace B-Trees, Hash Indexes, and Bloom Filters. Execute 3x faster than B-Trees, 10-100x less space. Executes on GPU, which are getting faster unlike CPU. Amazing.  &lt;a href=&#34;https://t.co/PPVkrFVKXg&#34;&gt;https://t.co/PPVkrFVKXg&lt;/a&gt;&lt;/p&gt;&amp;mdash; Nick Schrock (@schrockn) &lt;a href=&#34;https://twitter.com/schrockn/status/940037656494317568?ref_src=twsrc%5Etfw&#34;&gt;December 11, 2017&lt;/a&gt;&lt;/blockquote&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;/div&gt;&lt;/p&gt;
+
+&lt;p&gt;After seeing the videos made by &lt;a href=&#34;http://www.3blue1brown.com/&#34; target=&#34;_blank&#34;&gt;Grant Sanderson&lt;/a&gt; on deep learning I decided it was time to implement the basics by myself. I wanted to completely understand back-propagation, how it really is a dynamic programming algorithm where we actually do some smart book-keeping and reuse computations. That is one of the major &lt;em&gt;tricks&lt;/em&gt; that makes this algorithm work.&lt;/p&gt;
+
+&lt;h2 id=&#34;not-another-framework&#34;&gt;Not another framework&lt;/h2&gt;
+
+&lt;p&gt;But of course implementing a fully fledged DL framework is a feat one should not do, unless you have some very specific reason for it. Many frameworks have been created, and doing this alone &lt;strong&gt;to learn&lt;/strong&gt; should not have that goal in mind. I wanted to make something that would be easily extendable, I also wanted to do it in R (because I really like R), I also made a package at some point called &lt;a href=&#34;https://github.com/gumeo/mnistr&#34; target=&#34;_blank&#34;&gt;mnistr&lt;/a&gt; where I wanted to add some fun examples with neural networks on. When I&amp;rsquo;m done with this series I&amp;rsquo;ll add the implementation to the package and submit it to CRAN.&lt;/p&gt;
+
+&lt;h2 id=&#34;closures&#34;&gt;Closures&lt;/h2&gt;
+
+&lt;p&gt;The final reason I had for doing this relates to closures. So deep learning, or deep neural networks, are in it&amp;rsquo;s essance just functions, or rather compositions of functions. These individual functions are usually not that complicated, what makes them complicated is what they learn from complicated data, and how these individual simple things together make something complicated. We do not completely understand what they learn or do. If I can make a representation of a multi-layer percepteron (&lt;em&gt;which is a fully connected neural network&lt;/em&gt;) in a functional programming paradigm, then it might be easier to understand it for others and myself. I will hopefully be able to disentanlge the networks into inidvidual functions and using the &lt;a href=&#34;https://cran.r-project.org/web/packages/magrittr/index.html&#34; target=&#34;_blank&#34;&gt;magrittr&lt;/a&gt; package to do the function composition in a more obvious manner, which demonstrates that the individual pieces of a neural network are not so complicated, and the final composition does not need to be so complicated either.&lt;/p&gt;
+
+&lt;h2 id=&#34;but-wait-a-minute-what-are-closures&#34;&gt;But wait a minute? What are closures?&lt;/h2&gt;
+
+&lt;p&gt;So the &lt;a href=&#34;https://en.wikipedia.org/wiki/Closure_(computer_programming)&#34; target=&#34;_blank&#34;&gt;wikipedia article&lt;/a&gt; gives it a pretty good treatment&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;In programming languages, closures (also lexical closures or function closures) are techniques for implementing lexically scoped name binding in languages with first-class functions. Operationally, a closure is a record storing a function[a] together with an environment:[1] a mapping associating each free variable of the function (variables that are used locally, but defined in an enclosing scope) with the value or reference to which the name was bound when the closure was created.[b] A closure—unlike a plain function—allows the function to access those captured variables through the closure&amp;rsquo;s copies of their values or references, even when the function is invoked outside their scope&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;This sounds a lot like object oriented programming, but when the &lt;em&gt;objects&lt;/em&gt; that we are working with, are naturally functions, then this works very nicely. But let&amp;rsquo;s look at a simple example!&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;newBankAccount &amp;lt;- function(){
+  myMoney &amp;lt;- 0
+  putMonyInTheBank &amp;lt;- function(amount){
+    myMoney &amp;lt;&amp;lt;- myMoney + amount
+  }
+  howMuchDoIOwn &amp;lt;- function(){
+    print(paste(&#39;You have:&#39;,myMoney,&#39;bitcoins!&#39;))
+  }
+  return(list2env(list(putMonyInTheBank=putMonyInTheBank,
+                       howMuchDoIOwn=howMuchDoIOwn)))
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now I can use this to create a &lt;em&gt;bank account function&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;&amp;gt; myAccount &amp;lt;- newBankAccount()
+&amp;gt; myAccount$howMuchDoIOwn()
+[1] &amp;quot;You have: 0 bitcoins!&amp;quot;
+&amp;gt; myAccount$putMonyInTheBank(200)
+&amp;gt; myAccount$howMuchDoIOwn()
+[1] &amp;quot;You have: 200 bitcoins!&amp;quot;
+&amp;gt; copyAccount &amp;lt;- myAccount
+&amp;gt; copyAccount$howMuchDoIOwn()
+[1] &amp;quot;You have: 200 bitcoins!&amp;quot;
+&amp;gt; copyAccount$putMonyInTheBank(300)
+&amp;gt; copyAccount$howMuchDoIOwn()
+[1] &amp;quot;You have: 500 bitcoins!&amp;quot;
+&amp;gt; myAccount$howMuchDoIOwn() # Ahh snap, I also received bitcoins!
+[1] &amp;quot;You have: 500 bitcoins!&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So compared to &lt;em&gt;normal&lt;/em&gt; functions, now we have a function (&lt;em&gt;actually an environment&lt;/em&gt;) with a mutable state. Now we can have side-effects when we call the functions from the environment. But if you look at the calls I made above, you may have noticed that when I copied the account, added to the copied account, the original account also had an increased amount in it. So the copied account didn&amp;rsquo;t get the data copied, only the references. So if you make multiple bank accounts, initialize each seperately, don&amp;rsquo;t initialize one prototype and copy it to all the users. Otherwise all the users end up with one big shared account!&lt;/p&gt;
+
+&lt;p&gt;So be careful, and if you really want to copy environments look at &lt;a href=&#34;https://stackoverflow.com/questions/9965577/r-copy-move-one-environment-to-another&#34; target=&#34;_blank&#34;&gt;this SO post&lt;/a&gt;. If you want to learn more about environments and the functional programming side of R, &lt;a href=&#34;http://adv-r.had.co.nz/&#34; target=&#34;_blank&#34;&gt;advanced R&lt;/a&gt; by Hadley Wickham is a great starting point, you might also want to check out &lt;a href=&#34;http://www.lemnica.com/esotericR/Introducing-Closures/&#34; target=&#34;_blank&#34;&gt;this blogpost&lt;/a&gt;. Also if you have coded in javascript, you might be familiar with the issue of copying closures there. And btw, I have no bitcoins :(&lt;/p&gt;
+
+&lt;p&gt;Another important thing that you might have noticed is the assignment operators. If you are not familiar with R, &lt;code&gt;&amp;lt;-&lt;/code&gt; is pretty much the same as &lt;code&gt;=&lt;/code&gt;, they are kind of used interchangably, but they have a very subtle difference that you can read about &lt;a href=&#34;https://stackoverflow.com/questions/1741820/assignment-operators-in-r-and&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;. The weird assignment operator that you noticed was probably the &lt;code&gt;&amp;lt;&amp;lt;-&lt;/code&gt;, the scoping assignment. This is the whole trick about closures, best said &lt;a href=&#34;https://stackoverflow.com/questions/2628621/how-do-you-use-scoping-assignment-in-r?rq=1&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;A closure is a function written by another function. Closures are so called because they enclose the environment of the parent function, and can access all variables and parameters in that function.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The scoping operator creates the reference needed, such that the returned function encloses the environment of the caller. This is why closures are sometimes called poor man&amp;rsquo;s objects. We are basically emulating the creation of public and private members in some sense, but without the overhead of object oriented structured code. This is an essential part in making the implementation look cleaner and more transparent. The code that you write is more to the point of solving the task as hand, rather the adhearing to a structure of a particular paradigm.&lt;/p&gt;
+
+&lt;h2 id=&#34;too-the-point-on-deep-learning-again&#34;&gt;Too the point on deep learning again!&lt;/h2&gt;
+
+&lt;p&gt;For the structure of the implementation I was very inspired by &lt;a href=&#34;http://briandolhansky.com/blog/2014/10/30/artificial-neural-networks-matrix-form-part-5&#34; target=&#34;_blank&#34;&gt;this post&lt;/a&gt; by Brian Dolhansky, where he implements an MLP in python.&lt;/p&gt;
+
+&lt;p&gt;This structure completely encapsulates what is needed in a layer and how things are connected. Instead of creating a class, I am going to make a closure. So when I say a &lt;strong&gt;layer&lt;/strong&gt;, I mean the activations from the previous layers and the outgoing weights. So the only layer that doesn&amp;rsquo;t have, or doesn&amp;rsquo;t need weights, is the output layer.&lt;/p&gt;
+
+&lt;p&gt;This closure is therefore a function, or has some functions, which makes sense for a layer in a neural network, which is essentially a function in the mathematical sense. But before we get to the layer, we need what essentially creates the closure, a building block for a matrix:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;matrixInLayer &amp;lt;- function(init = FALSE, rS, cS, initPos = FALSE, initScale = 100){
+  intMat &amp;lt;- matrix(0, nrow=rS, ncol=cS)
+  if(init == TRUE){
+    intMat &amp;lt;- matrix(rnorm(rS*cS)/initScale,nrow = rS,ncol = cS)
+    if(initPos == TRUE){
+      intMat &amp;lt;- abs(intMat)
+    }
+  }
+  getter &amp;lt;- function(){
+    return(intMat)
+  }
+  setter &amp;lt;- function(nMat){
+    intMat &amp;lt;&amp;lt;- nMat
+  }
+  return(list2env(list(setter = setter, getter=getter)))
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We parameterize this function such that we can account for different initialization strategies in the weights, but we can use this to create all the needed matricies in a layer. The layer closure is then just something that encapsulates the internal state of the network, with placeholders for all the data needed to do a forward and backwards pass. The essential trick to make this work is of course the scope assignment in the &lt;code&gt;setter&lt;/code&gt; function. The fully connected layer can now be implemented as:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;Layer &amp;lt;- function(activation, minibatchSize, sizeP, is_input=FALSE, is_output=FALSE, initPos, initScale){
+  # Matrix holding the output values
+  Z &amp;lt;- matrixInLayer(FALSE,minibatchSize,sizeP[1])
+  # Outgoing Weights
+  W &amp;lt;- matrixInLayer(TRUE,sizeP[1],sizeP[2],initPos=initPos, initScale=initScale)
+  # Input to this layer
+  S &amp;lt;- matrixInLayer(FALSE,minibatchSize,sizeP[1])
+  # Deltas for this layer
+  D &amp;lt;- matrixInLayer(FALSE,minibatchSize,sizeP[1])
+  # Matrix holding derivatives of the activation function
+  Fp &amp;lt;- matrixInLayer(FALSE,sizeP[1],minibatchSize)
+  # Propagate minibatch through this layer
+  forward_propagate &amp;lt;- function(){
+    if(is_input == TRUE){
+      return(Z$getter()%*%W$getter())
+    }
+    Z$setter(activation(S$getter()))
+    if(is_output == TRUE){
+      return(Z$getter())
+    }else{
+      # Add bias for the hidden layer
+      Z$setter(cbind(Z$getter(),rep(1,nrow(Z$getter()))))
+      # Calculate the derivative
+      Fp$setter(t(activation(S$getter(),deriv = TRUE))) 
+      return(Z$getter()%*%W$getter())
+    }
+  }
+  # Return a list of these functions
+  myEnv &amp;lt;- list2env(list(forward_propagate=forward_propagate, S = S,
+                         D = D, Fp = Fp, W = W, Z = Z))
+  class(myEnv) &amp;lt;- &#39;Layer&#39;
+  return(myEnv)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The layer function includes all the things needed for doing the book-keeping of the calculations for backpropagation. With very little extra code we have the ability to have arbitrary minibatch sizes and arbitrary activation functions. The activation function just needs and extra boolean parameter to determine whether we are evaluating the function or calculating the deivative. (&lt;em&gt;I&amp;rsquo;ll go in more detail in the next post about what a minibatch is when I cover stocastic gradient descent&lt;/em&gt;). We can protype these activation functions on the fly, because R is a functional language. So in less than 50 lines of code we have already created the heart of a multilayer percepteron, with some generalizability. So what does this layer do? It takes input from the activations of the neurons in the previous layer as a vector, multiplies it with a matrix and element-wise applies the activation. In essance it is this:
+$$
+  \sigma(\mathbf{W}\cdot \mathbf{x})
+$$
+where $\mathbf{W}$ is the weight matrix, $\mathbf{x}$ is the input and $\sigma$ is the activation function. The problem of deep learning is then to find good parameters for the weights $\mathbf{W}$ when these functions are composed.&lt;/p&gt;
+
+&lt;h2 id=&#34;next-post&#34;&gt;Next post&lt;/h2&gt;
+
+&lt;p&gt;This ended up being a lot longer than I anticipated, but for the next post I aim at finishing the implementation for the MLP, going through backpropagation and simple training on mnist. For the last post the goal is to show how something like dropout can very easily be incorporated in this implementation and how we can disentangle a network using the magrittr package. Implementing other kinds of layers and different optimization strategies is also on the drawing board.&lt;/p&gt;
+
+&lt;p&gt;If you like this post I would greatly appreciate a tweet, my twitter handle is @gumgumeo :)&lt;/p&gt;
+
+&lt;div class=&#34;center&#34;&gt;
+{::options parse_block_html=&#34;false&#34; /} 
+&lt;a href=&#34;https://twitter.com/share?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-share-button&#34; data-size=&#34;large&#34; data-text=&#34;Learning Deep Learning in R&#34; data-url=&#34;https://gumeo.github.io/post/part-1-deep-learning-with-closures-in-r/&#34; data-via=&#34;gumgumeo&#34; data-hashtags=&#34;#rstats #machinelearning #deeplearning&#34; data-lang=&#34;en&#34; data-show-count=&#34;false&#34;&gt;Tweet&lt;/a&gt;&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Visualizing Strange Attractors</title>
+      <link>https://gumeo.github.io/post/visualizing-strange-attractors/</link>
+      <pubDate>Wed, 22 Nov 2017 13:40:09 +0200</pubDate>
+      
+      <guid>https://gumeo.github.io/post/visualizing-strange-attractors/</guid>
+      <description>
+
+&lt;h1 id=&#34;what-is-a-strange-attractor&#34;&gt;What is a strange attractor?&lt;/h1&gt;
+
+&lt;p&gt;The &lt;a href=&#34;https://en.wikipedia.org/wiki/Attractor#Strange_attractor&#34; target=&#34;_blank&#34;&gt;wikipedia article&lt;/a&gt; on attractors gives the following definition/explanation:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;An attractor is called strange if it has a fractal structure. This is often the case when the dynamics on it are chaotic, but strange nonchaotic attractors also exist. If a strange attractor is chaotic, exhibiting sensitive dependence on initial conditions, then any two arbitrarily close alternative initial points on the attractor, after any of various numbers of iterations, will lead to points that are arbitrarily far apart (subject to the confines of the attractor), and after any of various other numbers of iterations will lead to points that are arbitrarily close together. Thus a dynamic system with a chaotic attractor is locally unstable yet globally stable: once some sequences have entered the attractor, nearby points diverge from one another but never depart from the attractor.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;So for a dynamical system, which is usually a solution to a system of differential equations, we have some solutions which are called attractors. The attractors, attract a particle, or something moving in the system, meaning that when the particle falls into the attractor, it stays there. A relatable example is an asteroid that is moving in space and then starts orbiting a planet, and is then stuck in orbit, which is an attractor.&lt;/p&gt;
+
+&lt;p&gt;Some simple equations, like the &lt;a href=&#34;https://en.wikipedia.org/wiki/Lorenz_system&#34; target=&#34;_blank&#34;&gt;Lorenz system&lt;/a&gt; are chaotic. This means that if you change the initial conditions slightly, what you get out after a certain number of steps, (you iterate the solution in steps usually), is going to be vastly different. When scientists model something, this is not a very attractive property. We would like our system to be robust to minor initial perturbations, but this is not always possible. Many physical systems that we model have this chaotic nature, most notably the weather, it is very hard to make weather forecasts far into the future with good accuracy.&lt;/p&gt;
+
+&lt;p&gt;Although attractors are commonly associated with solutions of differential equations, they can also appear in general with an iterative system. An iterative system is a function, or a tuple of functions, where we iteratively feed the output in as input and &lt;em&gt;iterate&lt;/em&gt; the solution in this way. This is also how you numerically find solutions to differential equations, where no analytical solution exists, or we can&amp;rsquo;t find one.&lt;/p&gt;
+
+&lt;p&gt;In case I have piqued your interest in dynamical system, I took some &lt;a href=&#34;http://www.imm.dtu.dk/~guei/linfell.pdf&#34; target=&#34;_blank&#34;&gt;lecture notes&lt;/a&gt; in a course I took some years ago. These notes are not quite finished, but should give you a rough idea about the basics and where to go from there.&lt;/p&gt;
+
+&lt;h1 id=&#34;why-is-this-post-tagged-as-graphics&#34;&gt;Why is this post tagged as Graphics?&lt;/h1&gt;
+
+&lt;p&gt;Ok, so the point is that these attractors often look very nice. You can render them, but it can be a bit heavy computationally. I saw a very cool tweet by &lt;a href=&#34;https://www.data-imaginist.com/&#34; target=&#34;_blank&#34;&gt;Thomas Lin Pedersen&lt;/a&gt; where he was rendering particles in a very nice way in R:&lt;/p&gt;
+
+&lt;p&gt;{::options parse_block_html=&amp;ldquo;false&amp;rdquo; /}
+&lt;div class=&#34;center&#34;&gt;
+&lt;blockquote class=&#34;twitter-tweet&#34; data-lang=&#34;en&#34;&gt;&lt;p lang=&#34;und&#34; dir=&#34;ltr&#34;&gt;&lt;a href=&#34;https://twitter.com/hashtag/generative?src=hash&amp;amp;ref_src=twsrc%5Etfw&#34;&gt;#generative&lt;/a&gt; &lt;a href=&#34;https://twitter.com/hashtag/rstats?src=hash&amp;amp;ref_src=twsrc%5Etfw&#34;&gt;#rstats&lt;/a&gt; &lt;a href=&#34;https://t.co/h4vDmbrOX8&#34;&gt;pic.twitter.com/h4vDmbrOX8&lt;/a&gt;&lt;/p&gt;&amp;mdash; Thomas Lin Pedersen (@thomasp85) &lt;a href=&#34;https://twitter.com/thomasp85/status/912754660867497984?ref_src=twsrc%5Etfw&#34;&gt;September 26, 2017&lt;/a&gt;&lt;/blockquote&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;/div&gt;&lt;/p&gt;
+
+&lt;p&gt;At that point I was inspired to do some cool visualizations myself, and learn how to make these aesthetically pleasing renderings. I also wanted to be able to make gifs or screen savers with these things.&lt;/p&gt;
+
+&lt;p&gt;I found &lt;a href=&#34;https://fronkonstin.com/2017/11/07/drawing-10-million-points-with-ggplot-clifford-attractors/&#34; target=&#34;_blank&#34;&gt;this&lt;/a&gt; post about rendering strange attractors in R, using Rcpp. The Rcpp code for generating the points is actually very fast, what is the bottleneck here is the rendering with ggplot. So if you implement a rendering stack for a gif with this, the development time when you need to tweak many parameters is going to be rather slow.&lt;/p&gt;
+
+&lt;h1 id=&#34;the-clifford-attractor&#34;&gt;The Clifford attractor&lt;/h1&gt;
+
+&lt;p&gt;So the attractor in the post I linked to above is called a Clifford attractor. What is interesting about the way it is generated is that the shape is controlled by four parameters $a,b,c$ and $d$. The shape is in some sense continuous in these parameters, meaning that if I make small adjustments in the parameters, the shape will not change too much. With this in mind I wanted to make a gif with it, I.e. we make a loop in the parameters space and render images for equally spaced parameters along this curve. For a small enough spacing, this will give me a continuously deforming shape and I will be able to loop it, because the curve in parameter space is a loop.&lt;/p&gt;
+
+&lt;p&gt;Not all parameters give us nice looking attractors, so I need a way to iterate this process fast, for different sets of parameters, to see what works. I talked to some of my colleagues that know about computer graphics, and they said that they way to go forward would be to use openGL. I actually found a tutorial of exactly what I needed &lt;a href=&#34;https://nathanselikoff.com/training/tutorial-strange-attractors-in-c-and-opengl&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;. This is a tutorial on how to render multiple points, with point smoothing and good anti-aliasing, and this guy actually uses the Clifford attractor, &lt;strong&gt;nice!&lt;/strong&gt;. What I was missing was ways to save intermediate plots, then I was just going to use ImageMagick to combine it into a gif.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://stackoverflow.com/questions/3191978/how-to-use-glut-opengl-to-render-to-a-file&#34; target=&#34;_blank&#34;&gt;The highest voted answer in this SO thread&lt;/a&gt; had everything I needed for saving the images. Now I just had to combine these things together!&lt;/p&gt;
+
+&lt;p&gt;After saving the images I used the bash command &lt;code&gt;mogrify&lt;/code&gt; to change them into png images and finally ImageMagick to create the gif:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;mogrify -format png *.*
+convert -delay 120 -loop 0 *.png animated.gif
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Here you can see the results on imgur:&lt;/p&gt;
+
+&lt;p&gt;{::options parse_block_html=&amp;ldquo;false&amp;rdquo; /}
+&lt;div class=&#34;center&#34;&gt;
+&lt;blockquote class=&#34;imgur-embed-pub&#34; lang=&#34;en&#34; data-id=&#34;a/ZFpHB&#34;&gt;&lt;a href=&#34;//imgur.com/ZFpHB&#34;&gt;Strange attractors&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src=&#34;//s.imgur.com/min/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;/div&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/gumeo/movingAttractor&#34; target=&#34;_blank&#34;&gt;The code is also now on github&lt;/a&gt; in case you want to play around with it!&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Got some new books!</title>
+      <link>https://gumeo.github.io/post/got-some-new-books/</link>
+      <pubDate>Wed, 08 Nov 2017 13:40:09 +0200</pubDate>
+      
+      <guid>https://gumeo.github.io/post/got-some-new-books/</guid>
+      <description>&lt;p&gt;I have been waiting to read these for a while now!&lt;/p&gt;
+
+&lt;p&gt;{::options parse_block_html=&amp;ldquo;false&amp;rdquo; /}&lt;/p&gt;
+
+&lt;div class=&#34;center&#34;&gt;
+
+&lt;blockquote class=&#34;twitter-tweet&#34; data-lang=&#34;en&#34;&gt;&lt;p lang=&#34;en&#34; dir=&#34;ltr&#34;&gt;Let the reading commence &lt;a href=&#34;https://twitter.com/hashtag/rstats?src=hash&amp;amp;ref_src=twsrc%5Etfw&#34;&gt;#rstats&lt;/a&gt; &lt;a href=&#34;https://twitter.com/hashtag/MachineLearning?src=hash&amp;amp;ref_src=twsrc%5Etfw&#34;&gt;#MachineLearning&lt;/a&gt; &lt;a href=&#34;https://t.co/Lqx2IcTENI&#34;&gt;pic.twitter.com/Lqx2IcTENI&lt;/a&gt;&lt;/p&gt;&amp;mdash; Gudmundur Einarsson (@gumgumeo) &lt;a href=&#34;https://twitter.com/gumgumeo/status/928251371865956354?ref_src=twsrc%5Etfw&#34;&gt;November 8, 2017&lt;/a&gt;&lt;/blockquote&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+
+
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>First Post!</title>
+      <link>https://gumeo.github.io/post/first-post/</link>
+      <pubDate>Wed, 01 Nov 2017 13:40:09 +0200</pubDate>
+      
+      <guid>https://gumeo.github.io/post/first-post/</guid>
+      <description>
+
+&lt;h1 id=&#34;starting-a-blog&#34;&gt;Starting a blog&lt;/h1&gt;
+
+&lt;p&gt;The plan is to try to do weekly to monthly blogposts about something interesting I learn. I might also write up technical details about setting something up as a reference for my future self.&lt;/p&gt;
+
+&lt;p&gt;I chose to use the &lt;a href=&#34;https://bookdown.org/yihui/blogdown/&#34; target=&#34;_blank&#34;&gt;blogdown&lt;/a&gt; package to manage this blog, with the hugo theme &lt;a href=&#34;http://dplesca.github.io/purehugo/&#34; target=&#34;_blank&#34;&gt;&lt;code&gt;purehugo&lt;/code&gt;&lt;/a&gt;. The main reason I chose this is because I think it scales well for mobile devices and it looks clean and minimal. I will probably add an about section and some other stuff/fluff later.&lt;/p&gt;
+
+&lt;p&gt;This is not the first time that I start a blog, I also have my own &lt;a href=&#34;http://www.imm.dtu.dk/~guei/&#34; target=&#34;_blank&#34;&gt;academic page/blog&lt;/a&gt;. I just don&amp;rsquo;t post there regularly. Removing some of the overhead, by managing the content/posts as Rmarkdown documents, will hopefully make me more productive as a blogger.&lt;/p&gt;
+</description>
+    </item>
+    
   </channel>
 </rss>
