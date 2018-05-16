@@ -291,20 +291,18 @@
 
 <p>The gif below is the evolution of the weights from a neural network trained on the mnist dataset. Mnist is a dataset of handwritten digits, and is kind of the <strong>hello world/FizzBuzz</strong> of machine learning. It is maybe not a very challenging data set, but you can learn a lot from it. This is a 10 by 10 grid of images, where each individual small patch represents weights going to a single neuron in the first hidden layer of the network. After I saw the content by Grant Sanderson, I wanted to inspect by myself what the network is actually learning. This series is going to outline this development, with an angle towards functional programming.</p>
 
-<p>{::options parse_block_html=&ldquo;false&rdquo; /}
-<div class="center">
+<p><center>
 <blockquote class="imgur-embed-pub" lang="en" data-id="EgcQgkh"><a href="//imgur.com/EgcQgkh"></a></blockquote><script async src="//s.imgur.com/min/embed.js" charset="utf-8"></script>
-</div></p>
+</center></p>
 
 <p>So I received the <a href="http://www.deeplearningbook.org/" target="_blank">Deep Learning book</a> a little more than a month ago, and I have had time to read parts I and II. I think that overall the authors successfully explain and condense a lot of research into something digestable. The reason why I use the word condense is because how much information the book contains. The bibliography is 55 pages, so I almost feel that the book should be called <em>Introduction to Deep Learning Research</em>, because it is a gateway to so much good material. Another fascinating thing about this book is the discussion it contains. The authors are quite upfront about some criticisms on deep learning and discuss them to a great extent. All in all I look forward to finish reading the book.</p>
 
 <p>I have fiddled around with deep learning since I took a summer-school on it in 2014, where <a href="https://twitter.com/hugo_larochelle?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor" target="_blank">Hugo Larochelle</a> was giving lectures and he joined us for an epic sword fighting competition/LARP session in the countryside of Denmark. I have followed the evolution of deep learning since, and what has been most amazing is by how much the barrier of entry has been lowered. The current software frameworks make it so easy to get started. After reading the DL book I found a strong inner urge to implement some of these things myself. I think that a way to get a better understanding of programming concepts, algorithms and data structures, is just to go for it and implement it. Also talking about data-structures, deep learning is also becoming a part of that:</p>
 
-<p>{::options parse_block_html=&ldquo;false&rdquo; /}
-<div class="center">
+<p><center>
 <blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Jeff Dean and co at GOOG just released a paper showing how machine-learned indexes can replace B-Trees, Hash Indexes, and Bloom Filters. Execute 3x faster than B-Trees, 10-100x less space. Executes on GPU, which are getting faster unlike CPU. Amazing.  <a href="https://t.co/PPVkrFVKXg">https://t.co/PPVkrFVKXg</a></p>&mdash; Nick Schrock (@schrockn) <a href="https://twitter.com/schrockn/status/940037656494317568?ref_src=twsrc%5Etfw">December 11, 2017</a></blockquote>
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-</div></p>
+</center></p>
 
 <p>After seeing the videos made by <a href="http://www.3blue1brown.com/" target="_blank">Grant Sanderson</a> on deep learning I decided it was time to implement the basics by myself. I wanted to completely understand back-propagation, how it really is a dynamic programming algorithm where we actually do some smart book-keeping and reuse computations. That is one of the major <em>tricks</em> that makes this algorithm work.</p>
 
@@ -445,7 +443,6 @@ where $\mathbf{W}$ is the weight matrix, $\mathbf{x}$ is the input and $\sigma$ 
 <p>If you like this post I would greatly appreciate a tweet, my twitter handle is @gumgumeo :)</p>
 
 <div class="center">
-{::options parse_block_html="false" /} 
 <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-size="large" data-text="Learning Deep Learning in R" data-url="https://gumeo.github.io/post/part-1-deep-learning-with-closures-in-r/" data-via="gumgumeo" data-hashtags="#rstats #machinelearning #deeplearning" data-lang="en" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 </div>
 

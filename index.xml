@@ -22,20 +22,18 @@
 
 &lt;p&gt;The gif below is the evolution of the weights from a neural network trained on the mnist dataset. Mnist is a dataset of handwritten digits, and is kind of the &lt;strong&gt;hello world/FizzBuzz&lt;/strong&gt; of machine learning. It is maybe not a very challenging data set, but you can learn a lot from it. This is a 10 by 10 grid of images, where each individual small patch represents weights going to a single neuron in the first hidden layer of the network. After I saw the content by Grant Sanderson, I wanted to inspect by myself what the network is actually learning. This series is going to outline this development, with an angle towards functional programming.&lt;/p&gt;
 
-&lt;p&gt;{::options parse_block_html=&amp;ldquo;false&amp;rdquo; /}
-&lt;div class=&#34;center&#34;&gt;
+&lt;p&gt;&lt;center&gt;
 &lt;blockquote class=&#34;imgur-embed-pub&#34; lang=&#34;en&#34; data-id=&#34;EgcQgkh&#34;&gt;&lt;a href=&#34;//imgur.com/EgcQgkh&#34;&gt;&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src=&#34;//s.imgur.com/min/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
-&lt;/div&gt;&lt;/p&gt;
+&lt;/center&gt;&lt;/p&gt;
 
 &lt;p&gt;So I received the &lt;a href=&#34;http://www.deeplearningbook.org/&#34; target=&#34;_blank&#34;&gt;Deep Learning book&lt;/a&gt; a little more than a month ago, and I have had time to read parts I and II. I think that overall the authors successfully explain and condense a lot of research into something digestable. The reason why I use the word condense is because how much information the book contains. The bibliography is 55 pages, so I almost feel that the book should be called &lt;em&gt;Introduction to Deep Learning Research&lt;/em&gt;, because it is a gateway to so much good material. Another fascinating thing about this book is the discussion it contains. The authors are quite upfront about some criticisms on deep learning and discuss them to a great extent. All in all I look forward to finish reading the book.&lt;/p&gt;
 
 &lt;p&gt;I have fiddled around with deep learning since I took a summer-school on it in 2014, where &lt;a href=&#34;https://twitter.com/hugo_larochelle?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor&#34; target=&#34;_blank&#34;&gt;Hugo Larochelle&lt;/a&gt; was giving lectures and he joined us for an epic sword fighting competition/LARP session in the countryside of Denmark. I have followed the evolution of deep learning since, and what has been most amazing is by how much the barrier of entry has been lowered. The current software frameworks make it so easy to get started. After reading the DL book I found a strong inner urge to implement some of these things myself. I think that a way to get a better understanding of programming concepts, algorithms and data structures, is just to go for it and implement it. Also talking about data-structures, deep learning is also becoming a part of that:&lt;/p&gt;
 
-&lt;p&gt;{::options parse_block_html=&amp;ldquo;false&amp;rdquo; /}
-&lt;div class=&#34;center&#34;&gt;
+&lt;p&gt;&lt;center&gt;
 &lt;blockquote class=&#34;twitter-tweet&#34; data-lang=&#34;en&#34;&gt;&lt;p lang=&#34;en&#34; dir=&#34;ltr&#34;&gt;Jeff Dean and co at GOOG just released a paper showing how machine-learned indexes can replace B-Trees, Hash Indexes, and Bloom Filters. Execute 3x faster than B-Trees, 10-100x less space. Executes on GPU, which are getting faster unlike CPU. Amazing.  &lt;a href=&#34;https://t.co/PPVkrFVKXg&#34;&gt;https://t.co/PPVkrFVKXg&lt;/a&gt;&lt;/p&gt;&amp;mdash; Nick Schrock (@schrockn) &lt;a href=&#34;https://twitter.com/schrockn/status/940037656494317568?ref_src=twsrc%5Etfw&#34;&gt;December 11, 2017&lt;/a&gt;&lt;/blockquote&gt;
 &lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
-&lt;/div&gt;&lt;/p&gt;
+&lt;/center&gt;&lt;/p&gt;
 
 &lt;p&gt;After seeing the videos made by &lt;a href=&#34;http://www.3blue1brown.com/&#34; target=&#34;_blank&#34;&gt;Grant Sanderson&lt;/a&gt; on deep learning I decided it was time to implement the basics by myself. I wanted to completely understand back-propagation, how it really is a dynamic programming algorithm where we actually do some smart book-keeping and reuse computations. That is one of the major &lt;em&gt;tricks&lt;/em&gt; that makes this algorithm work.&lt;/p&gt;
 
@@ -176,7 +174,6 @@ where $\mathbf{W}$ is the weight matrix, $\mathbf{x}$ is the input and $\sigma$ 
 &lt;p&gt;If you like this post I would greatly appreciate a tweet, my twitter handle is @gumgumeo :)&lt;/p&gt;
 
 &lt;div class=&#34;center&#34;&gt;
-{::options parse_block_html=&#34;false&#34; /} 
 &lt;a href=&#34;https://twitter.com/share?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-share-button&#34; data-size=&#34;large&#34; data-text=&#34;Learning Deep Learning in R&#34; data-url=&#34;https://gumeo.github.io/post/part-1-deep-learning-with-closures-in-r/&#34; data-via=&#34;gumgumeo&#34; data-hashtags=&#34;#rstats #machinelearning #deeplearning&#34; data-lang=&#34;en&#34; data-show-count=&#34;false&#34;&gt;Tweet&lt;/a&gt;&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
 &lt;/div&gt;
 </description>
@@ -210,11 +207,10 @@ where $\mathbf{W}$ is the weight matrix, $\mathbf{x}$ is the input and $\sigma$ 
 
 &lt;p&gt;Ok, so the point is that these attractors often look very nice. You can render them, but it can be a bit heavy computationally. I saw a very cool tweet by &lt;a href=&#34;https://www.data-imaginist.com/&#34; target=&#34;_blank&#34;&gt;Thomas Lin Pedersen&lt;/a&gt; where he was rendering particles in a very nice way in R:&lt;/p&gt;
 
-&lt;p&gt;{::options parse_block_html=&amp;ldquo;false&amp;rdquo; /}
-&lt;div class=&#34;center&#34;&gt;
+&lt;p&gt;&lt;center&gt;
 &lt;blockquote class=&#34;twitter-tweet&#34; data-lang=&#34;en&#34;&gt;&lt;p lang=&#34;und&#34; dir=&#34;ltr&#34;&gt;&lt;a href=&#34;https://twitter.com/hashtag/generative?src=hash&amp;amp;ref_src=twsrc%5Etfw&#34;&gt;#generative&lt;/a&gt; &lt;a href=&#34;https://twitter.com/hashtag/rstats?src=hash&amp;amp;ref_src=twsrc%5Etfw&#34;&gt;#rstats&lt;/a&gt; &lt;a href=&#34;https://t.co/h4vDmbrOX8&#34;&gt;pic.twitter.com/h4vDmbrOX8&lt;/a&gt;&lt;/p&gt;&amp;mdash; Thomas Lin Pedersen (@thomasp85) &lt;a href=&#34;https://twitter.com/thomasp85/status/912754660867497984?ref_src=twsrc%5Etfw&#34;&gt;September 26, 2017&lt;/a&gt;&lt;/blockquote&gt;
 &lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
-&lt;/div&gt;&lt;/p&gt;
+&lt;/center&gt;&lt;/p&gt;
 
 &lt;p&gt;At that point I was inspired to do some cool visualizations myself, and learn how to make these aesthetically pleasing renderings. I also wanted to be able to make gifs or screen savers with these things.&lt;/p&gt;
 
@@ -236,10 +232,9 @@ convert -delay 120 -loop 0 *.png animated.gif
 
 &lt;p&gt;Here you can see the results on imgur:&lt;/p&gt;
 
-&lt;p&gt;{::options parse_block_html=&amp;ldquo;false&amp;rdquo; /}
-&lt;div class=&#34;center&#34;&gt;
+&lt;p&gt;&lt;center&gt;
 &lt;blockquote class=&#34;imgur-embed-pub&#34; lang=&#34;en&#34; data-id=&#34;a/ZFpHB&#34;&gt;&lt;a href=&#34;//imgur.com/ZFpHB&#34;&gt;Strange attractors&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src=&#34;//s.imgur.com/min/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
-&lt;/div&gt;&lt;/p&gt;
+&lt;/center&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://github.com/gumeo/movingAttractor&#34; target=&#34;_blank&#34;&gt;The code is also now on github&lt;/a&gt; in case you want to play around with it!&lt;/p&gt;
 </description>
@@ -253,15 +248,12 @@ convert -delay 120 -loop 0 *.png animated.gif
       <guid>https://gumeo.github.io/post/got-some-new-books/</guid>
       <description>&lt;p&gt;I have been waiting to read these for a while now!&lt;/p&gt;
 
-&lt;p&gt;{::options parse_block_html=&amp;ldquo;false&amp;rdquo; /}&lt;/p&gt;
+&lt;p&gt;&lt;center&gt;&lt;/p&gt;
 
-&lt;div class=&#34;center&#34;&gt;
+&lt;p&gt;&lt;blockquote class=&#34;twitter-tweet&#34; data-lang=&#34;en&#34;&gt;&lt;p lang=&#34;en&#34; dir=&#34;ltr&#34;&gt;Let the reading commence &lt;a href=&#34;https://twitter.com/hashtag/rstats?src=hash&amp;amp;ref_src=twsrc%5Etfw&#34;&gt;#rstats&lt;/a&gt; &lt;a href=&#34;https://twitter.com/hashtag/MachineLearning?src=hash&amp;amp;ref_src=twsrc%5Etfw&#34;&gt;#MachineLearning&lt;/a&gt; &lt;a href=&#34;https://t.co/Lqx2IcTENI&#34;&gt;pic.twitter.com/Lqx2IcTENI&lt;/a&gt;&lt;/p&gt;&amp;mdash; Gudmundur Einarsson (@gumgumeo) &lt;a href=&#34;https://twitter.com/gumgumeo/status/928251371865956354?ref_src=twsrc%5Etfw&#34;&gt;November 8, 2017&lt;/a&gt;&lt;/blockquote&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;&lt;/p&gt;
 
-&lt;blockquote class=&#34;twitter-tweet&#34; data-lang=&#34;en&#34;&gt;&lt;p lang=&#34;en&#34; dir=&#34;ltr&#34;&gt;Let the reading commence &lt;a href=&#34;https://twitter.com/hashtag/rstats?src=hash&amp;amp;ref_src=twsrc%5Etfw&#34;&gt;#rstats&lt;/a&gt; &lt;a href=&#34;https://twitter.com/hashtag/MachineLearning?src=hash&amp;amp;ref_src=twsrc%5Etfw&#34;&gt;#MachineLearning&lt;/a&gt; &lt;a href=&#34;https://t.co/Lqx2IcTENI&#34;&gt;pic.twitter.com/Lqx2IcTENI&lt;/a&gt;&lt;/p&gt;&amp;mdash; Gudmundur Einarsson (@gumgumeo) &lt;a href=&#34;https://twitter.com/gumgumeo/status/928251371865956354?ref_src=twsrc%5Etfw&#34;&gt;November 8, 2017&lt;/a&gt;&lt;/blockquote&gt;
-&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
-
-
-&lt;/div&gt;
+&lt;p&gt;&lt;/center&gt;&lt;/p&gt;
 </description>
     </item>
     
