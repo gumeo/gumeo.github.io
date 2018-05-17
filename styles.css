@@ -115,14 +115,14 @@ h4, h5, h6 {
 
 a,
 h3.article-title a:hover {
-  color: hsl(339, 90%, 68%);
+  color: hsl(0, 100%, 30%);
   text-decoration: none;
   transition: color 0.6s ease;
 }
 
 a:hover,
 a:focus {
-  color: hsl(339, 90%, 68%);
+  color: hsl(0, 100%, 30%);
 }
 
 img,
@@ -342,7 +342,7 @@ a[data-fancybox] img {
 }
 
 .home-section {
-  background-color: hsla(231, 15%, 18%, 1);
+  background-color: hsla(0, 100%, 30%, 0.05);
   padding: 110px 0 110px 0;
   animation: intro 0.3s both;
   animation-delay: 0.15s;
@@ -353,7 +353,7 @@ a[data-fancybox] img {
 }
 
 .home-section:nth-of-type(even) {
-  background-color: hsla(231, 15%, 17%, 1);
+  background-color: hsla(0, 100%, 30%, 0.1);
 }
 
 @media screen and (max-width: 768px) {
@@ -448,7 +448,7 @@ a[data-fancybox] img {
 .featurette-icon {
   display: block;
   width: 100%;
-  color: hsl(339, 90%, 68%);
+  color: hsl(0, 100%, 30%);
   font-size: 3rem;
   text-align: center;
 }
@@ -665,7 +665,7 @@ article .article-metadata {
 }
 
 .article-metadata a:hover {
-  color: hsl(339, 90%, 68%);
+  color: hsl(0, 100%, 30%);
 }
 
 .middot-divider {
@@ -1000,8 +1000,8 @@ footer a#back_to_top i {
  **************************************************/
 
 .btn-primary {
-  border-color: hsl(339, 90%, 68%) !important;
-  background: hsl(339, 90%, 68%) !important;
+  border-color: hsl(0, 100%, 30%) !important;
+  background: hsl(0, 100%, 30%) !important;
 }
 
 .btn-primary:hover,
@@ -1009,7 +1009,7 @@ footer a#back_to_top i {
 .btn-primary.active,
 .btn-primary:visited,
 .open > .dropdown-toggle.btn-primary {
-  background: hsl(339, 90%, 68%) !important;
+  background: hsl(0, 100%, 30%) !important;
 }
 
 .btn-light {
@@ -1043,12 +1043,12 @@ footer a#back_to_top i {
 
 .btn-toolbar .btn.btn-primary:hover,
 .btn-toolbar .btn.btn-primary:focus {
-  background-color: hsl(339, 90%, 58%) !important;
+  background-color: hsl(0, 100%, 20%) !important;
 }
 
 .btn-toolbar .btn.btn-primary:active,
 .btn-toolbar .btn.btn-primary.active {
-  background-color: hsl(339, 90%, 78%) !important;
+  background-color: hsl(0, 100%, 40%) !important;
 }
 
 /*************************************************
@@ -1062,12 +1062,12 @@ footer a#back_to_top i {
 }
 
 .btn-primary.btn-outline {
-  color: hsl(339, 90%, 68%) !important;
-  border-color: hsl(339, 90%, 68%) !important;
+  color: hsl(0, 100%, 30%) !important;
+  border-color: hsl(0, 100%, 30%) !important;
 }
 
 .btn-primary.btn-outline:focus {
-  color: hsl(339, 90%, 68%) !important;
+  color: hsl(0, 100%, 30%) !important;
 }
 
 .btn-primary.btn-outline:active {
@@ -1486,7 +1486,7 @@ body.dark {
 }
 
 .dark ul.share li a {
-  background-color: hsl(339, 90%, 68%);
+  background-color: hsl(0, 100%, 30%);
 }
 
 .dark table table {
@@ -1540,7 +1540,7 @@ body.dark {
 }
 
 .dark .card h4 a {
-  color: hsl(339, 90%, 68%);
+  color: hsl(0, 100%, 30%);
   border-bottom: solid 1px transparent;
 }
 
