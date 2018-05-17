@@ -1121,7 +1121,7 @@ footer a#back_to_top i {
 }
 
 .navbar-default {
-  background: rgb(20, 22, 34);
+  background: rgb(176,57,60);
   box-shadow: 0 0.125rem 0.25rem 0 rgba(0,0,0,.11)
 }
 
@@ -1183,7 +1183,7 @@ nav#navbar-main li {
 }
 
 .dropdown-menu {
-  background-color: rgb(20, 22, 34) !important;
+  background-color: rgb(176,57,60) !important;
 }
 
 .dropdown-menu > li > a {
@@ -1200,13 +1200,13 @@ nav#navbar-main li {
 .dropdown-menu>li>a:hover {
   color: rgba(255,255,255,1);
   text-decoration: none;
-  background-color: rgb(20, 22, 34);
+  background-color: rgb(176,57,60);
 }
 
 .dropdown-menu > .active > a,
 .dropdown-menu > .active > a:focus,
 .dropdown-menu > .active > a:hover {
-  color: rgb(20, 22, 34);
+  color: rgb(176,57,60);
   text-decoration: none;
   background-color: rgba(255,255,255,1);
   outline: 0;
@@ -1217,7 +1217,7 @@ nav#navbar-main li {
 .navbar-default .navbar-nav>.open>a:hover,
 .navbar-default .navbar-nav>.open>a:visited {
   color: rgba(255,255,255,0.6) !important;
-  background-color: rgb(20, 22, 34) !important;
+  background-color: rgb(176,57,60) !important;
 }
 
 .navbar-default .navbar-brand {
