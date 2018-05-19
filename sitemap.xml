@@ -68,16 +68,6 @@
     
     <url>
     
-      <loc>https://gumeo.github.io/</loc>
-      <lastmod>2018-05-14T00:00:00+02:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    
-    <url>
-    
       <loc>https://gumeo.github.io/categories/</loc>
       <priority>0</priority>
     </url>
@@ -109,6 +99,16 @@
     
       <loc>https://gumeo.github.io/tags/</loc>
       <lastmod>2017-12-14T13:40:09+02:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
+      <loc>https://gumeo.github.io/</loc>
+      <lastmod>2018-05-14T00:00:00+02:00</lastmod>
       <priority>0</priority>
     </url>
     
