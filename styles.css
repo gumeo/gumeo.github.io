@@ -25,7 +25,7 @@
 }
 
 html {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Merriweather', sans-serif;
   font-size: 16px;
   color: rgba(0,0,0,0.8);
   line-height: 1.65;
@@ -41,7 +41,7 @@ body {
   font-size: 1rem;
   line-height: inherit;
   color: inherit;
-  background-color: #fff;
+  background-color: rgb(40, 42, 54);
   margin-top: 71px; /* Offset body content by navbar height. */
   padding-top: 0;
   counter-reset: captions;
@@ -79,7 +79,7 @@ ul, ol, dl {
 
 /* Navigation bar text */
 .navbar-default {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Lato', sans-serif;
   font-weight: 400;
   line-height: 1.25;
   text-rendering: optimizeLegibility;
@@ -87,7 +87,7 @@ ul, ol, dl {
 
 /* Headings */
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Lato', sans-serif;
   font-weight: 400;
   margin-bottom: .5rem;
   line-height: 1.25;
@@ -115,14 +115,14 @@ h4, h5, h6 {
 
 a,
 h3.article-title a:hover {
-  color: hsl(0, 100%, 30%);
+  color: hsl(339, 90%, 68%);
   text-decoration: none;
   transition: color 0.6s ease;
 }
 
 a:hover,
 a:focus {
-  color: hsl(0, 100%, 30%);
+  color: hsl(339, 90%, 68%);
 }
 
 img,
@@ -149,7 +149,7 @@ figcaption {
   line-height: 1.25;
   font-size: 1rem;
   margin-bottom: 1.65rem;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Lato', sans-serif;
 }
 
 figcaption.numbered:before {
@@ -342,7 +342,7 @@ a[data-fancybox] img {
 }
 
 .home-section {
-  background-color: hsla(0, 100%, 30%, 0.05);
+  background-color: hsla(231, 15%, 18%, 1);
   padding: 110px 0 110px 0;
   animation: intro 0.3s both;
   animation-delay: 0.15s;
@@ -353,7 +353,7 @@ a[data-fancybox] img {
 }
 
 .home-section:nth-of-type(even) {
-  background-color: hsla(0, 100%, 30%, 0);
+  background-color: hsla(231, 15%, 17%, 1);
 }
 
 @media screen and (max-width: 768px) {
@@ -448,7 +448,7 @@ a[data-fancybox] img {
 .featurette-icon {
   display: block;
   width: 100%;
-  color: hsl(0, 100%, 30%);
+  color: hsl(339, 90%, 68%);
   font-size: 3rem;
   text-align: center;
 }
@@ -665,7 +665,7 @@ article .article-metadata {
 }
 
 .article-metadata a:hover {
-  color: hsl(0, 100%, 30%);
+  color: hsl(339, 90%, 68%);
 }
 
 .middot-divider {
@@ -1000,8 +1000,8 @@ footer a#back_to_top i {
  **************************************************/
 
 .btn-primary {
-  border-color: hsl(0, 100%, 30%) !important;
-  background: hsl(0, 100%, 30%) !important;
+  border-color: hsl(339, 90%, 68%) !important;
+  background: hsl(339, 90%, 68%) !important;
 }
 
 .btn-primary:hover,
@@ -1009,7 +1009,7 @@ footer a#back_to_top i {
 .btn-primary.active,
 .btn-primary:visited,
 .open > .dropdown-toggle.btn-primary {
-  background: hsl(0, 100%, 30%) !important;
+  background: hsl(339, 90%, 68%) !important;
 }
 
 .btn-light {
@@ -1043,12 +1043,12 @@ footer a#back_to_top i {
 
 .btn-toolbar .btn.btn-primary:hover,
 .btn-toolbar .btn.btn-primary:focus {
-  background-color: hsl(0, 100%, 20%) !important;
+  background-color: hsl(339, 90%, 58%) !important;
 }
 
 .btn-toolbar .btn.btn-primary:active,
 .btn-toolbar .btn.btn-primary.active {
-  background-color: hsl(0, 100%, 40%) !important;
+  background-color: hsl(339, 90%, 78%) !important;
 }
 
 /*************************************************
@@ -1062,12 +1062,12 @@ footer a#back_to_top i {
 }
 
 .btn-primary.btn-outline {
-  color: hsl(0, 100%, 30%) !important;
-  border-color: hsl(0, 100%, 30%) !important;
+  color: hsl(339, 90%, 68%) !important;
+  border-color: hsl(339, 90%, 68%) !important;
 }
 
 .btn-primary.btn-outline:focus {
-  color: hsl(0, 100%, 30%) !important;
+  color: hsl(339, 90%, 68%) !important;
 }
 
 .btn-primary.btn-outline:active {
@@ -1121,7 +1121,7 @@ footer a#back_to_top i {
 }
 
 .navbar-default {
-  background: rgb(153,0,0);
+  background: rgb(20, 22, 34);
   box-shadow: 0 0.125rem 0.25rem 0 rgba(0,0,0,.11)
 }
 
@@ -1183,7 +1183,7 @@ nav#navbar-main li {
 }
 
 .dropdown-menu {
-  background-color: rgb(153,0,0) !important;
+  background-color: rgb(20, 22, 34) !important;
 }
 
 .dropdown-menu > li > a {
@@ -1200,13 +1200,13 @@ nav#navbar-main li {
 .dropdown-menu>li>a:hover {
   color: rgba(255,255,255,1);
   text-decoration: none;
-  background-color: rgb(153,0,0);
+  background-color: rgb(20, 22, 34);
 }
 
 .dropdown-menu > .active > a,
 .dropdown-menu > .active > a:focus,
 .dropdown-menu > .active > a:hover {
-  color: rgb(153,0,0);
+  color: rgb(20, 22, 34);
   text-decoration: none;
   background-color: rgba(255,255,255,1);
   outline: 0;
@@ -1217,7 +1217,7 @@ nav#navbar-main li {
 .navbar-default .navbar-nav>.open>a:hover,
 .navbar-default .navbar-nav>.open>a:visited {
   color: rgba(255,255,255,0.6) !important;
-  background-color: rgb(153,0,0) !important;
+  background-color: rgb(20, 22, 34) !important;
 }
 
 .navbar-default .navbar-brand {
@@ -1486,7 +1486,7 @@ body.dark {
 }
 
 .dark ul.share li a {
-  background-color: hsl(0, 100%, 30%);
+  background-color: hsl(339, 90%, 68%);
 }
 
 .dark table table {
@@ -1540,7 +1540,7 @@ body.dark {
 }
 
 .dark .card h4 a {
-  color: hsl(0, 100%, 30%);
+  color: hsl(339, 90%, 68%);
   border-bottom: solid 1px transparent;
 }
 

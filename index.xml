@@ -1,14 +1,34 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>gumeo blog on gumeo blog</title>
+    <title>Gudmundur Blog&amp;Bio on Gudmundur Blog&amp;Bio</title>
     <link>https://gumeo.github.io/</link>
-    <description>Recent content in gumeo blog on gumeo blog</description>
+    <description>Recent content in Gudmundur Blog&amp;Bio on Gudmundur Blog&amp;Bio</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2018</copyright>
     <lastBuildDate>Mon, 14 May 2018 00:00:00 +0200</lastBuildDate>
     <atom:link href="/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Leaving Academia</title>
+      <link>https://gumeo.github.io/post/leaving-academia/</link>
+      <pubDate>Tue, 23 Oct 2018 13:00:26 +0200</pubDate>
+      
+      <guid>https://gumeo.github.io/post/leaving-academia/</guid>
+      <description>
+
+&lt;h1 id=&#34;the-choices-we-make&#34;&gt;The choices we make!&lt;/h1&gt;
+
+&lt;p&gt;One of the major decisions that has haunted me through my PhD is whether I want to stay in academia or not. I sincerely love doing research, I love going to conferences, I love reading scientific papers and talking to other scholars. I even love giving talks and teaching, dissemination can be very rewarding and enjoyable. At some point I was certain that I would go for an academic career, but things change.&lt;/p&gt;
+
+&lt;p&gt;Another thing I like is a fresh challenge. After having spent the summer at deCODE genetics, I saw the possibilities outside academia. Doing a PhD is a binary process, either you have a PhD or not (&lt;em&gt;Quote from my friend Óli Páll, who recited Professor Havard Rue from NTNU&lt;/em&gt;). Having obtained my PhD made me think differently about my own future, and what I could accomplish. We sometimes say, &lt;em&gt;&amp;ldquo;it is the journey, not the destination&amp;rdquo;&lt;/em&gt;, I feel that doing a PhD is different, there is a certain destination, obtaining the degree! In that regard I did not allow myself to ponder other possibilities.&lt;/p&gt;
+
+&lt;p&gt;It is good to evaluate your goals and values every now and then. I have certain goals that I would like to achieve 5, 10 and 20 years down the line. From my point of view, I have a higher likelihood of achieving these goals outside academia, at least if I stay there for some time. I would also feel good about returning to academia at some point, having experienced the outside world.&lt;/p&gt;
+
+&lt;p&gt;One of the important things my PhD supervisor made me realize is that the most valuable resource we possess is time. Time is a resource that we can &lt;strong&gt;never&lt;/strong&gt; get back. We should use this resource to do something we believe in, do something that makes a difference and we enjoy. I am forever grateful for my experience and time at DTU, I will cherish the moments I had there for the rest of my life. But for me the time for a change is now, it is time to go somewhere else, meet new people, learn, grow and contribute to great things. I look forward to this new path and I am happy for the choice I made.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Part 1: Deep Learning with Closures in R</title>
