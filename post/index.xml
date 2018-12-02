@@ -22,6 +22,15 @@
     </item>
     
     <item>
+      <title>Part 2: Deep Learning with Closures in R</title>
+      <link>https://gumeo.github.io/post/part-2-deep-learning/</link>
+      <pubDate>Thu, 21 Dec 2017 13:40:09 +0200</pubDate>
+      
+      <guid>https://gumeo.github.io/post/part-2-deep-learning/</guid>
+      <description>Let&amp;rsquo;s go on! If you just arrived, you can check out the first part here. The goal of this series is to demonstrate how compactly we can implement an MLP in a functional programming paradigm and how easy it becomes to extend/play around with it. This post is aimed at the R person that wants to get into deep learning or anyone curious about how these things are implemented. Another goal is to visualize what is happening in a neural network during training in hope to get a deeper understanding of what is going on.</description>
+    </item>
+    
+    <item>
       <title>Part 1: Deep Learning with Closures in R</title>
       <link>https://gumeo.github.io/post/part-1-deep-learning/</link>
       <pubDate>Thu, 14 Dec 2017 13:40:09 +0200</pubDate>

@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme" content="hugo-academic">
+  <meta name="generator" content="Hugo 0.52" />
+  <meta name="author" content="Gudmundur Einarsson">
+
+  
+  
+  
+  
+    
+      
+    
+  
+  <meta name="description" content="Let&rsquo;s go on! If you just arrived, you can check out the first part here. The goal of this series is to demonstrate how compactly we can implement an MLP in a functional programming paradigm and how easy it becomes to extend/play around with it. This post is aimed at the R person that wants to get into deep learning or anyone curious about how these things are implemented. Another goal is to visualize what is happening in a neural network during training in hope to get a deeper understanding of what is going on.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://gumeo.github.io/post/part-2-deep-learning/">
+
+  
+
+
+  
+
+  
+  
+  <meta name="theme-color" content="hsl(339, 90%, 68%)">
+  
+  
+  
+  
+    
+  
+  
+    
+    
+      
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/dracula.min.css">
+      
+    
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" integrity="sha256-ygkqlh3CYSUri3LhQxzdcm0n1EQvH2Y+U5S2idbLtxs=" crossorigin="anonymous">
+  
+  
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:400,700%7cMerriweather%7cRoboto&#43;Mono">
+  
+  <link rel="stylesheet" href="/styles.css">
+  
+
+  
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-110075286-1', 'auto');
+      
+      ga('require', 'eventTracker');
+      ga('require', 'outboundLinkTracker');
+      ga('require', 'urlChangeTracker');
+      ga('send', 'pageview');
+    </script>
+    <script async src="//www.google-analytics.com/analytics.js"></script>
+    
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js" integrity="sha512-HUmooslVKj4m6OBu0OgzjXXr+QuFYy/k7eLI5jdeEy/F4RSgMn6XRWRGkFi5IFaFgy7uFTkegp3Z0XnJf3Jq+g==" crossorigin="anonymous"></script>
+    
+  
+
+  
+  <link rel="alternate" href="https://gumeo.github.io/index.xml" type="application/rss+xml" title="Gudmundur Blog&amp;Bio">
+  <link rel="feed" href="https://gumeo.github.io/index.xml" type="application/rss+xml" title="Gudmundur Blog&amp;Bio">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://gumeo.github.io/post/part-2-deep-learning/">
+
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="twitter:site" content="@gumgumeo">
+  <meta property="twitter:creator" content="@gumgumeo">
+  
+  <meta property="og:site_name" content="Gudmundur Blog&amp;Bio">
+  <meta property="og:url" content="https://gumeo.github.io/post/part-2-deep-learning/">
+  <meta property="og:title" content="Part 2: Deep Learning with Closures in R | Gudmundur Blog&amp;Bio">
+  <meta property="og:description" content="Let&rsquo;s go on! If you just arrived, you can check out the first part here. The goal of this series is to demonstrate how compactly we can implement an MLP in a functional programming paradigm and how easy it becomes to extend/play around with it. This post is aimed at the R person that wants to get into deep learning or anyone curious about how these things are implemented. Another goal is to visualize what is happening in a neural network during training in hope to get a deeper understanding of what is going on.">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2017-12-21T13:40:09&#43;02:00">
+  
+  <meta property="article:modified_time" content="2017-12-21T13:40:09&#43;02:00">
+  
+
+  
+  
+
+  <title>Part 2: Deep Learning with Closures in R | Gudmundur Blog&amp;Bio</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#toc" data-offset="71" class="dark">
+
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="navbar-header">
+      
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+      <a class="navbar-brand" href="/">Gudmundur Blog&amp;Bio</a>
+    </div>
+
+    
+    <div class="collapse navbar-collapse">
+
+      
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+        
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a href="/#about">
+            
+            <span>Home</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a href="/#posts">
+            
+            <span>Posts</span>
+            
+          </a>
+        </li>
+
+        
+        
+
+        
+        
+        
+        
+        
+          
+        
+
+        <li class="nav-item">
+          <a href="/#contact">
+            
+            <span>Contact</span>
+            
+          </a>
+        </li>
+
+        
+        
+      
+
+      
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+  <div class="article-container">
+    <h1 itemprop="name">Part 2: Deep Learning with Closures in R</h1>
+
+    
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2017-12-21 13:40:09 &#43;0200 &#43;0200" itemprop="datePublished dateModified">
+      Dec 21, 2017
+    </time>
+  </span>
+  <span itemscope itemprop="author publisher" itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Gudmundur Einarsson">
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    9 min read
+  </span>
+  
+
+  
+  
+
+  
+  
+  
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Part%202%3a%20Deep%20Learning%20with%20Closures%20in%20R&amp;url=https%3a%2f%2fgumeo.github.io%2fpost%2fpart-2-deep-learning%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fgumeo.github.io%2fpost%2fpart-2-deep-learning%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fgumeo.github.io%2fpost%2fpart-2-deep-learning%2f&amp;title=Part%202%3a%20Deep%20Learning%20with%20Closures%20in%20R"
+         target="_blank" rel="noopener">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fgumeo.github.io%2fpost%2fpart-2-deep-learning%2f&amp;title=Part%202%3a%20Deep%20Learning%20with%20Closures%20in%20R"
+         target="_blank" rel="noopener">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Part%202%3a%20Deep%20Learning%20with%20Closures%20in%20R&amp;body=https%3a%2f%2fgumeo.github.io%2fpost%2fpart-2-deep-learning%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+<h1 id="let-s-go-on">Let&rsquo;s go on!</h1>
+
+<p>If you just arrived, you can check out the first part <a href="https://gumeo.github.io/post/part-1-deep-learning-with-closures-in-r/" target="_blank">here</a>. The goal of this series is to demonstrate how compactly we can implement an MLP in a functional programming paradigm and how easy it becomes to extend/play around with it. This post is aimed at the R person that wants to get into deep learning or anyone curious about how these things are implemented. Another goal is to visualize what is happening in a neural network during training in hope to get a deeper understanding of what is going on. I posted <a href="https://imgur.com/EgcQgkh" target="_blank">this gif</a> on the subreddit MachineLearning and dataisbeautiful, I got some constructive criticism on the gif and below is a <em>better</em> version where I have sped it up and removed the flickering and enhanced the contrast.</p>
+
+<p><center>
+<blockquote class="imgur-embed-pub" lang="en" data-id="a/wIytV"><a href="//imgur.com/wIytV"></a></blockquote><script async src="//s.imgur.com/min/embed.js" charset="utf-8"></script>
+</center></p>
+
+<p>So last time we got away with less than 50 lines of code to create a <a href="https://en.wikipedia.org/wiki/Factory_(object-oriented_programming)" target="_blank">factory</a> for generating fully connected layers. This included a closure for a matrix class, (for making the layer have a mutable state), and an implementation of a forward pass. But the forward pass is basically a wrapper for updating the internals of the layer, we need to implement a forward pass for the whole network, and the same goes for the backwards propagation. This requires creating a function factory that constructs the network environment. This environment needs to have functions that implement forward-, backwards passes and a function for training. The following is a demonstration of such a function:</p>
+
+<pre><code class="language-R,"># The following creates an MLP environment
+# structNet is a vector defining the number of nodes in each layer, ignoring biases.
+mlp &lt;- function(structNet, minibatchSize,activation, initPos =FALSE, initScale=100){
+  num_layers &lt;- length(structNet)
+  # Create the network
+  layers &lt;- list()
+  for(i in 1:num_layers){
+    if(i == 1){ # Input layer
+      layers[[i]] &lt;- Layer(activation, 
+                           minibatchSize, 
+                           c(structNet[1]+1,structNet[2]),
+                           is_input=TRUE,
+                           initPos = initPos,
+                           initScale=initScale)
+    }else if(i == length(structNet)){ # Output layer
+      layers[[i]] &lt;- Layer(softmax, 
+                           minibatchSize, 
+                           c(structNet[num_layers],structNet[num_layers]),
+                           is_output=TRUE,
+                           initPos = initPos,
+                           initScale=initScale)
+    }else{ # Hidden layers
+      layers[[i]] &lt;- Layer(activation, 
+                           minibatchSize, 
+                           c(structNet[i]+1,structNet[i+1]),
+                           initPos = initPos,
+                           initScale=initScale)
+    }
+  }
+  
+  forward_prop &lt;- function(dataBatch){
+    # Add bias to the input
+    layers[[1]]$Z$setter(cbind(dataBatch,rep(1,nrow(dataBatch))))
+    for(i in 1:(num_layers-1)){
+      layers[[i+1]]$S$setter(layers[[i]]$forward_propagate())
+    }
+    return(layers[[num_layers]]$forward_propagate())
+  }
+  
+  backwards_prop &lt;- function(yhat,labels){
+    layers[[num_layers]]$D$setter(t(yhat-labels))
+    for(i in (num_layers-1):2){
+      W_nobias &lt;- layers[[i]]$W$getter()
+      W_nobias &lt;- W_nobias[1:(nrow(W_nobias)-1),]
+      mat &lt;- layers[[i]]$Fp$getter()
+      layers[[i]]$D$setter((W_nobias%*%layers[[i+1]]$D$getter())*mat)
+    }
+  }
+  
+  update_weights &lt;- function(eta){
+    for(i in 1:(num_layers-1)){
+      W_grad &lt;- -eta*t(layers[[i+1]]$D$getter()%*%layers[[i]]$Z$getter())
+      layers[[i]]$W$setter(layers[[i]]$W$getter()+W_grad)
+    }
+  }
+  
+  # Labels here as dummy matrix
+  train &lt;- function(trainData, trainLabels, num_epochs, eta, cvSplit = 0.3){
+    # Code for preparing input
+    for(i in 1:num_epochs){
+      # Loop over epochs
+      for(j in 1:numIter){
+        # Loop over all minibatches
+        # ...
+        # Essential part for training
+        preds &lt;- forward_prop(tDat)
+        backwards_prop(preds,tLab)
+        update_weights(eta = eta)
+      }
+    }
+  }
+  
+  myEnv &lt;- list2env(list(network=layers,
+                         forward_prop=forward_prop,
+                         train = train))
+  class(myEnv) &lt;- 'mlp'
+  return(myEnv)
+}
+</code></pre>
+
+<p>The <code>mlp</code> function above starts by constructing the network given the layer configuration that we desire. Most of the implementation of the <code>train</code> function is omitted to highlight the essential part. The shown part highlights what is needed for stochastic gradient descent. We need to <strong>forward propagate</strong> the data, then <strong>back propagate</strong> the error, and finally based on this error we can <strong>update the weights</strong>. This is the heart and soul of SGD. Instead of using the whole dataset to estimate the gradient, we subsample a <em>minibatch</em> and estimate the gradient as an average over these samples. Quite a lot of gradient descent based optimization is done as a full batch optimization, specifically when people first learn about it, because SGD just adds an extra layer of complication. SGD allows for online updates, as more data arrives, and it may be computationally more efficient. The only issue is of course the diffculties of scaling the gradient, i.e. choosing the best learning rate, which is also an issue for regular/full battch gradient descent.</p>
+
+<p>So the training function is essentially broken up into 3 steps, these steps are abstracted from the training algorithm, so we could easily change the <code>update_weights</code> function to include a momentum term or other things we might want to try, without changing the <code>train</code> function.</p>
+
+<p>Notice that we take the vector <code>structNet</code> as input. This design can be extended to take in another vector describing what kind of layers we want and build the network with these different layers. This would generalize the implementation quite significantly. This would of course also require us to change the definition of the <code>Layer</code> function, or implement new layer functions.</p>
+
+<h1 id="is-deep-learning-simple">Is deep learning simple?</h1>
+
+<p>Now we have an <code>mlp</code> implementation in roughly 100 lines of code. I think this demonstrates in some way how <em>simple</em> an mlp really is, but also in contrast the difficulties needed to get to the modern implementations of deep learning. Modern implementations are much more general, where they usually implement a computation graph where all computations can be automatically differentiated. These are also made to target GPU hardware, where matrix-matrix and matrix-vector multiplication can be significantly accelerated. There is a package for R called <code>gpuR</code>, where one can do matrix calculations on the GPU. I might try that in the future, to see if I can speed this up significantly with minimal change of this code.</p>
+
+<h1 id="how-to-use-this">How to use this?</h1>
+
+<p>First we need to define the activation function we want, the softmax function and a function to create a dummy encoding of factors variables in R. I have now included all of these in the package <code>minstr</code> available <a href="https://github.com/gumeo/mnistr" target="_blank">here</a>. So you do not need to define the yourself. Although you can of course define your own activation function as you wish. Take a look at the following to get an idea of how it is done.</p>
+
+<pre><code class="language-R,"># rectified linear unit activation
+# activation functions need a boolean parameter for 
+# calculating the derivative
+reLU &lt;- function(X,deriv=FALSE){
+  if(deriv==FALSE){
+    X[X&lt;0] &lt;- 0 
+    return(X)
+  }else{
+    X[X&lt;0] &lt;- 0
+    X[X&gt;0] &lt;- 1
+    return(X)
+  }
+}
+
+# softmax for output layer
+softmax &lt;- function(X){
+  Z &lt;- rowSums(exp(X))
+  X &lt;- exp(t(X))%*%diag(1/Z)
+  return(t(X))
+}
+
+# Function to represent factor as dummy matrix
+class.ind &lt;- function(cl) {
+  Ik=diag(length(levels(cl)))
+  x=Ik[as.numeric(cl),]
+  dimnames(x) &lt;- list(names(cl), levels(cl))
+  x
+}
+</code></pre>
+
+<p>Here is an example of how we can train a network with this. Feel free to play around with some of the parameters, such as the learning rate. If it is too big, nothing will be learned. The current configuration for the network works fine, but you can also try to squeeze it down or remove/add more hidden layers.</p>
+
+<pre><code class="language-R,"># Load mnist dataset, note that you need to download it first
+# mnistr::download_mnist() # This saves to the current working directory
+mnistr::load_mnist()
+
+# Visualize random digit, just to get familiar with the data, in case this is the 
+# first time you see mnist
+randDig &lt;- sample(1:60000,1)
+# Base R, notice that the data is in trainSet$x where each digit is stored as a row vector
+image(matrix(trainSet$x[randDig,],28,28)[,c(28:1),drop=FALSE],main=paste(trainSet$y[randDig]),asp=1)
+# ggplot function from the mnistr package, we can supply the data as a row vector
+mnistr::ggDigit(trainSet$x[randDig,])
+
+# Construct a network with two hidden layers (100 and 50 units) and rectified linear units
+mnw &lt;- mlp(structNet = c(784,100,50,10), 
+           minibatchSize = 100, 
+           activation = reLU,
+           initPos = TRUE,
+           initScale = 100)
+
+# Define the training set
+trainX &lt;- trainSet$x
+trainY &lt;- class.ind(factor(trainSet$y))
+
+# Call train
+mnw$train(trainData = trainX/256,
+          trainLabels = trainY,
+          num_epochs = 3,
+          eta = 0.005, 
+          cvSplit = 0.3)
+</code></pre>
+
+<h1 id="no-hidden-layers">No hidden layers</h1>
+
+<p>I wanted to visualize the training when there were no hidden layers. The weights in the gif below correspond to the training over one epoch, where the weights according to the digits are aligned like the matrix below:
+$$
+  \begin{bmatrix}
+    2 &amp; 5 &amp; 8<br />
+    1 &amp; 4 &amp; 7<br />
+    0 &amp; 3 &amp; 6
+  \end{bmatrix}
+$$</p>
+
+<p><center>
+<blockquote class="imgur-embed-pub" lang="en" data-id="a/s29MY"><a href="//imgur.com/s29MY"></a></blockquote><script async src="//s.imgur.com/min/embed.js" charset="utf-8"></script>
+</center></p>
+
+<p>You can clearly see that the weights resemble templates that evolve to capture more and more of the variation present for each digit. The template also counts for making the patch dissimilar to the digits that it is not trying to match. This simple linear approach achieves a little more than 90% accuracy, which is amazing for how simple the method is. But still, for reading digits on checks, having every tenth read wrong is far from acceptable.</p>
+
+<h1 id="decomposing-the-network-with-magrittr">Decomposing the network with magrittr</h1>
+
+<p>Now, one of the main things I wanted to achieve with this implementation was to decompose the network into it&rsquo;s individual components, to demonstrate how simple it truly is. Now I can in a simple manner compose functions that I have trained in order to produce some output. The <code>magrittr</code> is perfect for this, because then we do not need to nest inside parenthesis the composition of functions, we can just pipe the input through all the layers.</p>
+
+<pre><code class="language-R,"># Needed for pipes
+library(magrittr)
+
+# Get the weight matricies from the network we trained above
+w1 &lt;- mnw$network[[1]]$W$getter()
+w2 &lt;- mnw$network[[2]]$W$getter()
+w3 &lt;- mnw$network[[3]]$W$getter()
+
+set.seed(12345)
+randDig &lt;- sample(1:60000,1) # sample random digit
+testDigit &lt;- matrix(trainSet$x[randDig,]/256,nrow=1,ncol=28*28)
+# Check label, it is a 2 for this seed
+trainSet$y[randDig]
+mnistr::ggDigit(testDigit)
+
+# Add the bias term
+testDigit &lt;- cbind(testDigit,matrix(1,1,1))
+
+# We are passing a single instance
+simple_softmax &lt;- function(X){
+  Z &lt;- sum(exp(X))
+  X &lt;- exp(X)/Z
+  return(X)
+}
+
+# Now pipe it throught the network:
+# Multiply by weights, use activation and then add 1 for bias
+testDigit %&gt;% 
+  multiply_by_matrix(y=w1) %&gt;% reLU %&gt;% cbind(.,matrix(1,1,1)) %&gt;% 
+  multiply_by_matrix(y=w2) %&gt;% reLU %&gt;% cbind(.,matrix(1,1,1)) %&gt;%
+  multiply_by_matrix(y=w3) %&gt;% simple_softmax %&gt;% barplot
+</code></pre>
+
+<p>The network I trained is 99.6% certain that this is a two! The <code>magrittr</code> package allows us to write out the calculations happening inside the MLP in a very understandable way. Note that some networks used today have more than 50 layers, then this is not so useful anymore. In the case of 50plus layers we need other tricks to train it, e.g. skip connections and other optimizers.</p>
+
+<h1 id="code-for-generating-the-gifs">Code for generating the gifs</h1>
+
+<p>If you want to create you own gifs, it is probably easiest to define your own <code>mlp</code> function, just look at the <code>mnistr</code> implementation. Then add something similar to the following where the main update is happening. You could of course also save the weights to a matrix outside the environment using the <code>&lt;&lt;-</code> scope assignment operator.</p>
+
+<pre><code class="language-R,">        # Where we do the SGD steps in the train function part of mlp
+        preds &lt;- forward_prop(tDat)
+        backwards_prop(preds,tLab)
+        update_weights(eta = eta)
+        # The following is code for generating plots
+        layerMat &lt;- layers[[1]]$W$getter()
+        # Removw bias
+        layerMat &lt;- layerMat[-nrow(layerMat),]
+        # Set the number of columns and rows for the image
+        nr &lt;- 10
+        nc &lt;- 10
+        weightsIm &lt;- matrix(0,28*nr,28*nc)
+        w &lt;- 1
+        # Fill the image with the relevant weights
+        for(i in 1:nr){
+          for(m in 1:nc){
+            weightsIm[((i-1)*28+1):(i*28),((m-1)*28+1):(m*28)] &lt;- matrix(layerMat[,w],28,28)[,c(28:1),drop=FALSE]
+            w &lt;- w + 1
+          }
+        }
+        # Save for every fourth minibatch
+        if(j%%4 == 1){
+          data &lt;- c(weightsIm)
+          # Standardize to remove flickering
+          nData &lt;- qnorm(seq(0,1,len=28*28*nr*nc))[rank(data)]
+          nIm &lt;- matrix(nData,28*nr,28*nc)
+          png(paste0('./plots/','reLU',sprintf(&quot;%08d&quot;, k),'.png'),width=28*nc*2,height=28*nr*2)
+          # Remove margins so it looks nicer
+          par(mar = rep(0, 4))
+          image(nIm,asp=1,col=gray(seq(0,1,by=0.005),1),axes=FALSE)
+          dev.off()
+          k &lt;- k+1
+        }
+</code></pre>
+
+<h1 id="next-post">Next post</h1>
+
+<p>For the next post I plan to compare different activation functions and implement dropout for the network. It will probably be the final post until I get new ideas for stuff to implement.</p>
+
+<p><a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-size="large" data-text="Learning Deep Learning in R" data-url="https://gumeo.github.io/post/part-2-deep-learning-with-closures-in-r/" data-via="gumgumeo" data-hashtags="#rstats #machinelearning #deeplearning" data-lang="en" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+    </div>
+
+    
+
+
+
+
+
+    
+    
+
+    
+
+    
+
+
+  </div>
+</article>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="powered-by">
+
+      &copy; 2018 &middot; 
+
+      Powered by the
+      <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+      <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+      <span class="pull-right" aria-hidden="true">
+        <a href="#" id="back_to_top">
+          <span class="button_icon">
+            <i class="fa fa-chevron-up fa-2x"></i>
+          </span>
+        </a>
+      </span>
+
+    </p>
+  </div>
+</footer>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close btn-large" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Cite</h4>
+      </div>
+      <div>
+        <pre><code class="modal-body tex"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary btn-outline js-copy-cite" href="#" target="_blank">
+          <i class="fa fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-primary btn-outline js-download-cite" href="#" target="_blank">
+          <i class="fa fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+
+    
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha512-3P8rXCuGJdNZOnUx/03c1jOTnMn3rP63nBip5gOP2qmUh5YAdVAvFZ1E+QLZZbC1rtMrQb+mah3AfYW11RUrWA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.3/imagesloaded.pkgd.min.js" integrity="sha512-umsR78NN0D23AzgoZ11K7raBD+R6hqKojyBZs1w8WvYlsI+QuKRGBx3LFCwhatzBunCjDuJpDHwxD13sLMbpRA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha512-iztkobsvnjKfAtTNdHkGVjAYTrrtlC7mGp/54c40wowO7LhURYl3gVzzcEqGl/qKXQltJ2HwMrdLcNUdo+N/RQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" integrity="sha256-X5PoE3KU5l+JcX+w09p/wHl9AzK333C4hJ2I9S5mD4M=" crossorigin="anonymous"></script>
+    
+    
+    <script src="/js/hugo-academic.js"></script>
+    
+
+    
+    
+      
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+      
+
+      
+
+      
+
+      <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({ tex2jax: { inlineMath: [['$','$'], ['\\(','\\)']] } });
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_CHTML" integrity="sha512-tOav5w1OjvsSJzePRtt2uQPFwBoHt1VZcUq8l8nm5284LEKE9FSJBQryzMBzHxY5P0zRdNqEcpLIRVYFNgu1jw==" crossorigin="anonymous"></script>
+    
+    
+
+  </body>
+</html>
+
