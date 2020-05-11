@@ -397,7 +397,7 @@ In file included from /usr/include/c++/7/bits/basic_string.h:6361:0,
 
 <h2 id="emplace-back-is-a-premature-optimization"><code>emplace_back</code> is a premature optimization.</h2>
 
-<p>Going from <code>push_back</code> to <code>emplace_back</code> is a small change that can wait. For safety, reliability and maintainability reasons, it is better to write the code with <code>push_back</code>. This reduces the chance of pushing an unwanted hard to find implicit conversionis into the codebase. When one can finally get to profiling the code, this is an opportunity to replace some of those <code>push_back</code> with <code>emplace_back</code> if there is any significant gain.</p>
+<p>Going from <code>push_back</code> to <code>emplace_back</code> is a small change that can wait. For safety, reliability and maintainability reasons, it is better to write the code with <code>push_back</code>. This reduces the chance of pushing an unwanted hard to find implicit conversion into the codebase. When one can finally get to profiling the code, this is an opportunity to replace some of those <code>push_back</code> with <code>emplace_back</code> if there is any significant gain.</p>
 
     </div>
 
