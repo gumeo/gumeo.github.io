@@ -17,8 +17,8 @@
       
     
   
-  <meta name="description" content="emplace_back vs push_back I have now ran into the discussion of whether one should use emplace_back instead of push_back in C&#43;&#43; several times and I wanted to document my current view on it.
-emplace_back came with C&#43;&#43;11, I&rsquo;m not sure when it was introduced exactly. Both of these methods, (and insert and emplace), are ways to insert data into standard library containers. emplace_back is for the dynamic array std::vector. There is a very subtle difference between the two:">
+  <meta name="description" content="emplace_back vs push_back I have now run into the discussion of whether one should use emplace_back instead of push_back in C&#43;&#43; several times and I wanted to document my current view on it. In short, use push_back when implementing and do not change to emplace_back unless it shows significant improvements when profiling.
+emplace_back came with C&#43;&#43;11, I&rsquo;m not sure when it was introduced exactly. Both of these methods, (and insert and emplace), are ways to insert data into standard library containers.">
 
   
   <link rel="alternate" hreflang="en-us" href="https://gumeo.github.io/post/emplace-back/">
@@ -94,8 +94,8 @@ emplace_back came with C&#43;&#43;11, I&rsquo;m not sure when it was introduced 
   <meta property="og:site_name" content="Gudmundur Blog&amp;Bio">
   <meta property="og:url" content="https://gumeo.github.io/post/emplace-back/">
   <meta property="og:title" content="emplace_back vs push_back | Gudmundur Blog&amp;Bio">
-  <meta property="og:description" content="emplace_back vs push_back I have now ran into the discussion of whether one should use emplace_back instead of push_back in C&#43;&#43; several times and I wanted to document my current view on it.
-emplace_back came with C&#43;&#43;11, I&rsquo;m not sure when it was introduced exactly. Both of these methods, (and insert and emplace), are ways to insert data into standard library containers. emplace_back is for the dynamic array std::vector. There is a very subtle difference between the two:">
+  <meta property="og:description" content="emplace_back vs push_back I have now run into the discussion of whether one should use emplace_back instead of push_back in C&#43;&#43; several times and I wanted to document my current view on it. In short, use push_back when implementing and do not change to emplace_back unless it shows significant improvements when profiling.
+emplace_back came with C&#43;&#43;11, I&rsquo;m not sure when it was introduced exactly. Both of these methods, (and insert and emplace), are ways to insert data into standard library containers.">
   <meta property="og:locale" content="en-us">
   
   <meta property="article:published_time" content="2020-05-11T13:00:26&#43;02:00">
@@ -291,7 +291,7 @@ emplace_back came with C&#43;&#43;11, I&rsquo;m not sure when it was introduced 
 
 <h1 id="emplace-back-vs-push-back"><code>emplace_back</code> vs <code>push_back</code></h1>
 
-<p>I have now ran into the discussion of whether one should use <code>emplace_back</code> instead of <code>push_back</code> in C++ several times and I wanted to document my current view on it.</p>
+<p>I have now run into the discussion of whether one should use <code>emplace_back</code> instead of <code>push_back</code> in C++ several times and I wanted to document my current view on it. In short, use <code>push_back</code> when implementing and do not change to <code>emplace_back</code> unless it shows significant improvements when profiling.</p>
 
 <p><a href="http://www.cplusplus.com/reference/vector/vector/emplace_back/" target="_blank"><code>emplace_back</code></a> came with C++11, I&rsquo;m not sure when it was introduced exactly. Both of these methods, (and <code>insert</code> and <code>emplace</code>), are ways to insert data into standard library containers. <code>emplace_back</code> is for the dynamic array <code>std::vector</code>. There is a very subtle difference between the two:</p>
 

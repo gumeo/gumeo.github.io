@@ -20,7 +20,7 @@
 
 &lt;h1 id=&#34;emplace-back-vs-push-back&#34;&gt;&lt;code&gt;emplace_back&lt;/code&gt; vs &lt;code&gt;push_back&lt;/code&gt;&lt;/h1&gt;
 
-&lt;p&gt;I have now ran into the discussion of whether one should use &lt;code&gt;emplace_back&lt;/code&gt; instead of &lt;code&gt;push_back&lt;/code&gt; in C++ several times and I wanted to document my current view on it.&lt;/p&gt;
+&lt;p&gt;I have now run into the discussion of whether one should use &lt;code&gt;emplace_back&lt;/code&gt; instead of &lt;code&gt;push_back&lt;/code&gt; in C++ several times and I wanted to document my current view on it. In short, use &lt;code&gt;push_back&lt;/code&gt; when implementing and do not change to &lt;code&gt;emplace_back&lt;/code&gt; unless it shows significant improvements when profiling.&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&#34;http://www.cplusplus.com/reference/vector/vector/emplace_back/&#34; target=&#34;_blank&#34;&gt;&lt;code&gt;emplace_back&lt;/code&gt;&lt;/a&gt; came with C++11, I&amp;rsquo;m not sure when it was introduced exactly. Both of these methods, (and &lt;code&gt;insert&lt;/code&gt; and &lt;code&gt;emplace&lt;/code&gt;), are ways to insert data into standard library containers. &lt;code&gt;emplace_back&lt;/code&gt; is for the dynamic array &lt;code&gt;std::vector&lt;/code&gt;. There is a very subtle difference between the two:&lt;/p&gt;
 
