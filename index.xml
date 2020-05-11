@@ -77,12 +77,12 @@ data_vec[0] size: 20
 
 &lt;h2 id=&#34;why-is-this-a-problem&#34;&gt;Why is this a problem?&lt;/h2&gt;
 
-&lt;p&gt;The problem is that this was not caught at compile time, and if this was not the intended behavior, we have caused a runtime error, which are generally harder to deal with. So let&amp;rsquo;s catch this somehow! So you might think that you can just add some warning flags, e.g. &lt;code&gt;-Wall&lt;/code&gt;. But this program compiles fine with &lt;code&gt;-Wall&lt;/code&gt;. &lt;code&gt;-Wall&lt;/code&gt; contains narrowing, but it does not contain conversion for some reason, so we can add &lt;code&gt;-Wconversion&lt;/code&gt;, but it still compiles fine without any warnings!&lt;/p&gt;
+&lt;p&gt;The problem is that we are unaware of the problem at compile-time. If this was not the intended behavior, we have caused a runtime error, which is generally harder to fix. Let us catch the issue somehow. You might wonder that some warning flags, e.g., &lt;code&gt;-Wall&lt;/code&gt; could reveal the issue. However, the program compiles fine with &lt;code&gt;-Wall&lt;/code&gt;. &lt;code&gt;-Wall&lt;/code&gt; contains narrowing, but it does not contain conversion. Further, adding &lt;code&gt;-Wconversion&lt;/code&gt; yields no warnings!&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ g++ -Wall -Wconversion test.cpp -o test
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The problem is that this conversion is happening in a system header, so we also need &lt;code&gt;-Wsystem-headers&lt;/code&gt; to catch this:&lt;/p&gt;
+&lt;p&gt;The problem is that this conversion is happening in a system header, so we also need &lt;code&gt;-Wsystem-headers&lt;/code&gt; to catch the issue.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ g++ -Wconversion -Wsystem-headers test.cpp -o test
 In file included from /usr/include/c++/7/vector:60:0,
@@ -122,11 +122,11 @@ In file included from /usr/include/c++/7/bits/basic_string.h:6361:0,
 
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;And boom&amp;hellip;. look at all that verbose output. Skimming through a sea of warnings, it would be rather tricky to nail this down.&lt;/p&gt;
+&lt;p&gt;And there you have it - look at all the verbose output. The problem is not apparent from this wall of text for the uninitiated.&lt;/p&gt;
 
 &lt;h2 id=&#34;emplace-back-is-a-premature-optimization&#34;&gt;&lt;code&gt;emplace_back&lt;/code&gt; is a premature optimization.&lt;/h2&gt;
 
-&lt;p&gt;Going from &lt;code&gt;push_back&lt;/code&gt; to &lt;code&gt;emplace_back&lt;/code&gt; is a small change that can wait. For safety, reliability and maintainability reasons, it is better to write the code with &lt;code&gt;push_back&lt;/code&gt;. This reduces the chance of pushing an unwanted hard to find implicit conversion into the codebase. When one can finally get to profiling the code, this is an opportunity to replace some of those &lt;code&gt;push_back&lt;/code&gt; with &lt;code&gt;emplace_back&lt;/code&gt; if there is any significant gain.&lt;/p&gt;
+&lt;p&gt;Going from &lt;code&gt;push_back&lt;/code&gt; to &lt;code&gt;emplace_back&lt;/code&gt; is a small change that can usually wait. For safety, reliability, and maintainability reasons, it is better to write the code with &lt;code&gt;push_back&lt;/code&gt;. This choice reduces the chance of pushing an unwanted hard to find implicit conversion into the codebase. Profiling the code might reveal opportunities to replace some &lt;code&gt;push_back&lt;/code&gt; calls with &lt;code&gt;emplace_back&lt;/code&gt;, but remember when optimizing to tread carefully.&lt;/p&gt;
 </description>
     </item>
     
