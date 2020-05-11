@@ -35,7 +35,7 @@
 
 &lt;p&gt;After searching a bit more I found &lt;a href=&#34;https://abseil.io/tips/112&#34; target=&#34;_blank&#34;&gt;this post&lt;/a&gt;, which stresses how careful one should be with this decision. Which kind of tells you to be careful. To further stress the ambiguity of the matter, the google c++ style guide does not provide an explicit preference. However, in their section on &lt;a href=&#34;https://google.github.io/styleguide/cppguide.html#Implicit_Conversions&#34; target=&#34;_blank&#34;&gt;implicit conversion&lt;/a&gt;, it becomes clear that the decision between the two methods is not completely obvious. The following code should make it clear why &lt;code&gt;emplace_back&lt;/code&gt; is not worth the risk:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;#include&amp;lt;vector&amp;gt;                                                                                                                                                                                                   
+&lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;#include&amp;lt;vector&amp;gt;
 #include&amp;lt;iostream&amp;gt;
 
 int main(){
@@ -75,62 +75,9 @@ data_vec[0] size: 20
 
 &lt;p&gt;What is the difference? For &lt;code&gt;emplace_back&lt;/code&gt; we &lt;strong&gt;forward the arguments to the constructor&lt;/strong&gt;, adding a new &lt;code&gt;std::vector&amp;lt;int&amp;gt; new_vector_to_add(20)&lt;/code&gt; to &lt;code&gt;data_vec&lt;/code&gt;.&lt;/p&gt;
 
-&lt;h2 id=&#34;why-is-this-a-problem&#34;&gt;Why is this a problem?&lt;/h2&gt;
+&lt;h2 id=&#34;another-example-with-conversion&#34;&gt;Another example with conversion&lt;/h2&gt;
 
-&lt;p&gt;The problem is that we are unaware of the problem at compile-time. If this was not the intended behavior, we have caused a runtime error, which is generally harder to fix. Let us catch the issue somehow. You might wonder that some warning flags, e.g., &lt;code&gt;-Wall&lt;/code&gt; could reveal the issue. However, the program compiles fine with &lt;code&gt;-Wall&lt;/code&gt;. &lt;code&gt;-Wall&lt;/code&gt; contains narrowing, but it does not contain conversion. Further, adding &lt;code&gt;-Wconversion&lt;/code&gt; yields no warnings.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ g++ -Wall -Wconversion test.cpp -o test
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The problem is that this conversion is happening in a system header, so we also need &lt;code&gt;-Wsystem-headers&lt;/code&gt; to catch the issue.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ g++ -Wconversion -Wsystem-headers test.cpp -o test
-In file included from /usr/include/c++/7/vector:60:0,
-                 from test.cpp:1:
-/usr/include/c++/7/bits/stl_algobase.h: In function ‘constexpr int std::__lg(int)’:
-/usr/include/c++/7/bits/stl_algobase.h:1001:44: warning: conversion to ‘int’ from ‘long unsigned int’ may alter its value [-Wconversion]
-   { return sizeof(int) * __CHAR_BIT__  - 1 - __builtin_clz(__n); }
-                                            ^
-/usr/include/c++/7/bits/stl_algobase.h: In function ‘constexpr unsigned int std::__lg(unsigned int)’:
-/usr/include/c++/7/bits/stl_algobase.h:1005:44: warning: conversion to ‘unsigned int’ from ‘long unsigned int’ may alter its value [-Wconversion]
-   { return sizeof(int) * __CHAR_BIT__  - 1 - __builtin_clz(__n); }
-                                            ^
-In file included from /usr/include/c++/7/bits/stl_algobase.h:63:0,
-                 from /usr/include/c++/7/vector:60,
-                 from test.cpp:1:
-/usr/include/c++/7/ext/numeric_traits.h: In instantiation of ‘const short int __gnu_cxx::__numeric_traits_integer&amp;lt;short int&amp;gt;::__min’:
-/usr/include/c++/7/bits/istream.tcc:138:54:   required from here
-/usr/include/c++/7/ext/numeric_traits.h:58:35: warning: conversion to ‘short int’ alters ‘int’ constant value [-Wconversion]
-       static const _Value __min = __glibcxx_min(_Value);
-                                   ^~~~~~~~~~~~~
-In file included from /usr/include/c++/7/bits/basic_string.h:6361:0,
-                 from /usr/include/c++/7/string:52,
-                 from /usr/include/c++/7/bits/locale_classes.h:40,
-                 from /usr/include/c++/7/bits/ios_base.h:41,
-                 from /usr/include/c++/7/ios:42,
-                 from /usr/include/c++/7/ostream:38,
-                 from /usr/include/c++/7/iostream:39,
-                 from test.cpp:2:
-/usr/include/c++/7/ext/string_conversions.h: In instantiation of ‘_Ret __gnu_cxx::__stoa(_TRet (*)(const _CharT*, _CharT**, _Base ...), const char*, const _CharT*, std::size_t*, _Base ...) [with _TRet = long int; _Ret = int; _CharT = char; _Base = {int}; std::size_t = long unsigned int]’:
-/usr/include/c++/7/bits/basic_string.h:6373:19:   required from here
-/usr/include/c++/7/ext/string_conversions.h:88:8: warning: conversion to ‘int’ from ‘long int’ may alter its value [-Wconversion]
-  __ret = __tmp;
-        ^
-/usr/include/c++/7/ext/string_conversions.h: In instantiation of ‘_Ret __gnu_cxx::__stoa(_TRet (*)(const _CharT*, _CharT**, _Base ...), const char*, const _CharT*, std::size_t*, _Base ...) [with _TRet = long int; _Ret = int; _CharT = wchar_t; _Base = {int}; std::size_t = long unsigned int]’:
-/usr/include/c++/7/bits/basic_string.h:6479:19:   required from here
-/usr/include/c++/7/ext/string_conversions.h:88:8: warning: conversion to ‘int’ from ‘long int’ may alter its value [-Wconversion]
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;And there you have it - look at all the verbose output. The problem is not apparent from this wall of text for the uninitiated.&lt;/p&gt;
-
-&lt;h2 id=&#34;emplace-back-is-a-premature-optimization&#34;&gt;&lt;code&gt;emplace_back&lt;/code&gt; is a premature optimization.&lt;/h2&gt;
-
-&lt;p&gt;Going from &lt;code&gt;push_back&lt;/code&gt; to &lt;code&gt;emplace_back&lt;/code&gt; is a small change that can usually wait. For safety, reliability, and maintainability reasons, it is better to write the code with &lt;code&gt;push_back&lt;/code&gt;. This choice reduces the chance of pushing an unwanted hard to find implicit conversion into the codebase. Profiling the code might reveal opportunities to replace some &lt;code&gt;push_back&lt;/code&gt; calls with &lt;code&gt;emplace_back&lt;/code&gt;, but remember when optimizing to tread carefully.&lt;/p&gt;
-
-&lt;h2 id=&#34;a-longer-example&#34;&gt;A longer example&lt;/h2&gt;
-
-&lt;p&gt;The example above is very simple, and does not really show why we need conversion warnings, it is more to show the difference of forwarding arguments to the value type constructor or not. The following example I added in an &lt;a href=&#34;https://stackoverflow.com/questions/61592849/no-narrowing-warnings-when-using-emplace-back-instead-of-push-back&#34; target=&#34;_blank&#34;&gt;SO question&lt;/a&gt; shows a bit more subtle case where &lt;code&gt;emplace_back&lt;/code&gt; could make us miss catching a conversion from &lt;code&gt;double&lt;/code&gt; to &lt;code&gt;int&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The example above is very simple and shows the difference of forwarding arguments to the value type constructor or not. The following example I added in an &lt;a href=&#34;https://stackoverflow.com/questions/61592849/no-narrowing-warnings-when-using-emplace-back-instead-of-push-back&#34; target=&#34;_blank&#34;&gt;SO question&lt;/a&gt; shows a bit more subtle case where &lt;code&gt;emplace_back&lt;/code&gt; could make us miss catching a conversion from &lt;code&gt;double&lt;/code&gt; to &lt;code&gt;int&lt;/code&gt;.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;#include &amp;lt;vector&amp;gt;
 class A {
@@ -144,6 +91,44 @@ int main() {
   A a(foo); // Gives compiler warning with Wconversion as expected
 }
 &lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;why-is-this-a-problem&#34;&gt;Why is this a problem?&lt;/h2&gt;
+
+&lt;p&gt;The problem is that we are unaware of the problem at compile-time. If this was not the intended behavior, we have caused a runtime error, which is generally harder to fix. Let us catch the issue somehow. You might wonder that some warning flags, e.g., &lt;code&gt;-Wall&lt;/code&gt; could reveal the issue. However, the program compiles fine with &lt;code&gt;-Wall&lt;/code&gt;. &lt;code&gt;-Wall&lt;/code&gt; contains narrowing, but it does not contain conversion. Further, adding &lt;code&gt;-Wconversion&lt;/code&gt; yields no warnings.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ g++ -Wall -Wconversion test_2.cpp -o test
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The problem is that this conversion is happening in a system header, so we also need &lt;code&gt;-Wsystem-headers&lt;/code&gt; to catch the issue.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ g++ -Wconversion -Wsystem-headers test_2.cpp 
+In file included from /usr/include/c++/7/vector:60:0,
+                 from test_2.cpp:1:
+/usr/include/c++/7/bits/stl_algobase.h: In function ‘constexpr int std::__lg(int)’:
+/usr/include/c++/7/bits/stl_algobase.h:1001:44: warning: conversion to ‘int’ from ‘long unsigned int’ may alter its value [-Wconversion]
+   { return sizeof(int) * __CHAR_BIT__  - 1 - __builtin_clz(__n); }
+                                            ^
+/usr/include/c++/7/bits/stl_algobase.h: In function ‘constexpr unsigned int std::__lg(unsigned int)’:
+/usr/include/c++/7/bits/stl_algobase.h:1005:44: warning: conversion to ‘unsigned int’ from ‘long unsigned int’ may alter its value [-Wconversion]
+   { return sizeof(int) * __CHAR_BIT__  - 1 - __builtin_clz(__n); }
+                                            ^
+In file included from /usr/include/x86_64-linux-gnu/c++/7/bits/c++allocator.h:33:0,
+                 from /usr/include/c++/7/bits/allocator.h:46,
+                 from /usr/include/c++/7/vector:61,
+                 from test_2.cpp:1:
+/usr/include/c++/7/ext/new_allocator.h: In instantiation of ‘void __gnu_cxx::new_allocator&amp;lt;_Tp&amp;gt;::construct(_Up*, _Args&amp;amp;&amp;amp; ...) [with _Up = A; _Args = {double&amp;amp;}; _Tp = A]’:
+/usr/include/c++/7/bits/alloc_traits.h:475:4:   required from ‘static void std::allocator_traits&amp;lt;std::allocator&amp;lt;_Tp1&amp;gt; &amp;gt;::construct(std::allocator_traits&amp;lt;std::allocator&amp;lt;_Tp1&amp;gt; &amp;gt;::allocator_type&amp;amp;, _Up*, _Args&amp;amp;&amp;amp; ...) [with _Up = A; _Args = {double&amp;amp;}; _Tp = A; std::allocator_traits&amp;lt;std::allocator&amp;lt;_Tp1&amp;gt; &amp;gt;::allocator_type = std::allocator&amp;lt;A&amp;gt;]’
+/usr/include/c++/7/bits/vector.tcc💯30:   required from ‘void std::vector&amp;lt;_Tp, _Alloc&amp;gt;::emplace_back(_Args&amp;amp;&amp;amp; ...) [with _Args = {double&amp;amp;}; _Tp = A; _Alloc = std::allocator&amp;lt;A&amp;gt;]’
+test_2.cpp:9:25:   required from here
+/usr/include/c++/7/ext/new_allocator.h:136:4: warning: conversion to ‘int’ from ‘double’ may alter its value [-Wfloat-conversion]
+  { ::new((void *)__p) _Up(std::forward&amp;lt;_Args&amp;gt;(__args)...); }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And there you have it - look at all the verbose output. The problem is not apparent from this wall of text for the uninitiated.&lt;/p&gt;
+
+&lt;h2 id=&#34;emplace-back-is-a-premature-optimization&#34;&gt;&lt;code&gt;emplace_back&lt;/code&gt; is a premature optimization.&lt;/h2&gt;
+
+&lt;p&gt;Going from &lt;code&gt;push_back&lt;/code&gt; to &lt;code&gt;emplace_back&lt;/code&gt; is a small change that can usually wait. For safety, reliability, and maintainability reasons, it is better to write the code with &lt;code&gt;push_back&lt;/code&gt;. This choice reduces the chance of pushing an unwanted hard to find implicit conversion into the codebase. Profiling the code might reveal opportunities to replace some &lt;code&gt;push_back&lt;/code&gt; calls with &lt;code&gt;emplace_back&lt;/code&gt;, but remember when optimizing to tread carefully.&lt;/p&gt;
 </description>
     </item>
     
