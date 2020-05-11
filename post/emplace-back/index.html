@@ -401,6 +401,23 @@ In file included from /usr/include/c++/7/bits/basic_string.h:6361:0,
 
 <p>Going from <code>push_back</code> to <code>emplace_back</code> is a small change that can usually wait. For safety, reliability, and maintainability reasons, it is better to write the code with <code>push_back</code>. This choice reduces the chance of pushing an unwanted hard to find implicit conversion into the codebase. Profiling the code might reveal opportunities to replace some <code>push_back</code> calls with <code>emplace_back</code>, but remember when optimizing to tread carefully.</p>
 
+<h2 id="a-longer-example">A longer example</h2>
+
+<p>The example above is very simple, and does not really show why we need conversion warnings, it is more to show the difference of forwarding arguments to the value type constructor or not. The following example I added in an <a href="https://stackoverflow.com/questions/61592849/no-narrowing-warnings-when-using-emplace-back-instead-of-push-back" target="_blank">SO question</a> shows a bit more subtle case where <code>emplace_back</code> could make us miss catching a conversion from <code>double</code> to <code>int</code>.</p>
+
+<pre><code class="language-cpp">#include &lt;vector&gt;
+class A {
+ public:
+  explicit A(int /*unused*/) {}
+};
+int main() {
+  double foo = 4.5;
+  std::vector&lt;A&gt; a_vec{};
+  a_vec.emplace_back(foo); // No warning with Wconversion
+  A a(foo); // Gives compiler warning with Wconversion as expected
+}
+</code></pre>
+
     </div>
 
     
