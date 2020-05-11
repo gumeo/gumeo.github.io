@@ -88,7 +88,7 @@ int main() {
   double foo = 4.5;
   std::vector&amp;lt;A&amp;gt; a_vec{};
   a_vec.emplace_back(foo); // No warning with Wconversion
-  A a(foo); // Gives compiler warning with Wconversion as expected
+  //A a(foo); // Gives compiler warning with Wconversion as expected
 }
 &lt;/code&gt;&lt;/pre&gt;
 
