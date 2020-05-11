@@ -298,8 +298,8 @@ Both of the methods in the title, along with insert and emplace, are ways to ins
 <p>Both of the methods in the title, along with <code>insert</code> and <code>emplace</code>, are ways to insert data into standard library containers. <code>emplace_back</code> is for adding a single element to the dynamic array <code>std::vector</code>. There is a somewhat subtle difference between the two:</p>
 
 <ol>
-<li><code>push_back calls</code> the constructor of the data that you intend to push and then pushes it to the container.</li>
-<li><code>emplace_back</code> &ldquo;constructs in place&rdquo;, so one skips an extra move operation, potentially creating faster bytecode.</li>
+<li><code>push_back</code> calls the constructor of the data that you intend to push and then pushes it to the container.</li>
+<li><code>emplace_back</code> &ldquo;constructs in place&rdquo;, so one skips an extra move operation, potentially creating faster bytecode. This is done by forwarding the arguments to the container&rsquo;s template type constructor.</li>
 </ol>
 
 <p>One could naively choose the faster method. Why even offer a slower alternative? Searching for the problem online yields a lengthy discussion on the <a href="https://stackoverflow.com/questions/4303513/push-back-vs-emplace-back" target="_blank">issue (emplace_back vs push_back)</a>. In summary, the discussion leans towards choosing the more efficient <code>emplace_back</code> to insert data into your container, however the reason it is not completely clear.</p>
@@ -321,8 +321,8 @@ int main(){
   std::vector&lt;std::vector&lt;int&gt;&gt; data_vec;
   //data_vec.push_back(10); // Throws error!!!!
   data_vec.emplace_back(20); // Compiles with no issue
-  std::cout &lt;&lt; &quot;data_vec size: &quot; &lt;&lt; data_vec.size() &lt;&lt; std::endl;
-  std::cout &lt;&lt; &quot;data_vec[0] size: &quot; &lt;&lt; data_vec[0].size() &lt;&lt; std::endl;
+  std::cout &lt;&lt; &quot;data_vec size: &quot; &lt;&lt; data_vec.size() &lt;&lt; &quot;\n&quot;;
+  std::cout &lt;&lt; &quot;data_vec[0] size: &quot; &lt;&lt; data_vec[0].size() &lt;&lt; &quot;\n&quot;;
   return 0;
 }
 </code></pre>
