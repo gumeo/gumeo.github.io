@@ -17,8 +17,8 @@
       
     
   
-  <meta name="description" content="emplace_back vs push_back I have now run into the discussion of whether one should use emplace_back instead of push_back in C&#43;&#43; several times and I wanted to document my current view on it. In short, use push_back when implementing and do not change to emplace_back unless it shows significant improvements when profiling.
-emplace_back came with C&#43;&#43;11, I&rsquo;m not sure when it was introduced exactly. Both of these methods, (and insert and emplace), are ways to insert data into standard library containers.">
+  <meta name="description" content="emplace_back vs push_back I have repeatedly run into the choice of using emplace_back instead of push_back in C&#43;&#43;. This short blog post serves as my take on this decision. In short, choose push_back and only later change to emplace_back if it provides significant speed improvements when profiling.
+Both of the methods in the title, along with insert and emplace, are ways to insert data into standard library containers. emplace_back is for adding a single element to the dynamic array std::vector.">
 
   
   <link rel="alternate" hreflang="en-us" href="https://gumeo.github.io/post/emplace-back/">
@@ -94,8 +94,8 @@ emplace_back came with C&#43;&#43;11, I&rsquo;m not sure when it was introduced 
   <meta property="og:site_name" content="Gudmundur Blog&amp;Bio">
   <meta property="og:url" content="https://gumeo.github.io/post/emplace-back/">
   <meta property="og:title" content="emplace_back vs push_back | Gudmundur Blog&amp;Bio">
-  <meta property="og:description" content="emplace_back vs push_back I have now run into the discussion of whether one should use emplace_back instead of push_back in C&#43;&#43; several times and I wanted to document my current view on it. In short, use push_back when implementing and do not change to emplace_back unless it shows significant improvements when profiling.
-emplace_back came with C&#43;&#43;11, I&rsquo;m not sure when it was introduced exactly. Both of these methods, (and insert and emplace), are ways to insert data into standard library containers.">
+  <meta property="og:description" content="emplace_back vs push_back I have repeatedly run into the choice of using emplace_back instead of push_back in C&#43;&#43;. This short blog post serves as my take on this decision. In short, choose push_back and only later change to emplace_back if it provides significant speed improvements when profiling.
+Both of the methods in the title, along with insert and emplace, are ways to insert data into standard library containers. emplace_back is for adding a single element to the dynamic array std::vector.">
   <meta property="og:locale" content="en-us">
   
   <meta property="article:published_time" content="2020-05-11T13:00:26&#43;02:00">
@@ -291,20 +291,20 @@ emplace_back came with C&#43;&#43;11, I&rsquo;m not sure when it was introduced 
 
 <h1 id="emplace-back-vs-push-back"><code>emplace_back</code> vs <code>push_back</code></h1>
 
-<p>I have now run into the discussion of whether one should use <code>emplace_back</code> instead of <code>push_back</code> in C++ several times and I wanted to document my current view on it. In short, use <code>push_back</code> when implementing and do not change to <code>emplace_back</code> unless it shows significant improvements when profiling.</p>
+<p>I have repeatedly run into the choice of using <code>emplace_back</code> instead of <code>push_back</code> in C++. This short blog post serves as my take on this decision. In short, choose <code>push_back</code> and only later change to <code>emplace_back</code> if it provides significant speed improvements when profiling.</p>
 
-<p><a href="http://www.cplusplus.com/reference/vector/vector/emplace_back/" target="_blank"><code>emplace_back</code></a> came with C++11, I&rsquo;m not sure when it was introduced exactly. Both of these methods, (and <code>insert</code> and <code>emplace</code>), are ways to insert data into standard library containers. <code>emplace_back</code> is for the dynamic array <code>std::vector</code>. There is a very subtle difference between the two:</p>
+<p>Both of the methods in the title, along with <code>insert</code> and <code>emplace</code>, are ways to insert data into standard library containers. <code>emplace_back</code> is for adding a single element to the dynamic array <code>std::vector</code>. There is a very subtle difference between the two:</p>
 
 <ol>
-<li><code>push_back</code> calls the constructor of the data that is being pushed, and then moves it to the container.</li>
+<li><code>push_back calls</code> the constructor of the data that you intend to push and then pushes it to the container.</li>
 <li><code>emplace_back</code> &ldquo;constructs in place&rdquo;, so one skips an extra move operation, potentially creating faster bytecode.</li>
 </ol>
 
-<p>If you are new to C++, then this looks like an obvious choice. Pick the one that is faster, end of story, why should anyone even be using <code>push_back</code>&hellip; If you google this <a href="https://stackoverflow.com/questions/4303513/push-back-vs-emplace-back" target="_blank"><code>emplace_back</code> vs <code>push_back</code></a>, then you are taken to an old stackoverflow question around the time this was introduced, where the conclusion is also that it is kind of obvious that you should use this more efficient way of inserting data into your container.</p>
+<p>One could naively choose the faster method. Why even offer a slower alternative? Searching for the problem online yields a lengthy discussion on the <a href="https://stackoverflow.com/questions/4303513/push-back-vs-emplace-back" target="_blank">issue (emplace_back vs push_back)</a>. In summary, the discussion leans towards choosing the more efficient <code>emplace_back</code> to insert data into your container, but it is not completely clear.</p>
 
-<h2 id="be-skeptical">Be skeptical</h2>
+<h2 id="be-skeptical-and-careful-the-devil-is-in-the-details">Be skeptical and careful, the devil is in the details!</h2>
 
-<p>After googling a bit more I found <a href="https://abseil.io/tips/112" target="_blank">this post</a>. Which kind of tells you to be careful! The google c++ styleguide does not explicitly state which of the two you should use. But if you read their bit on <a href="https://google.github.io/styleguide/cppguide.html#Implicit_Conversions" target="_blank">implicit conversion</a>, it is clear that this is not completely obvious. The following code should make it clear why this is risky business:</p>
+<p>After searching a bit more I found <a href="https://abseil.io/tips/112" target="_blank">this post</a>, which stresses how careful one should be with this decision. Which kind of tells you to be careful! To further stress the ambiguity of the matter, the google c++ style guide does not provide an explicit preference. However, in their section on <a href="https://google.github.io/styleguide/cppguide.html#Implicit_Conversions" target="_blank">implicit conversion</a>, it becomes clear that the decision between the two methods is not completely obvious. The following code should make it clear why <code>emplace_back</code> is not worth the risk:</p>
 
 <pre><code class="language-cpp">#include&lt;vector&gt;                                                                                                                                                                                                   
 #include&lt;iostream&gt;
@@ -325,7 +325,7 @@ int main(){
 }
 </code></pre>
 
-<p>So if I compile this with the commented out line <strong>not commented out</strong> I get:</p>
+<p>Uncommenting the line <code>data_vec.push_back(10)</code> yields the following compilation error.</p>
 
 <pre><code>$ g++ test.cpp -o test
 test.cpp: In function ‘int main()’:
@@ -335,18 +335,18 @@ test.cpp:11:24: error: no matching function for call to ‘std::vector&lt;std::v
 ... Some more verbose diagnostic
 </code></pre>
 
-<p>So we get an error. In the extra diagnostic we get <code>no known conversion for argument 1 from ‘int’ to ‘const value_type&amp; {aka const std::vector&lt;int&gt;&amp;}’</code>. So there is really no conversion here that makes sense.</p>
+<p>So we get an error. An extra diagnostic provides us with the following: <code>no known conversion for argument 1 from ‘int’ to ‘const value_type&amp; {aka const std::vector&lt;int&gt;&amp;}’</code>. So it seems there is no conversion here that makes sense.</p>
 
-<p>What is alarming is that if we comment out the trouble line, this works fine and when we run this we get:</p>
+<p>The compilation completes without errors if we comment out the trouble line. Running the code yields the following result:</p>
 
 <pre><code>$ ./test
 data_vec size: 1
 data_vec[0] size: 20
 </code></pre>
 
-<p>So what was the difference? For <code>emplace_back</code> we <strong>forward the arguments to the constructor</strong>, adding a new <code>std::vector&lt;int&gt; new_vector_to_add(20)</code> to <code>data_vec</code>.</p>
+<p>What is the difference? For <code>emplace_back</code> we <strong>forward the arguments to the constructor</strong>, adding a new <code>std::vector&lt;int&gt; new_vector_to_add(20)</code> to <code>data_vec</code>.</p>
 
-<h2 id="so-what-is-the-issue">So what is the issue?</h2>
+<h2 id="why-is-this-a-problem">Why is this a problem?</h2>
 
 <p>The problem is that this was not caught at compile time, and if this was not the intended behavior, we have caused a runtime error, which are generally harder to deal with. So let&rsquo;s catch this somehow! So you might think that you can just add some warning flags, e.g. <code>-Wall</code>. But this program compiles fine with <code>-Wall</code>. <code>-Wall</code> contains narrowing, but it does not contain conversion for some reason, so we can add <code>-Wconversion</code>, but it still compiles fine without any warnings!</p>
 

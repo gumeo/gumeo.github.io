@@ -20,20 +20,20 @@
 
 &lt;h1 id=&#34;emplace-back-vs-push-back&#34;&gt;&lt;code&gt;emplace_back&lt;/code&gt; vs &lt;code&gt;push_back&lt;/code&gt;&lt;/h1&gt;
 
-&lt;p&gt;I have now run into the discussion of whether one should use &lt;code&gt;emplace_back&lt;/code&gt; instead of &lt;code&gt;push_back&lt;/code&gt; in C++ several times and I wanted to document my current view on it. In short, use &lt;code&gt;push_back&lt;/code&gt; when implementing and do not change to &lt;code&gt;emplace_back&lt;/code&gt; unless it shows significant improvements when profiling.&lt;/p&gt;
+&lt;p&gt;I have repeatedly run into the choice of using &lt;code&gt;emplace_back&lt;/code&gt; instead of &lt;code&gt;push_back&lt;/code&gt; in C++. This short blog post serves as my take on this decision. In short, choose &lt;code&gt;push_back&lt;/code&gt; and only later change to &lt;code&gt;emplace_back&lt;/code&gt; if it provides significant speed improvements when profiling.&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&#34;http://www.cplusplus.com/reference/vector/vector/emplace_back/&#34; target=&#34;_blank&#34;&gt;&lt;code&gt;emplace_back&lt;/code&gt;&lt;/a&gt; came with C++11, I&amp;rsquo;m not sure when it was introduced exactly. Both of these methods, (and &lt;code&gt;insert&lt;/code&gt; and &lt;code&gt;emplace&lt;/code&gt;), are ways to insert data into standard library containers. &lt;code&gt;emplace_back&lt;/code&gt; is for the dynamic array &lt;code&gt;std::vector&lt;/code&gt;. There is a very subtle difference between the two:&lt;/p&gt;
+&lt;p&gt;Both of the methods in the title, along with &lt;code&gt;insert&lt;/code&gt; and &lt;code&gt;emplace&lt;/code&gt;, are ways to insert data into standard library containers. &lt;code&gt;emplace_back&lt;/code&gt; is for adding a single element to the dynamic array &lt;code&gt;std::vector&lt;/code&gt;. There is a very subtle difference between the two:&lt;/p&gt;
 
 &lt;ol&gt;
-&lt;li&gt;&lt;code&gt;push_back&lt;/code&gt; calls the constructor of the data that is being pushed, and then moves it to the container.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;push_back calls&lt;/code&gt; the constructor of the data that you intend to push and then pushes it to the container.&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;emplace_back&lt;/code&gt; &amp;ldquo;constructs in place&amp;rdquo;, so one skips an extra move operation, potentially creating faster bytecode.&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;If you are new to C++, then this looks like an obvious choice. Pick the one that is faster, end of story, why should anyone even be using &lt;code&gt;push_back&lt;/code&gt;&amp;hellip; If you google this &lt;a href=&#34;https://stackoverflow.com/questions/4303513/push-back-vs-emplace-back&#34; target=&#34;_blank&#34;&gt;&lt;code&gt;emplace_back&lt;/code&gt; vs &lt;code&gt;push_back&lt;/code&gt;&lt;/a&gt;, then you are taken to an old stackoverflow question around the time this was introduced, where the conclusion is also that it is kind of obvious that you should use this more efficient way of inserting data into your container.&lt;/p&gt;
+&lt;p&gt;One could naively choose the faster method. Why even offer a slower alternative? Searching for the problem online yields a lengthy discussion on the &lt;a href=&#34;https://stackoverflow.com/questions/4303513/push-back-vs-emplace-back&#34; target=&#34;_blank&#34;&gt;issue (emplace_back vs push_back)&lt;/a&gt;. In summary, the discussion leans towards choosing the more efficient &lt;code&gt;emplace_back&lt;/code&gt; to insert data into your container, but it is not completely clear.&lt;/p&gt;
 
-&lt;h2 id=&#34;be-skeptical&#34;&gt;Be skeptical&lt;/h2&gt;
+&lt;h2 id=&#34;be-skeptical-and-careful-the-devil-is-in-the-details&#34;&gt;Be skeptical and careful, the devil is in the details!&lt;/h2&gt;
 
-&lt;p&gt;After googling a bit more I found &lt;a href=&#34;https://abseil.io/tips/112&#34; target=&#34;_blank&#34;&gt;this post&lt;/a&gt;. Which kind of tells you to be careful! The google c++ styleguide does not explicitly state which of the two you should use. But if you read their bit on &lt;a href=&#34;https://google.github.io/styleguide/cppguide.html#Implicit_Conversions&#34; target=&#34;_blank&#34;&gt;implicit conversion&lt;/a&gt;, it is clear that this is not completely obvious. The following code should make it clear why this is risky business:&lt;/p&gt;
+&lt;p&gt;After searching a bit more I found &lt;a href=&#34;https://abseil.io/tips/112&#34; target=&#34;_blank&#34;&gt;this post&lt;/a&gt;, which stresses how careful one should be with this decision. Which kind of tells you to be careful! To further stress the ambiguity of the matter, the google c++ style guide does not provide an explicit preference. However, in their section on &lt;a href=&#34;https://google.github.io/styleguide/cppguide.html#Implicit_Conversions&#34; target=&#34;_blank&#34;&gt;implicit conversion&lt;/a&gt;, it becomes clear that the decision between the two methods is not completely obvious. The following code should make it clear why &lt;code&gt;emplace_back&lt;/code&gt; is not worth the risk:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;#include&amp;lt;vector&amp;gt;                                                                                                                                                                                                   
 #include&amp;lt;iostream&amp;gt;
@@ -54,7 +54,7 @@ int main(){
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;So if I compile this with the commented out line &lt;strong&gt;not commented out&lt;/strong&gt; I get:&lt;/p&gt;
+&lt;p&gt;Uncommenting the line &lt;code&gt;data_vec.push_back(10)&lt;/code&gt; yields the following compilation error.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ g++ test.cpp -o test
 test.cpp: In function ‘int main()’:
@@ -64,18 +64,18 @@ test.cpp:11:24: error: no matching function for call to ‘std::vector&amp;lt;st
 ... Some more verbose diagnostic
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;So we get an error. In the extra diagnostic we get &lt;code&gt;no known conversion for argument 1 from ‘int’ to ‘const value_type&amp;amp; {aka const std::vector&amp;lt;int&amp;gt;&amp;amp;}’&lt;/code&gt;. So there is really no conversion here that makes sense.&lt;/p&gt;
+&lt;p&gt;So we get an error. An extra diagnostic provides us with the following: &lt;code&gt;no known conversion for argument 1 from ‘int’ to ‘const value_type&amp;amp; {aka const std::vector&amp;lt;int&amp;gt;&amp;amp;}’&lt;/code&gt;. So it seems there is no conversion here that makes sense.&lt;/p&gt;
 
-&lt;p&gt;What is alarming is that if we comment out the trouble line, this works fine and when we run this we get:&lt;/p&gt;
+&lt;p&gt;The compilation completes without errors if we comment out the trouble line. Running the code yields the following result:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ ./test
 data_vec size: 1
 data_vec[0] size: 20
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;So what was the difference? For &lt;code&gt;emplace_back&lt;/code&gt; we &lt;strong&gt;forward the arguments to the constructor&lt;/strong&gt;, adding a new &lt;code&gt;std::vector&amp;lt;int&amp;gt; new_vector_to_add(20)&lt;/code&gt; to &lt;code&gt;data_vec&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;What is the difference? For &lt;code&gt;emplace_back&lt;/code&gt; we &lt;strong&gt;forward the arguments to the constructor&lt;/strong&gt;, adding a new &lt;code&gt;std::vector&amp;lt;int&amp;gt; new_vector_to_add(20)&lt;/code&gt; to &lt;code&gt;data_vec&lt;/code&gt;.&lt;/p&gt;
 
-&lt;h2 id=&#34;so-what-is-the-issue&#34;&gt;So what is the issue?&lt;/h2&gt;
+&lt;h2 id=&#34;why-is-this-a-problem&#34;&gt;Why is this a problem?&lt;/h2&gt;
 
 &lt;p&gt;The problem is that this was not caught at compile time, and if this was not the intended behavior, we have caused a runtime error, which are generally harder to deal with. So let&amp;rsquo;s catch this somehow! So you might think that you can just add some warning flags, e.g. &lt;code&gt;-Wall&lt;/code&gt;. But this program compiles fine with &lt;code&gt;-Wall&lt;/code&gt;. &lt;code&gt;-Wall&lt;/code&gt; contains narrowing, but it does not contain conversion for some reason, so we can add &lt;code&gt;-Wconversion&lt;/code&gt;, but it still compiles fine without any warnings!&lt;/p&gt;
 
