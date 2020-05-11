@@ -13,6 +13,16 @@
     
     
     <item>
+      <title>emplace_back vs push_back</title>
+      <link>https://gumeo.github.io/post/emplace-back/</link>
+      <pubDate>Mon, 11 May 2020 13:00:26 +0200</pubDate>
+      
+      <guid>https://gumeo.github.io/post/emplace-back/</guid>
+      <description>emplace_back vs push_back I have now ran into the discussion of whether one should use emplace_back instead of push_back in C++ several times and I wanted to document my current view on it.
+emplace_back came with C++11, I&amp;rsquo;m not sure when it was introduced exactly. Both of these methods, (and insert and emplace), are ways to insert data into standard library containers. emplace_back is for the dynamic array std::vector. There is a very subtle difference between the two:</description>
+    </item>
+    
+    <item>
       <title>Eating Less vs Fad? Diets</title>
       <link>https://gumeo.github.io/post/weight-loss/</link>
       <pubDate>Sat, 23 Feb 2019 13:00:26 +0200</pubDate>

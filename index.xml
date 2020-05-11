@@ -11,6 +11,126 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>emplace_back vs push_back</title>
+      <link>https://gumeo.github.io/post/emplace-back/</link>
+      <pubDate>Mon, 11 May 2020 13:00:26 +0200</pubDate>
+      
+      <guid>https://gumeo.github.io/post/emplace-back/</guid>
+      <description>
+
+&lt;h1 id=&#34;emplace-back-vs-push-back&#34;&gt;&lt;code&gt;emplace_back&lt;/code&gt; vs &lt;code&gt;push_back&lt;/code&gt;&lt;/h1&gt;
+
+&lt;p&gt;I have now ran into the discussion of whether one should use &lt;code&gt;emplace_back&lt;/code&gt; instead of &lt;code&gt;push_back&lt;/code&gt; in C++ several times and I wanted to document my current view on it.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://www.cplusplus.com/reference/vector/vector/emplace_back/&#34; target=&#34;_blank&#34;&gt;&lt;code&gt;emplace_back&lt;/code&gt;&lt;/a&gt; came with C++11, I&amp;rsquo;m not sure when it was introduced exactly. Both of these methods, (and &lt;code&gt;insert&lt;/code&gt; and &lt;code&gt;emplace&lt;/code&gt;), are ways to insert data into standard library containers. &lt;code&gt;emplace_back&lt;/code&gt; is for the dynamic array &lt;code&gt;std::vector&lt;/code&gt;. There is a very subtle difference between the two:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;push_back&lt;/code&gt; calls the constructor of the data that is being pushed, and then moves it to the container.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;emplace_back&lt;/code&gt; &amp;ldquo;constructs in place&amp;rdquo;, so one skips an extra move operation, potentially creating faster bytecode.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;If you are new to C++, then this looks like an obvious choice. Pick the one that is faster, end of story, why should anyone even be using &lt;code&gt;push_back&lt;/code&gt;&amp;hellip; If you google this &lt;a href=&#34;https://stackoverflow.com/questions/4303513/push-back-vs-emplace-back&#34; target=&#34;_blank&#34;&gt;&lt;code&gt;emplace_back&lt;/code&gt; vs &lt;code&gt;push_back&lt;/code&gt;&lt;/a&gt;, then you are taken to an old stackoverflow question around the time this was introduced, where the conclusion is also that it is kind of obvious that you should use this more efficient way of inserting data into your container.&lt;/p&gt;
+
+&lt;h2 id=&#34;be-skeptical&#34;&gt;Be skeptical&lt;/h2&gt;
+
+&lt;p&gt;After googling a bit more I found &lt;a href=&#34;https://abseil.io/tips/112&#34; target=&#34;_blank&#34;&gt;this post&lt;/a&gt;. Which kind of tells you to be careful! The google c++ styleguide does not explicitly state which of the two you should use. But if you read their bit on &lt;a href=&#34;https://google.github.io/styleguide/cppguide.html#Implicit_Conversions&#34; target=&#34;_blank&#34;&gt;implicit conversion&lt;/a&gt;, it is clear that this is not completely obvious. The following code should make it clear why this is risky business:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;#include&amp;lt;vector&amp;gt;                                                                                                                                                                                                   
+#include&amp;lt;iostream&amp;gt;
+
+int main(){
+  // Basic example
+  std::vector&amp;lt;int&amp;gt; data;
+  data.push_back(10);
+  data.emplace_back(20);
+
+  // More tricky example
+  std::vector&amp;lt;std::vector&amp;lt;int&amp;gt;&amp;gt; data_vec;
+  //data_vec.push_back(10); // Throws error!!!!
+  data_vec.emplace_back(20); // Compiles with no issue
+  std::cout &amp;lt;&amp;lt; &amp;quot;data_vec size: &amp;quot; &amp;lt;&amp;lt; data_vec.size() &amp;lt;&amp;lt; std::endl;
+  std::cout &amp;lt;&amp;lt; &amp;quot;data_vec[0] size: &amp;quot; &amp;lt;&amp;lt; data_vec[0].size() &amp;lt;&amp;lt; std::endl;
+  return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So if I compile this with the commented out line &lt;strong&gt;not commented out&lt;/strong&gt; I get:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ g++ test.cpp -o test
+test.cpp: In function ‘int main()’:
+test.cpp:11:24: error: no matching function for call to ‘std::vector&amp;lt;std::vector&amp;lt;int&amp;gt; &amp;gt;::push_back(int)’
+   data_vec.push_back(10);
+                        ^
+... Some more verbose diagnostic
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So we get an error. In the extra diagnostic we get &lt;code&gt;no known conversion for argument 1 from ‘int’ to ‘const value_type&amp;amp; {aka const std::vector&amp;lt;int&amp;gt;&amp;amp;}’&lt;/code&gt;. So there is really no conversion here that makes sense.&lt;/p&gt;
+
+&lt;p&gt;What is alarming is that if we comment out the trouble line, this works fine and when we run this we get:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ./test
+data_vec size: 1
+data_vec[0] size: 20
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So what was the difference? For &lt;code&gt;emplace_back&lt;/code&gt; we &lt;strong&gt;forward the arguments to the constructor&lt;/strong&gt;, adding a new &lt;code&gt;std::vector&amp;lt;int&amp;gt; new_vector_to_add(20)&lt;/code&gt; to &lt;code&gt;data_vec&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;so-what-is-the-issue&#34;&gt;So what is the issue?&lt;/h2&gt;
+
+&lt;p&gt;The problem is that this was not caught at compile time, and if this was not the intended behavior, we have caused a runtime error, which are generally harder to deal with. So let&amp;rsquo;s catch this somehow! So you might think that you can just add some warning flags, e.g. &lt;code&gt;-Wall&lt;/code&gt;. But this program compiles fine with &lt;code&gt;-Wall&lt;/code&gt;. &lt;code&gt;-Wall&lt;/code&gt; contains narrowing, but it does not contain conversion for some reason, so we can add &lt;code&gt;-Wconversion&lt;/code&gt;, but it still compiles fine without any warnings!&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ g++ -Wall -Wconversion test.cpp -o test
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The problem is that this conversion is happening in a system header, so we also need &lt;code&gt;-Wsystem-headers&lt;/code&gt; to catch this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ g++ -Wconversion -Wsystem-headers test.cpp -o test
+In file included from /usr/include/c++/7/vector:60:0,
+                 from test.cpp:1:
+/usr/include/c++/7/bits/stl_algobase.h: In function ‘constexpr int std::__lg(int)’:
+/usr/include/c++/7/bits/stl_algobase.h:1001:44: warning: conversion to ‘int’ from ‘long unsigned int’ may alter its value [-Wconversion]
+   { return sizeof(int) * __CHAR_BIT__  - 1 - __builtin_clz(__n); }
+                                            ^
+/usr/include/c++/7/bits/stl_algobase.h: In function ‘constexpr unsigned int std::__lg(unsigned int)’:
+/usr/include/c++/7/bits/stl_algobase.h:1005:44: warning: conversion to ‘unsigned int’ from ‘long unsigned int’ may alter its value [-Wconversion]
+   { return sizeof(int) * __CHAR_BIT__  - 1 - __builtin_clz(__n); }
+                                            ^
+In file included from /usr/include/c++/7/bits/stl_algobase.h:63:0,
+                 from /usr/include/c++/7/vector:60,
+                 from test.cpp:1:
+/usr/include/c++/7/ext/numeric_traits.h: In instantiation of ‘const short int __gnu_cxx::__numeric_traits_integer&amp;lt;short int&amp;gt;::__min’:
+/usr/include/c++/7/bits/istream.tcc:138:54:   required from here
+/usr/include/c++/7/ext/numeric_traits.h:58:35: warning: conversion to ‘short int’ alters ‘int’ constant value [-Wconversion]
+       static const _Value __min = __glibcxx_min(_Value);
+                                   ^~~~~~~~~~~~~
+In file included from /usr/include/c++/7/bits/basic_string.h:6361:0,
+                 from /usr/include/c++/7/string:52,
+                 from /usr/include/c++/7/bits/locale_classes.h:40,
+                 from /usr/include/c++/7/bits/ios_base.h:41,
+                 from /usr/include/c++/7/ios:42,
+                 from /usr/include/c++/7/ostream:38,
+                 from /usr/include/c++/7/iostream:39,
+                 from test.cpp:2:
+/usr/include/c++/7/ext/string_conversions.h: In instantiation of ‘_Ret __gnu_cxx::__stoa(_TRet (*)(const _CharT*, _CharT**, _Base ...), const char*, const _CharT*, std::size_t*, _Base ...) [with _TRet = long int; _Ret = int; _CharT = char; _Base = {int}; std::size_t = long unsigned int]’:
+/usr/include/c++/7/bits/basic_string.h:6373:19:   required from here
+/usr/include/c++/7/ext/string_conversions.h:88:8: warning: conversion to ‘int’ from ‘long int’ may alter its value [-Wconversion]
+  __ret = __tmp;
+        ^
+/usr/include/c++/7/ext/string_conversions.h: In instantiation of ‘_Ret __gnu_cxx::__stoa(_TRet (*)(const _CharT*, _CharT**, _Base ...), const char*, const _CharT*, std::size_t*, _Base ...) [with _TRet = long int; _Ret = int; _CharT = wchar_t; _Base = {int}; std::size_t = long unsigned int]’:
+/usr/include/c++/7/bits/basic_string.h:6479:19:   required from here
+/usr/include/c++/7/ext/string_conversions.h:88:8: warning: conversion to ‘int’ from ‘long int’ may alter its value [-Wconversion]
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And boom&amp;hellip;. look at all that verbose output. Skimming through a sea of warnings, it would be rather tricky to nail this down.&lt;/p&gt;
+
+&lt;h2 id=&#34;emplace-back-is-a-premature-optimization&#34;&gt;&lt;code&gt;emplace_back&lt;/code&gt; is a premature optimization.&lt;/h2&gt;
+
+&lt;p&gt;Going from &lt;code&gt;push_back&lt;/code&gt; to &lt;code&gt;emplace_back&lt;/code&gt; is a small change that can wait. For safety, reliability and maintainability reasons, it is better to write the code with &lt;code&gt;push_back&lt;/code&gt;. This reduces the chance of pushing an unwanted hard to find implicit conversionis into the codebase. When one can finally get to profiling the code, this is an opportunity to replace some of those &lt;code&gt;push_back&lt;/code&gt; with &lt;code&gt;emplace_back&lt;/code&gt; if there is any significant gain.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Eating Less vs Fad? Diets</title>
       <link>https://gumeo.github.io/post/weight-loss/</link>
       <pubDate>Sat, 23 Feb 2019 13:00:26 +0200</pubDate>
