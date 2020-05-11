@@ -18,20 +18,22 @@
       <guid>https://gumeo.github.io/post/emplace-back/</guid>
       <description>
 
-&lt;h1 id=&#34;emplace-back-vs-push-back&#34;&gt;&lt;code&gt;emplace_back&lt;/code&gt; vs &lt;code&gt;push_back&lt;/code&gt;&lt;/h1&gt;
+&lt;h1 id=&#34;which-to-choose&#34;&gt;Which to choose?&lt;/h1&gt;
 
-&lt;p&gt;I have repeatedly run into the choice of using &lt;code&gt;emplace_back&lt;/code&gt; instead of &lt;code&gt;push_back&lt;/code&gt; in C++. This short blog post serves as my take on this decision. In short, choose &lt;code&gt;push_back&lt;/code&gt; and only later change to &lt;code&gt;emplace_back&lt;/code&gt; if it provides significant speed improvements when profiling.&lt;/p&gt;
+&lt;p&gt;tl;dr Choose &lt;code&gt;push_back&lt;/code&gt; and only later change to &lt;code&gt;emplace_back&lt;/code&gt; if it provides significant speed improvements when profiling.&lt;/p&gt;
 
-&lt;p&gt;Both of the methods in the title, along with &lt;code&gt;insert&lt;/code&gt; and &lt;code&gt;emplace&lt;/code&gt;, are ways to insert data into standard library containers. &lt;code&gt;emplace_back&lt;/code&gt; is for adding a single element to the dynamic array &lt;code&gt;std::vector&lt;/code&gt;. There is a very subtle difference between the two:&lt;/p&gt;
+&lt;p&gt;I have repeatedly run into the choice of using &lt;code&gt;emplace_back&lt;/code&gt; instead of &lt;code&gt;push_back&lt;/code&gt; in C++. This short blog post serves as my take on this decision.&lt;/p&gt;
+
+&lt;p&gt;Both of the methods in the title, along with &lt;code&gt;insert&lt;/code&gt; and &lt;code&gt;emplace&lt;/code&gt;, are ways to insert data into standard library containers. &lt;code&gt;emplace_back&lt;/code&gt; is for adding a single element to the dynamic array &lt;code&gt;std::vector&lt;/code&gt;. There is a somewhat subtle difference between the two:&lt;/p&gt;
 
 &lt;ol&gt;
 &lt;li&gt;&lt;code&gt;push_back calls&lt;/code&gt; the constructor of the data that you intend to push and then pushes it to the container.&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;emplace_back&lt;/code&gt; &amp;ldquo;constructs in place&amp;rdquo;, so one skips an extra move operation, potentially creating faster bytecode.&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;One could naively choose the faster method. Why even offer a slower alternative? Searching for the problem online yields a lengthy discussion on the &lt;a href=&#34;https://stackoverflow.com/questions/4303513/push-back-vs-emplace-back&#34; target=&#34;_blank&#34;&gt;issue (emplace_back vs push_back)&lt;/a&gt;. In summary, the discussion leans towards choosing the more efficient &lt;code&gt;emplace_back&lt;/code&gt; to insert data into your container, but it is not completely clear.&lt;/p&gt;
+&lt;p&gt;One could naively choose the faster method. Why even offer a slower alternative? Searching for the problem online yields a lengthy discussion on the &lt;a href=&#34;https://stackoverflow.com/questions/4303513/push-back-vs-emplace-back&#34; target=&#34;_blank&#34;&gt;issue (emplace_back vs push_back)&lt;/a&gt;. In summary, the discussion leans towards choosing the more efficient &lt;code&gt;emplace_back&lt;/code&gt; to insert data into your container, however the reason it is not completely clear.&lt;/p&gt;
 
-&lt;h2 id=&#34;be-skeptical-and-careful-the-devil-is-in-the-details&#34;&gt;Be skeptical and careful, the devil is in the details!&lt;/h2&gt;
+&lt;h2 id=&#34;be-critical-and-careful-the-devil-is-in-the-details&#34;&gt;Be critical and careful, the devil is in the details!&lt;/h2&gt;
 
 &lt;p&gt;After searching a bit more I found &lt;a href=&#34;https://abseil.io/tips/112&#34; target=&#34;_blank&#34;&gt;this post&lt;/a&gt;, which stresses how careful one should be with this decision. Which kind of tells you to be careful! To further stress the ambiguity of the matter, the google c++ style guide does not provide an explicit preference. However, in their section on &lt;a href=&#34;https://google.github.io/styleguide/cppguide.html#Implicit_Conversions&#34; target=&#34;_blank&#34;&gt;implicit conversion&lt;/a&gt;, it becomes clear that the decision between the two methods is not completely obvious. The following code should make it clear why &lt;code&gt;emplace_back&lt;/code&gt; is not worth the risk:&lt;/p&gt;
 
