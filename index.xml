@@ -33,7 +33,7 @@
 
 &lt;h2 id=&#34;be-careful&#34;&gt;Be careful&lt;/h2&gt;
 
-&lt;p&gt;After searching a bit more I found &lt;a href=&#34;https://abseil.io/tips/112&#34; target=&#34;_blank&#34;&gt;this post&lt;/a&gt;, which stresses how careful one should be with this decision. To further stress the ambiguity of the matter, the google c++ style guide does not provide an explicit preference.&lt;/p&gt;
+&lt;p&gt;After searching a bit more I found &lt;a href=&#34;https://abseil.io/tips/112&#34; target=&#34;_blank&#34;&gt;this post&lt;/a&gt;, which stresses how careful one should be with this decision. To further stress the ambiguity of the matter, the google c++ style guide does not provide an explicit preference. The reason the don&amp;rsquo;t state a preference, is because these are simply slightly different tools, and you should not use &lt;code&gt;emplace_back&lt;/code&gt; unless you properly understand it.&lt;/p&gt;
 
 &lt;p&gt;The following code should make it clear how &lt;code&gt;emplace_back&lt;/code&gt; is different from &lt;code&gt;push_back&lt;/code&gt;:&lt;/p&gt;
 

@@ -306,7 +306,7 @@ Both of the methods in the title, along with insert and emplace, are ways to ins
 
 <h2 id="be-careful">Be careful</h2>
 
-<p>After searching a bit more I found <a href="https://abseil.io/tips/112" target="_blank">this post</a>, which stresses how careful one should be with this decision. To further stress the ambiguity of the matter, the google c++ style guide does not provide an explicit preference.</p>
+<p>After searching a bit more I found <a href="https://abseil.io/tips/112" target="_blank">this post</a>, which stresses how careful one should be with this decision. To further stress the ambiguity of the matter, the google c++ style guide does not provide an explicit preference. The reason the don&rsquo;t state a preference, is because these are simply slightly different tools, and you should not use <code>emplace_back</code> unless you properly understand it.</p>
 
 <p>The following code should make it clear how <code>emplace_back</code> is different from <code>push_back</code>:</p>
 
