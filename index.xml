@@ -18,7 +18,7 @@
       <guid>https://gumeo.github.io/post/emplace-back/</guid>
       <description>
 
-&lt;p&gt;tl;dr Choose &lt;code&gt;push_back&lt;/code&gt; and only later change to &lt;code&gt;emplace_back&lt;/code&gt; if it provides significant speed improvements when profiling.&lt;/p&gt;
+&lt;p&gt;tl;dr &lt;code&gt;emplace_back&lt;/code&gt; is often mistaken as a faster &lt;code&gt;push_back&lt;/code&gt;, while it is in fact just a different tool. Do not blindly replace &lt;code&gt;push_back&lt;/code&gt; by &lt;code&gt;emplace_back&lt;/code&gt;, be careful of how you use &lt;code&gt;emplace_back&lt;/code&gt;, since it can have unexpected consequences.&lt;/p&gt;
 
 &lt;p&gt;I have repeatedly run into the choice of using &lt;code&gt;emplace_back&lt;/code&gt; instead of &lt;code&gt;push_back&lt;/code&gt; in C++. This short blog post serves as my take on this decision.&lt;/p&gt;
 
@@ -29,11 +29,13 @@
 &lt;li&gt;&lt;code&gt;emplace_back&lt;/code&gt; &amp;ldquo;constructs in place&amp;rdquo;, so one skips an extra move operation, potentially creating faster bytecode. This is done by forwarding the arguments to the container&amp;rsquo;s template type constructor.&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;One could naively choose the faster method. Why even offer a slower alternative? Searching for the problem online yields a lengthy discussion on the &lt;a href=&#34;https://stackoverflow.com/questions/4303513/push-back-vs-emplace-back&#34; target=&#34;_blank&#34;&gt;issue (emplace_back vs push_back)&lt;/a&gt;. In summary, the discussion leans towards choosing the more efficient &lt;code&gt;emplace_back&lt;/code&gt; to insert data into your container, however the reason it is not completely clear.&lt;/p&gt;
+&lt;p&gt;On the surface, &lt;code&gt;emplace_back&lt;/code&gt; might look like a faster &lt;code&gt;push_back&lt;/code&gt;, but there is a subtle difference contained in the act of forwarding arguments. Searching for the problem online yields a lengthy discussion on the &lt;a href=&#34;https://stackoverflow.com/questions/4303513/push-back-vs-emplace-back&#34; target=&#34;_blank&#34;&gt;issue (emplace_back vs push_back)&lt;/a&gt;. In summary, the discussion leans towards choosing &lt;code&gt;emplace_back&lt;/code&gt; to insert data into your container, however the reason is not completely clear.&lt;/p&gt;
 
 &lt;h2 id=&#34;be-careful&#34;&gt;Be careful&lt;/h2&gt;
 
-&lt;p&gt;After searching a bit more I found &lt;a href=&#34;https://abseil.io/tips/112&#34; target=&#34;_blank&#34;&gt;this post&lt;/a&gt;, which stresses how careful one should be with this decision. Which kind of tells you to be careful. To further stress the ambiguity of the matter, the google c++ style guide does not provide an explicit preference. However, in their section on &lt;a href=&#34;https://google.github.io/styleguide/cppguide.html#Implicit_Conversions&#34; target=&#34;_blank&#34;&gt;implicit conversion&lt;/a&gt;, it becomes clear that the decision between the two methods is not completely obvious. The following code should make it clear why &lt;code&gt;emplace_back&lt;/code&gt; is not worth the risk:&lt;/p&gt;
+&lt;p&gt;After searching a bit more I found &lt;a href=&#34;https://abseil.io/tips/112&#34; target=&#34;_blank&#34;&gt;this post&lt;/a&gt;, which stresses how careful one should be with this decision. To further stress the ambiguity of the matter, the google c++ style guide does not provide an explicit preference.&lt;/p&gt;
+
+&lt;p&gt;The following code should make it clear how &lt;code&gt;emplace_back&lt;/code&gt; is different from &lt;code&gt;push_back&lt;/code&gt;:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;#include&amp;lt;vector&amp;gt;
 #include&amp;lt;iostream&amp;gt;
@@ -73,11 +75,11 @@ data_vec size: 1
 data_vec[0] size: 20
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;What is the difference? For &lt;code&gt;emplace_back&lt;/code&gt; we &lt;strong&gt;forward the arguments to the constructor&lt;/strong&gt;, adding a new &lt;code&gt;std::vector&amp;lt;int&amp;gt; new_vector_to_add(20)&lt;/code&gt; to &lt;code&gt;data_vec&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;What is the difference? For &lt;code&gt;emplace_back&lt;/code&gt; we &lt;strong&gt;forward the arguments to the constructor&lt;/strong&gt;, adding a new &lt;code&gt;std::vector&amp;lt;int&amp;gt; new_vector_to_add(20)&lt;/code&gt; to &lt;code&gt;data_vec&lt;/code&gt;. This is the critical difference. So if you are using &lt;code&gt;emplace_back&lt;/code&gt; you need to be a bit extra careful in double checking types.&lt;/p&gt;
 
 &lt;h2 id=&#34;another-example-with-conversion&#34;&gt;Another example with conversion&lt;/h2&gt;
 
-&lt;p&gt;The example above is very simple and shows the difference of forwarding arguments to the value type constructor or not. The following example I added in an &lt;a href=&#34;https://stackoverflow.com/questions/61592849/no-narrowing-warnings-when-using-emplace-back-instead-of-push-back&#34; target=&#34;_blank&#34;&gt;SO question&lt;/a&gt; shows a bit more subtle case where &lt;code&gt;emplace_back&lt;/code&gt; could make us miss catching a conversion from &lt;code&gt;double&lt;/code&gt; to &lt;code&gt;int&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The example above is very simple and shows the difference of forwarding arguments to the value type constructor or not. The following example I added in an &lt;a href=&#34;https://stackoverflow.com/questions/61592849/no-narrowing-warnings-when-using-emplace-back-instead-of-push-back&#34; target=&#34;_blank&#34;&gt;SO question&lt;/a&gt; shows a bit more subtle case where &lt;code&gt;emplace_back&lt;/code&gt; could make us miss catching a narrowing conversion from &lt;code&gt;double&lt;/code&gt; to &lt;code&gt;int&lt;/code&gt;.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;#include &amp;lt;vector&amp;gt;
 class A {
@@ -128,7 +130,7 @@ test_2.cpp:9:25:   required from here
 
 &lt;h2 id=&#34;emplace-back-is-a-premature-optimization&#34;&gt;&lt;code&gt;emplace_back&lt;/code&gt; is a premature optimization.&lt;/h2&gt;
 
-&lt;p&gt;Going from &lt;code&gt;push_back&lt;/code&gt; to &lt;code&gt;emplace_back&lt;/code&gt; is a small change that can usually wait. For safety, reliability, and maintainability reasons, it is better to write the code with &lt;code&gt;push_back&lt;/code&gt;. This choice reduces the chance of pushing an unwanted hard to find implicit conversion into the codebase. Profiling the code might reveal opportunities to replace some &lt;code&gt;push_back&lt;/code&gt; calls with &lt;code&gt;emplace_back&lt;/code&gt;, but remember when optimizing to tread carefully.&lt;/p&gt;
+&lt;p&gt;Going from &lt;code&gt;push_back&lt;/code&gt; to &lt;code&gt;emplace_back&lt;/code&gt; is a small change that can usually wait. If you want to use &lt;code&gt;emplace_back&lt;/code&gt; from the start, then make sure you understand the differences. This is not just a faster &lt;code&gt;push_back&lt;/code&gt;. For safety, reliability, and maintainability reasons, it is better to write the code with &lt;code&gt;push_back&lt;/code&gt;. This choice reduces the chance of pushing an unwanted hard to find implicit conversion into the codebase, but you should weigh that risk against the potential speedups.&lt;/p&gt;
 </description>
     </item>
     

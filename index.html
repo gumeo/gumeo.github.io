@@ -434,9 +434,9 @@
   </h3>
   <div class="article-style" itemprop="articleBody">
     
-    tl;dr Choose push_back and only later change to emplace_back if it provides significant speed improvements when profiling.
+    tl;dr emplace_back is often mistaken as a faster push_back, while it is in fact just a different tool. Do not blindly replace push_back by emplace_back, be careful of how you use emplace_back, since it can have unexpected consequences.
 I have repeatedly run into the choice of using emplace_back instead of push_back in C++. This short blog post serves as my take on this decision.
-Both of the methods in the title, along with insert and emplace, are ways to insert data into standard library containers. emplace_back is for adding a single element to the dynamic array std::vector.
+Both of the methods in the title, along with insert and emplace, are ways to insert data into standard library containers.
     
   </div>
   <p class="read-more" itemprop="mainEntityOfPage">

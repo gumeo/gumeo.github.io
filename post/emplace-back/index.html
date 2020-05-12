@@ -17,9 +17,9 @@
       
     
   
-  <meta name="description" content="tl;dr Choose push_back and only later change to emplace_back if it provides significant speed improvements when profiling.
+  <meta name="description" content="tl;dr emplace_back is often mistaken as a faster push_back, while it is in fact just a different tool. Do not blindly replace push_back by emplace_back, be careful of how you use emplace_back, since it can have unexpected consequences.
 I have repeatedly run into the choice of using emplace_back instead of push_back in C&#43;&#43;. This short blog post serves as my take on this decision.
-Both of the methods in the title, along with insert and emplace, are ways to insert data into standard library containers. emplace_back is for adding a single element to the dynamic array std::vector.">
+Both of the methods in the title, along with insert and emplace, are ways to insert data into standard library containers.">
 
   
   <link rel="alternate" hreflang="en-us" href="https://gumeo.github.io/post/emplace-back/">
@@ -95,9 +95,9 @@ Both of the methods in the title, along with insert and emplace, are ways to ins
   <meta property="og:site_name" content="Gudmundur Blog&amp;Bio">
   <meta property="og:url" content="https://gumeo.github.io/post/emplace-back/">
   <meta property="og:title" content="emplace_back vs push_back | Gudmundur Blog&amp;Bio">
-  <meta property="og:description" content="tl;dr Choose push_back and only later change to emplace_back if it provides significant speed improvements when profiling.
+  <meta property="og:description" content="tl;dr emplace_back is often mistaken as a faster push_back, while it is in fact just a different tool. Do not blindly replace push_back by emplace_back, be careful of how you use emplace_back, since it can have unexpected consequences.
 I have repeatedly run into the choice of using emplace_back instead of push_back in C&#43;&#43;. This short blog post serves as my take on this decision.
-Both of the methods in the title, along with insert and emplace, are ways to insert data into standard library containers. emplace_back is for adding a single element to the dynamic array std::vector.">
+Both of the methods in the title, along with insert and emplace, are ways to insert data into standard library containers.">
   <meta property="og:locale" content="en-us">
   
   <meta property="article:published_time" content="2020-05-11T13:00:26&#43;02:00">
@@ -291,7 +291,7 @@ Both of the methods in the title, along with insert and emplace, are ways to ins
     <div class="article-style" itemprop="articleBody">
       
 
-<p>tl;dr Choose <code>push_back</code> and only later change to <code>emplace_back</code> if it provides significant speed improvements when profiling.</p>
+<p>tl;dr <code>emplace_back</code> is often mistaken as a faster <code>push_back</code>, while it is in fact just a different tool. Do not blindly replace <code>push_back</code> by <code>emplace_back</code>, be careful of how you use <code>emplace_back</code>, since it can have unexpected consequences.</p>
 
 <p>I have repeatedly run into the choice of using <code>emplace_back</code> instead of <code>push_back</code> in C++. This short blog post serves as my take on this decision.</p>
 
@@ -302,11 +302,13 @@ Both of the methods in the title, along with insert and emplace, are ways to ins
 <li><code>emplace_back</code> &ldquo;constructs in place&rdquo;, so one skips an extra move operation, potentially creating faster bytecode. This is done by forwarding the arguments to the container&rsquo;s template type constructor.</li>
 </ol>
 
-<p>One could naively choose the faster method. Why even offer a slower alternative? Searching for the problem online yields a lengthy discussion on the <a href="https://stackoverflow.com/questions/4303513/push-back-vs-emplace-back" target="_blank">issue (emplace_back vs push_back)</a>. In summary, the discussion leans towards choosing the more efficient <code>emplace_back</code> to insert data into your container, however the reason it is not completely clear.</p>
+<p>On the surface, <code>emplace_back</code> might look like a faster <code>push_back</code>, but there is a subtle difference contained in the act of forwarding arguments. Searching for the problem online yields a lengthy discussion on the <a href="https://stackoverflow.com/questions/4303513/push-back-vs-emplace-back" target="_blank">issue (emplace_back vs push_back)</a>. In summary, the discussion leans towards choosing <code>emplace_back</code> to insert data into your container, however the reason is not completely clear.</p>
 
 <h2 id="be-careful">Be careful</h2>
 
-<p>After searching a bit more I found <a href="https://abseil.io/tips/112" target="_blank">this post</a>, which stresses how careful one should be with this decision. Which kind of tells you to be careful. To further stress the ambiguity of the matter, the google c++ style guide does not provide an explicit preference. However, in their section on <a href="https://google.github.io/styleguide/cppguide.html#Implicit_Conversions" target="_blank">implicit conversion</a>, it becomes clear that the decision between the two methods is not completely obvious. The following code should make it clear why <code>emplace_back</code> is not worth the risk:</p>
+<p>After searching a bit more I found <a href="https://abseil.io/tips/112" target="_blank">this post</a>, which stresses how careful one should be with this decision. To further stress the ambiguity of the matter, the google c++ style guide does not provide an explicit preference.</p>
+
+<p>The following code should make it clear how <code>emplace_back</code> is different from <code>push_back</code>:</p>
 
 <pre><code class="language-cpp">#include&lt;vector&gt;
 #include&lt;iostream&gt;
@@ -346,11 +348,11 @@ data_vec size: 1
 data_vec[0] size: 20
 </code></pre>
 
-<p>What is the difference? For <code>emplace_back</code> we <strong>forward the arguments to the constructor</strong>, adding a new <code>std::vector&lt;int&gt; new_vector_to_add(20)</code> to <code>data_vec</code>.</p>
+<p>What is the difference? For <code>emplace_back</code> we <strong>forward the arguments to the constructor</strong>, adding a new <code>std::vector&lt;int&gt; new_vector_to_add(20)</code> to <code>data_vec</code>. This is the critical difference. So if you are using <code>emplace_back</code> you need to be a bit extra careful in double checking types.</p>
 
 <h2 id="another-example-with-conversion">Another example with conversion</h2>
 
-<p>The example above is very simple and shows the difference of forwarding arguments to the value type constructor or not. The following example I added in an <a href="https://stackoverflow.com/questions/61592849/no-narrowing-warnings-when-using-emplace-back-instead-of-push-back" target="_blank">SO question</a> shows a bit more subtle case where <code>emplace_back</code> could make us miss catching a conversion from <code>double</code> to <code>int</code>.</p>
+<p>The example above is very simple and shows the difference of forwarding arguments to the value type constructor or not. The following example I added in an <a href="https://stackoverflow.com/questions/61592849/no-narrowing-warnings-when-using-emplace-back-instead-of-push-back" target="_blank">SO question</a> shows a bit more subtle case where <code>emplace_back</code> could make us miss catching a narrowing conversion from <code>double</code> to <code>int</code>.</p>
 
 <pre><code class="language-cpp">#include &lt;vector&gt;
 class A {
@@ -401,7 +403,7 @@ test_2.cpp:9:25:   required from here
 
 <h2 id="emplace-back-is-a-premature-optimization"><code>emplace_back</code> is a premature optimization.</h2>
 
-<p>Going from <code>push_back</code> to <code>emplace_back</code> is a small change that can usually wait. For safety, reliability, and maintainability reasons, it is better to write the code with <code>push_back</code>. This choice reduces the chance of pushing an unwanted hard to find implicit conversion into the codebase. Profiling the code might reveal opportunities to replace some <code>push_back</code> calls with <code>emplace_back</code>, but remember when optimizing to tread carefully.</p>
+<p>Going from <code>push_back</code> to <code>emplace_back</code> is a small change that can usually wait. If you want to use <code>emplace_back</code> from the start, then make sure you understand the differences. This is not just a faster <code>push_back</code>. For safety, reliability, and maintainability reasons, it is better to write the code with <code>push_back</code>. This choice reduces the chance of pushing an unwanted hard to find implicit conversion into the codebase, but you should weigh that risk against the potential speedups.</p>
 
     </div>
 
