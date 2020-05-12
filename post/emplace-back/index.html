@@ -315,26 +315,26 @@ Both of the methods in the title, along with insert and emplace, are ways to ins
 
 int main(){
   // Basic example
-  std::vector&lt;int&gt; data;
-  data.push_back(10);
-  data.emplace_back(20);
+  std::vector&lt;int&gt; foo;
+  foo.push_back(10);
+  foo.emplace_back(20);
 
   // More tricky example
-  std::vector&lt;std::vector&lt;int&gt;&gt; data_vec;
-  //data_vec.push_back(10); // Throws error!!!!
-  data_vec.emplace_back(20); // Compiles with no issue
-  std::cout &lt;&lt; &quot;data_vec size: &quot; &lt;&lt; data_vec.size() &lt;&lt; &quot;\n&quot;;
-  std::cout &lt;&lt; &quot;data_vec[0] size: &quot; &lt;&lt; data_vec[0].size() &lt;&lt; &quot;\n&quot;;
+  std::vector&lt;std::vector&lt;int&gt;&gt; foo_bar;
+  //foo_bar.push_back(10); // Throws error!!!!
+  foo_bar.emplace_back(20); // Compiles with no issue
+  std::cout &lt;&lt; &quot;foo_bar size: &quot; &lt;&lt; foo_bar.size() &lt;&lt; &quot;\n&quot;;
+  std::cout &lt;&lt; &quot;foo_bar[0] size: &quot; &lt;&lt; foo_bar[0].size() &lt;&lt; &quot;\n&quot;;
   return 0;
 }
 </code></pre>
 
-<p>Uncommenting the line <code>data_vec.push_back(10)</code> yields the following compilation error.</p>
+<p>Uncommenting the line <code>foo_bar.push_back(10)</code> yields the following compilation error.</p>
 
 <pre><code>$ g++ test.cpp -o test
 test.cpp: In function ‘int main()’:
 test.cpp:11:24: error: no matching function for call to ‘std::vector&lt;std::vector&lt;int&gt; &gt;::push_back(int)’
-   data_vec.push_back(10);
+   foo_bar.push_back(10);
                         ^
 ... Some more verbose diagnostic
 </code></pre>
@@ -344,11 +344,11 @@ test.cpp:11:24: error: no matching function for call to ‘std::vector&lt;std::v
 <p>The compilation completes without errors if we comment out the trouble line. Running the code yields the following result:</p>
 
 <pre><code>$ ./test
-data_vec size: 1
-data_vec[0] size: 20
+foo_bar size: 1
+foo_bar[0] size: 20
 </code></pre>
 
-<p>What is the difference? For <code>emplace_back</code> we <strong>forward the arguments to the constructor</strong>, adding a new <code>std::vector&lt;int&gt; new_vector_to_add(20)</code> to <code>data_vec</code>. This is the critical difference. So if you are using <code>emplace_back</code> you need to be a bit extra careful in double checking types.</p>
+<p>What is the difference? For <code>emplace_back</code> we <strong>forward the arguments to the constructor</strong>, adding a new <code>std::vector&lt;int&gt; new_vector_to_add(20)</code> to <code>foo_bar</code>. This is the critical difference. So if you are using <code>emplace_back</code> you need to be a bit extra careful in double checking types.</p>
 
 <h2 id="another-example-with-conversion">Another example with conversion</h2>
 

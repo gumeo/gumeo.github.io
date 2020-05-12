@@ -42,26 +42,26 @@
 
 int main(){
   // Basic example
-  std::vector&amp;lt;int&amp;gt; data;
-  data.push_back(10);
-  data.emplace_back(20);
+  std::vector&amp;lt;int&amp;gt; foo;
+  foo.push_back(10);
+  foo.emplace_back(20);
 
   // More tricky example
-  std::vector&amp;lt;std::vector&amp;lt;int&amp;gt;&amp;gt; data_vec;
-  //data_vec.push_back(10); // Throws error!!!!
-  data_vec.emplace_back(20); // Compiles with no issue
-  std::cout &amp;lt;&amp;lt; &amp;quot;data_vec size: &amp;quot; &amp;lt;&amp;lt; data_vec.size() &amp;lt;&amp;lt; &amp;quot;\n&amp;quot;;
-  std::cout &amp;lt;&amp;lt; &amp;quot;data_vec[0] size: &amp;quot; &amp;lt;&amp;lt; data_vec[0].size() &amp;lt;&amp;lt; &amp;quot;\n&amp;quot;;
+  std::vector&amp;lt;std::vector&amp;lt;int&amp;gt;&amp;gt; foo_bar;
+  //foo_bar.push_back(10); // Throws error!!!!
+  foo_bar.emplace_back(20); // Compiles with no issue
+  std::cout &amp;lt;&amp;lt; &amp;quot;foo_bar size: &amp;quot; &amp;lt;&amp;lt; foo_bar.size() &amp;lt;&amp;lt; &amp;quot;\n&amp;quot;;
+  std::cout &amp;lt;&amp;lt; &amp;quot;foo_bar[0] size: &amp;quot; &amp;lt;&amp;lt; foo_bar[0].size() &amp;lt;&amp;lt; &amp;quot;\n&amp;quot;;
   return 0;
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Uncommenting the line &lt;code&gt;data_vec.push_back(10)&lt;/code&gt; yields the following compilation error.&lt;/p&gt;
+&lt;p&gt;Uncommenting the line &lt;code&gt;foo_bar.push_back(10)&lt;/code&gt; yields the following compilation error.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ g++ test.cpp -o test
 test.cpp: In function ‘int main()’:
 test.cpp:11:24: error: no matching function for call to ‘std::vector&amp;lt;std::vector&amp;lt;int&amp;gt; &amp;gt;::push_back(int)’
-   data_vec.push_back(10);
+   foo_bar.push_back(10);
                         ^
 ... Some more verbose diagnostic
 &lt;/code&gt;&lt;/pre&gt;
@@ -71,11 +71,11 @@ test.cpp:11:24: error: no matching function for call to ‘std::vector&amp;lt;st
 &lt;p&gt;The compilation completes without errors if we comment out the trouble line. Running the code yields the following result:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ ./test
-data_vec size: 1
-data_vec[0] size: 20
+foo_bar size: 1
+foo_bar[0] size: 20
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;What is the difference? For &lt;code&gt;emplace_back&lt;/code&gt; we &lt;strong&gt;forward the arguments to the constructor&lt;/strong&gt;, adding a new &lt;code&gt;std::vector&amp;lt;int&amp;gt; new_vector_to_add(20)&lt;/code&gt; to &lt;code&gt;data_vec&lt;/code&gt;. This is the critical difference. So if you are using &lt;code&gt;emplace_back&lt;/code&gt; you need to be a bit extra careful in double checking types.&lt;/p&gt;
+&lt;p&gt;What is the difference? For &lt;code&gt;emplace_back&lt;/code&gt; we &lt;strong&gt;forward the arguments to the constructor&lt;/strong&gt;, adding a new &lt;code&gt;std::vector&amp;lt;int&amp;gt; new_vector_to_add(20)&lt;/code&gt; to &lt;code&gt;foo_bar&lt;/code&gt;. This is the critical difference. So if you are using &lt;code&gt;emplace_back&lt;/code&gt; you need to be a bit extra careful in double checking types.&lt;/p&gt;
 
 &lt;h2 id=&#34;another-example-with-conversion&#34;&gt;Another example with conversion&lt;/h2&gt;
 
