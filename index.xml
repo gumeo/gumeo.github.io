@@ -1,0 +1,681 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Gudmundur Blog&amp;Bio</title>
+    <link>https://gumeo.github.io/</link>
+      <atom:link href="https://gumeo.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <description>Gudmundur Blog&amp;Bio</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2020</copyright><lastBuildDate>Mon, 11 May 2020 13:00:00 +0000</lastBuildDate>
+    <image>
+      <url>https://gumeo.github.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
+      <title>Gudmundur Blog&amp;Bio</title>
+      <link>https://gumeo.github.io/</link>
+    </image>
+    
+    <item>
+      <title>emplace_back vs push_back</title>
+      <link>https://gumeo.github.io/post/emplace-back/</link>
+      <pubDate>Mon, 11 May 2020 13:00:00 +0000</pubDate>
+      <guid>https://gumeo.github.io/post/emplace-back/</guid>
+      <description>&lt;p&gt;tl;dr &lt;code&gt;emplace_back&lt;/code&gt; is often mistaken as a faster &lt;code&gt;push_back&lt;/code&gt;, while it is in fact just a different tool. Do not blindly replace &lt;code&gt;push_back&lt;/code&gt; by &lt;code&gt;emplace_back&lt;/code&gt;, be careful of how you use &lt;code&gt;emplace_back&lt;/code&gt;, since it can have unexpected consequences.&lt;/p&gt;
+&lt;p&gt;I have repeatedly run into the choice of using &lt;code&gt;emplace_back&lt;/code&gt; instead of &lt;code&gt;push_back&lt;/code&gt; in C++. This short blog post serves as my take on this decision.&lt;/p&gt;
+&lt;p&gt;Both of the methods in the title, along with &lt;code&gt;insert&lt;/code&gt; and &lt;code&gt;emplace&lt;/code&gt;, are ways to insert data into standard library containers. &lt;code&gt;emplace_back&lt;/code&gt; is for adding a single element to the dynamic array &lt;code&gt;std::vector&lt;/code&gt;. There is a somewhat subtle difference between the two:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;push_back&lt;/code&gt; calls the constructor of the data that you intend to push and then pushes it to the container.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;emplace_back&lt;/code&gt; &amp;ldquo;constructs in place&amp;rdquo;, so one skips an extra move operation, potentially creating faster bytecode. This is done by forwarding the arguments to the container&amp;rsquo;s template type constructor.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;On the surface, &lt;code&gt;emplace_back&lt;/code&gt; might look like a faster &lt;code&gt;push_back&lt;/code&gt;, but there is a subtle difference contained in the act of forwarding arguments. Searching for the problem online yields a lengthy discussion on the 
+&lt;a href=&#34;https://stackoverflow.com/questions/4303513/push-back-vs-emplace-back&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;issue (emplace_back vs push_back)&lt;/a&gt;. In summary, the discussion leans towards choosing &lt;code&gt;emplace_back&lt;/code&gt; to insert data into your container, however the reason is not completely clear.&lt;/p&gt;
+&lt;h2 id=&#34;be-careful&#34;&gt;Be careful&lt;/h2&gt;
+&lt;p&gt;After searching a bit more I found 
+&lt;a href=&#34;https://abseil.io/tips/112&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;this post&lt;/a&gt;, which stresses how careful one should be. To further stress the ambiguity of the matter, the google c++ style guide does not provide an explicit preference. The reason they don&amp;rsquo;t state a preference, is because these are simply slightly different tools, and you should not use &lt;code&gt;emplace_back&lt;/code&gt; unless you properly understand it, and there is a proper reason for it.&lt;/p&gt;
+&lt;p&gt;The following code should make it clear how &lt;code&gt;emplace_back&lt;/code&gt; is different from &lt;code&gt;push_back&lt;/code&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-{cpp}&#34;&gt;#include&amp;lt;vector&amp;gt;
+#include&amp;lt;iostream&amp;gt;
+
+int main(){
+  // Basic example
+  std::vector&amp;lt;int&amp;gt; foo;
+  foo.push_back(10);
+  foo.emplace_back(20);
+
+  // More tricky example
+  std::vector&amp;lt;std::vector&amp;lt;int&amp;gt;&amp;gt; foo_bar;
+  //foo_bar.push_back(10); // Throws error!!!!
+  foo_bar.emplace_back(20); // Compiles with no issue
+  std::cout &amp;lt;&amp;lt; &amp;quot;foo_bar size: &amp;quot; &amp;lt;&amp;lt; foo_bar.size() &amp;lt;&amp;lt; &amp;quot;\n&amp;quot;;
+  std::cout &amp;lt;&amp;lt; &amp;quot;foo_bar[0] size: &amp;quot; &amp;lt;&amp;lt; foo_bar[0].size() &amp;lt;&amp;lt; &amp;quot;\n&amp;quot;;
+  return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Uncommenting the line &lt;code&gt;foo_bar.push_back(10)&lt;/code&gt; yields the following compilation error.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ g++ test.cpp -o test
+test.cpp: In function ‘int main()’:
+test.cpp:11:24: error: no matching function for call to ‘std::vector&amp;lt;std::vector&amp;lt;int&amp;gt; &amp;gt;::push_back(int)’
+   foo_bar.push_back(10);
+                        ^
+... Some more verbose diagnostic
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So we get an error. An extra diagnostic provides us with the following: &lt;code&gt;no known conversion for argument 1 from ‘int’ to ‘const value_type&amp;amp; {aka const std::vector&amp;lt;int&amp;gt;&amp;amp;}’&lt;/code&gt;. So it seems there is no conversion here that makes sense.&lt;/p&gt;
+&lt;p&gt;The compilation completes without errors if we comment out the trouble line. Running the code yields the following result:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ ./test
+foo_bar size: 1
+foo_bar[0] size: 20
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;What is the difference? For &lt;code&gt;emplace_back&lt;/code&gt; we &lt;strong&gt;forward the arguments to the constructor&lt;/strong&gt;, adding a new &lt;code&gt;std::vector&amp;lt;int&amp;gt; new_vector_to_add(20)&lt;/code&gt; to &lt;code&gt;foo_bar&lt;/code&gt;. This is the critical difference. So if you are using &lt;code&gt;emplace_back&lt;/code&gt; you need to be a bit extra careful in double checking types.&lt;/p&gt;
+&lt;h2 id=&#34;another-example-with-conversion&#34;&gt;Another example with conversion&lt;/h2&gt;
+&lt;p&gt;The example above is very simple and shows the difference of forwarding arguments to the value type constructor or not. The following example I added in an 
+&lt;a href=&#34;https://stackoverflow.com/questions/61592849/no-narrowing-warnings-when-using-emplace-back-instead-of-push-back&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;SO question&lt;/a&gt; shows a bit more subtle case where &lt;code&gt;emplace_back&lt;/code&gt; could make us miss catching a narrowing conversion from &lt;code&gt;double&lt;/code&gt; to &lt;code&gt;int&lt;/code&gt;.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-{cpp}&#34;&gt;#include &amp;lt;vector&amp;gt;
+class A {
+ public:
+  explicit A(int /*unused*/) {}
+};
+int main() {
+  double foo = 4.5;
+  std::vector&amp;lt;A&amp;gt; a_vec{};
+  a_vec.emplace_back(foo); // No warning with Wconversion
+  //A a(foo); // Gives compiler warning with Wconversion as expected
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;why-is-this-a-problem&#34;&gt;Why is this a problem?&lt;/h2&gt;
+&lt;p&gt;The problem is that we are unaware of the problem at compile-time. If this was not the intended behavior, we have caused a runtime error, which is generally harder to fix. Let us catch the issue somehow. You might wonder that some warning flags, e.g., &lt;code&gt;-Wall&lt;/code&gt; could reveal the issue. However, the program compiles fine with &lt;code&gt;-Wall&lt;/code&gt;. &lt;code&gt;-Wall&lt;/code&gt; contains narrowing, but it does not contain conversion. Further, adding &lt;code&gt;-Wconversion&lt;/code&gt; yields no warnings.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ g++ -Wall -Wconversion test_2.cpp -o test
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The problem is that this conversion is happening in a system header, so we also need &lt;code&gt;-Wsystem-headers&lt;/code&gt; to catch the issue.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ g++ -Wconversion -Wsystem-headers test_2.cpp 
+In file included from /usr/include/c++/7/vector:60:0,
+                 from test_2.cpp:1:
+/usr/include/c++/7/bits/stl_algobase.h: In function ‘constexpr int std::__lg(int)’:
+/usr/include/c++/7/bits/stl_algobase.h:1001:44: warning: conversion to ‘int’ from ‘long unsigned int’ may alter its value [-Wconversion]
+   { return sizeof(int) * __CHAR_BIT__  - 1 - __builtin_clz(__n); }
+                                            ^
+/usr/include/c++/7/bits/stl_algobase.h: In function ‘constexpr unsigned int std::__lg(unsigned int)’:
+/usr/include/c++/7/bits/stl_algobase.h:1005:44: warning: conversion to ‘unsigned int’ from ‘long unsigned int’ may alter its value [-Wconversion]
+   { return sizeof(int) * __CHAR_BIT__  - 1 - __builtin_clz(__n); }
+                                            ^
+In file included from /usr/include/x86_64-linux-gnu/c++/7/bits/c++allocator.h:33:0,
+                 from /usr/include/c++/7/bits/allocator.h:46,
+                 from /usr/include/c++/7/vector:61,
+                 from test_2.cpp:1:
+/usr/include/c++/7/ext/new_allocator.h: In instantiation of ‘void __gnu_cxx::new_allocator&amp;lt;_Tp&amp;gt;::construct(_Up*, _Args&amp;amp;&amp;amp; ...) [with _Up = A; _Args = {double&amp;amp;}; _Tp = A]’:
+/usr/include/c++/7/bits/alloc_traits.h:475:4:   required from ‘static void std::allocator_traits&amp;lt;std::allocator&amp;lt;_Tp1&amp;gt; &amp;gt;::construct(std::allocator_traits&amp;lt;std::allocator&amp;lt;_Tp1&amp;gt; &amp;gt;::allocator_type&amp;amp;, _Up*, _Args&amp;amp;&amp;amp; ...) [with _Up = A; _Args = {double&amp;amp;}; _Tp = A; std::allocator_traits&amp;lt;std::allocator&amp;lt;_Tp1&amp;gt; &amp;gt;::allocator_type = std::allocator&amp;lt;A&amp;gt;]’
+/usr/include/c++/7/bits/vector.tcc💯30:   required from ‘void std::vector&amp;lt;_Tp, _Alloc&amp;gt;::emplace_back(_Args&amp;amp;&amp;amp; ...) [with _Args = {double&amp;amp;}; _Tp = A; _Alloc = std::allocator&amp;lt;A&amp;gt;]’
+test_2.cpp:9:25:   required from here
+/usr/include/c++/7/ext/new_allocator.h:136:4: warning: conversion to ‘int’ from ‘double’ may alter its value [-Wfloat-conversion]
+  { ::new((void *)__p) _Up(std::forward&amp;lt;_Args&amp;gt;(__args)...); }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And there you have it - look at all the verbose output. The problem is not apparent from this wall of text for the uninitiated.&lt;/p&gt;
+&lt;h2 id=&#34;so-when-should-you-use-emplace_back&#34;&gt;So when should you use &lt;code&gt;emplace_back&lt;/code&gt;?&lt;/h2&gt;
+&lt;p&gt;One reason to use &lt;code&gt;emplace_back&lt;/code&gt; is when the move operation that we can save, is actually quite expensive. Consider the following example:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;class Image {
+  Image(size_t w, size_t h);
+};
+
+std::vector&amp;lt;Image&amp;gt; images;
+images.emplace_back(2000, 1000);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Instead of moving the image, which consists of potentially a lot of data, we construct it in place, and forward the constructor arguments in order to do that. These kind of cases are quite special, we should already be aware that this is &lt;em&gt;large&lt;/em&gt; data that we are adding to the container.&lt;/p&gt;
+&lt;p&gt;Another case for using &lt;code&gt;emplace_back&lt;/code&gt; was added in C++17. Then &lt;code&gt;emplace_back&lt;/code&gt; returns a reference to the inserted element, this is not possible at all with &lt;code&gt;push_back&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;emplace_back-is-a-potential-premature-optimization&#34;&gt;&lt;code&gt;emplace_back&lt;/code&gt; is a potential premature optimization.&lt;/h2&gt;
+&lt;p&gt;Going from &lt;code&gt;push_back&lt;/code&gt; to &lt;code&gt;emplace_back&lt;/code&gt; is a small change that can usually wait, and like the image case, it is usually quite apparent when we want to use it. If you want to use &lt;code&gt;emplace_back&lt;/code&gt; from the start, then make sure you understand the differences. This is not just a faster &lt;code&gt;push_back&lt;/code&gt;. For safety, reliability, and maintainability reasons, it is better to write the code with &lt;code&gt;push_back&lt;/code&gt; when in doubt. This choice reduces the chance of pushing an unwanted hard to find implicit conversion into the codebase, but you should weigh that risk against the potential speedups, these speedups should then ideally be evaluated when profiling.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Eating Less vs Fad? Diets</title>
+      <link>https://gumeo.github.io/post/weight-loss/</link>
+      <pubDate>Sat, 23 Feb 2019 13:00:00 +0000</pubDate>
+      <guid>https://gumeo.github.io/post/weight-loss/</guid>
+      <description>&lt;h1 id=&#34;i-have-to-lose-weight&#34;&gt;I have to lose weight&lt;/h1&gt;
+&lt;p&gt;The reasons I am going through some weightloss has some history behind it, so I&amp;rsquo;m going to briefly outline that.&lt;/p&gt;
+&lt;h2 id=&#34;knee-injury&#34;&gt;Knee Injury&lt;/h2&gt;
+&lt;p&gt;End of July 2017 I was extremely unlucky and had an accident in BJJ, where I fully ruptured the PCL, LCL and popliteus tendon (where it connects to the fibula) in my left knee. We have four ligaments in the knee, one on each lateral side, and then the front (ACL) and back (PCL) cross ligaments. The stability of the knee relates to the elasticity (and existence) of these ligaments, but also the muscles around the knee joint. So half of the ligaments and a muscle tendon were torn, ouch!&lt;/p&gt;
+&lt;p&gt;The PCL ligament is the worst to be gone of these. It prevents the lower leg to shift backwards. The doctors measure the difference in posterior shift, compared to the healthy knee. My lower leg was moving backwards 1cm more than the other leg. When I was sitting down and pressed on the front of my knee, I could feel immense difference in slack. The doctors started with a conservative treatment, but I ended up needing a surgery, which was performed in May 2018 (
+&lt;a href=&#34;https://imgur.com/a/FT7j3Nv&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Picture after surgery, pretty big scar&lt;/a&gt;).&lt;/p&gt;
+&lt;h2 id=&#34;physio-training-and-diet&#34;&gt;Physio Training and Diet&lt;/h2&gt;
+&lt;p&gt;The surgery fixed most of the difference in slack, but it takes a long time to recover from it. Now I&amp;rsquo;m almost a year post-surgery, and I have been in some pretty intense physio training to try to get the leg as strong as the healthy one. I still haven&amp;rsquo;t started running, but one of the reasons for that is that running has a high impact on the knee joint, which scales with weight. My physical therapist said that when you run, the impact on the knee is four times the bodyweight. Not sure about the exact numbers, but it is definitaly true that the impact scales with weight. So losing weight is a crucial part of the recovery process, such that I can hopefully get back to some of the sport activities I was doing prior to the accident.&lt;/p&gt;
+&lt;p&gt;In terms of BMI, I was overweight (BMI 29), when I had the accident. My fat percentage was around 15%, so I was in pretty good shape. Note that BMI was designed to measure malnutrition, and doesn&amp;rsquo;t take fat percentage into account, so quite a lot of athletes and people with more muscles will be measured as overweight, although they are in ok shape. After the surgery I had to use crutches and was not allowed to put weight on the leg for the first 12 weeks. I gained weight and at the end of the summer 2018, when I started walking, my BMI was 30.5. I was in the obese range, I had not been training anything intense for a year, so it was time to do something if I ever wanted to do sports again.&lt;/p&gt;
+&lt;h2 id=&#34;calorie-restriction&#34;&gt;Calorie Restriction&lt;/h2&gt;
+&lt;p&gt;I started with a sustainable solution, basically reducing the amount of calories I was consuming. I used Myfitnesspal, to track calories and my weight. Myfitnesspal has a built in barcode scanner, with a huge user-generated data-base behind it. So by scanning barcodes of the food packaging, it becomes fast and easy to track the amount you are eating, and macros. I almost never scanned something that had not been logged by a prior user. Myfitnesspal is definitely sitting on a goldmine of consumer data. The only problem this has is when you go eat out, then you cannot barcode scan things, and it becomes a bit more guesswork. I did the scanning for about a month, and that was enough to become aware of portion sizes for the most common things I was consuming.&lt;/p&gt;
+&lt;p&gt;Then, the 1st of November I started a new job, and I lost focus on the calorie counting. I felt the weight was slowly creeping back up, so around Christmas I decided that I should try Huel again. I had tried it for a week prior, but I decided that I wanted  to commit to it for more than a month to see if it was doable.&lt;/p&gt;
+&lt;h2 id=&#34;huel&#34;&gt;Huel&lt;/h2&gt;
+&lt;p&gt;Huel is a very inexpensive meal substitute and it gives you absolutely full control of how many calories you consume. They state that it is a full meal substitute, meaning that it contains all the essential vitamins, minerals and nutrition you need. It is also super convenient, because it is just powder that you mix with water, so the time preparing food is gone, and it takes faster to eat/drink.&lt;/p&gt;
+&lt;p&gt;So that were the pros of Huel. I&amp;rsquo;m always up for trying to do things in a more efficient way, but after trying this I&amp;rsquo;m not sure replacing this with every meal is a good idea. After the first day on huel, you miss chewing stuff. Chewing gum helped a bit, but it is still not a substitute. I read online and some people complained about stomach problems, I experienced it a bit, but not to an extent that concerned me. I&amp;rsquo;m also not sure if Huel contains all the essential vitamins. My nails became stiffer and more brittle, that did not happen when I was just restricting calories. There is also a lot less sodium in Huel compared to the other food I was eating, so I had a big weight drop in the beginning, because I was bloated from the salty food. I would not say I was hungry when on Huel, but I had to go to bed before 10, otherwise I became hungry and it was harder to fall alsleep.&lt;/p&gt;
+&lt;p&gt;Eating with other people also becomes a bit weird when you bring out your shaker. It was ok at work, but at home I sincerely missed eating dinner with my wife and son, and that complicated the experience a bit. I think I will never try Huel again as a &lt;em&gt;replace every meal&lt;/em&gt;, but potentially as breakfast/lunch substitute.&lt;/p&gt;
+&lt;h2 id=&#34;the-data&#34;&gt;The Data&lt;/h2&gt;
+&lt;p&gt;But I made it, I tried Huel for more than a month, except was a couple of Saturday nights we went to a restaurant. Almost since I started the weightloss journey, I weight myself everyday. I always did it in the morning, when I woke up. I wanted to see the trend, and what kind of daily variation I could expect. When I tried to get the data from Myfitnesspal I was hit with a paywall! What? do I need to pay to export my data in &lt;code&gt;csv&lt;/code&gt; format? But of course someone had created a python module to do this. It mas a matter of &lt;code&gt;pip install myfitnesspal&lt;/code&gt; and I had the data in a breeze, doing something similar to 
+&lt;a href=&#34;https://ladvien.com/get-myfitness-pal-data-python/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;this&lt;/a&gt;. I made a simple visualisation to compare the three periods, &lt;em&gt;calorie restriction&lt;/em&gt;, &lt;em&gt;not paying attention to what I eat (New Work)&lt;/em&gt; and of course &lt;em&gt;Huel&lt;/em&gt;. The following is a visualization demonstrating that.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;./wloss.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;what-did-i-learn&#34;&gt;What Did I learn?&lt;/h2&gt;
+&lt;p&gt;There are higher residuals in the middle period when I am not paying attention to what I eat. I think this is because of the high variation in sodium content, i.e. if I eat fast-food, it  is bound to have a lot of salt in it. The two large spikes in the Huel period are the same thing. The prior one is the morning after I went to an all you can eat sushi place, and the other spike is also after going to an asian cuisine restaurant with salty soy sauce.&lt;/p&gt;
+&lt;p&gt;Notice that the residuals are pretty big. You need to look at a trend of at least two weeks to see if things are working. Be patient and consistent, that is key. If you are trying something similar, then do not obsess over your daily numbers. Just measure the weight and look at it every two weeks to see if there is a trend.&lt;/p&gt;
+&lt;p&gt;Another thing I learned is that if I want to reach my weight goal of 82 kg, I cannot be lazy about what I eat, the middle period shows that. It might play into it that the middle period covers December, causing an abnormal increase in calorie consumption, (because of Christmas parties), but at least the trend is not going down, so I will have to focus to reach my goals, this is an effort.&lt;/p&gt;
+&lt;p&gt;Also, if I want to reach my goal and maintain it, I have to be consistent. I will continue to track my weight after I reach my goal to make sure I don&amp;rsquo;t slip again. Also, I do not see Huel as an option for consistency. I would maybe consider it for breakfast or lunch in between, but I would rather enjoy a cheewy dinner with my family. If you want to lose weight and stay healthy, it is a matter of choosing a healthier lifestyle, not investing in a fad.&lt;/p&gt;
+&lt;p&gt;The slope for using Huel is slightly more agressive than the calorie restriction, but in the long term, calorie restriction is a more sustainable option, so I will continue with that.&lt;/p&gt;
+&lt;h1 id=&#34;appendix&#34;&gt;Appendix&lt;/h1&gt;
+&lt;p&gt;I used &lt;code&gt;theme_Publication&lt;/code&gt; for the plot from 
+&lt;a href=&#34;https://rpubs.com/Koundy/71792&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;here&lt;/a&gt;. This theme makes the plot look a bit cleaner compared to the default &lt;code&gt;ggplot&lt;/code&gt;, imo.&lt;/p&gt;
+&lt;h2 id=&#34;code-for-plot&#34;&gt;Code for plot&lt;/h2&gt;
+&lt;pre&gt;&lt;code class=&#34;language-{r}&#34;&gt;library(ggplot2)
+setwd(&amp;quot;~/Documents/myfitnesspal_data&amp;quot;)
+source(&#39;./plot_funcs.R&#39;)
+
+data &amp;lt;- read.csv2(&#39;./weight_data.csv&#39;, sep=&amp;quot; &amp;quot;, 
+                  stringsAsFactors = FALSE)
+data &amp;lt;- data[data$Weight != &#39;None&#39;, ]
+data$Weight &amp;lt;- as.numeric(data$Weight)
+data$Date &amp;lt;- as.Date(data$Date)
+data$Type &amp;lt;- factor(c(rep(&#39;Calorie Restriction&#39;,42),
+                      rep(&#39;New Work&#39;,56),
+                      rep(&#39;Huel&#39;,44)), 
+                    levels = c(&amp;quot;Calorie Restriction&amp;quot;, 
+                               &amp;quot;New Work&amp;quot;, &amp;quot;Huel&amp;quot;))
+
+#############################################################################
+# Visualisation
+#############################################################################
+
+p &amp;lt;- ggplot(data, aes(x = Date, y=Weight, group = Type)) +
+  geom_line(aes(group = Type, col=Type))+
+  geom_smooth(aes(group = Type), method = &amp;quot;lm&amp;quot;, se = FALSE) +
+  labs(title = &amp;quot;Huel vs Cal Restriction \nFall 2018 to Spring 2019&amp;quot;, 
+       x=&amp;quot;Date&amp;quot;, y=&amp;quot;Weight (Kg)&amp;quot;) +
+  scale_colour_Publication()+ theme_Publication() +
+  theme(legend.key.width = unit(3,&amp;quot;cm&amp;quot;)) 
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Leaving Academia</title>
+      <link>https://gumeo.github.io/post/leaving-academia/</link>
+      <pubDate>Tue, 23 Oct 2018 13:00:00 +0000</pubDate>
+      <guid>https://gumeo.github.io/post/leaving-academia/</guid>
+      <description>&lt;h1 id=&#34;the-choices-we-make&#34;&gt;The choices we make!&lt;/h1&gt;
+&lt;p&gt;One of the major decisions that has haunted me through my PhD is whether I want to stay in academia or not. I sincerely love doing research, I love going to conferences, I love reading scientific papers and talking to other scholars. I even love giving talks and teaching, dissemination can be very rewarding and enjoyable. At some point I was certain that I would go for an academic career, but things change.&lt;/p&gt;
+&lt;p&gt;Another thing I like is a fresh challenge. After having spent the summer at deCODE genetics, I saw the possibilities outside academia. Doing a PhD is a binary process, either you have a PhD or not (&lt;em&gt;Quote from my friend Óli Páll, who recited Professor Havard Rue from NTNU&lt;/em&gt;). Having obtained my PhD made me think differently about my own future, and what I could accomplish. We sometimes say, &lt;em&gt;&amp;ldquo;it is the journey, not the destination&amp;rdquo;&lt;/em&gt;, I feel that doing a PhD is different, there is a certain destination, obtaining the degree! In that regard I did not allow myself to ponder other possibilities.&lt;/p&gt;
+&lt;p&gt;It is good to evaluate your goals and values every now and then. I have certain goals that I would like to achieve 5, 10 and 20 years down the line. From my point of view, I have a higher likelihood of achieving these goals outside academia, at least if I stay there for some time. I would also feel good about returning to academia at some point, having experienced the outside world.&lt;/p&gt;
+&lt;p&gt;One of the important things my PhD supervisor made me realize is that the most valuable resource we possess is time. Time is a resource that we can &lt;strong&gt;never&lt;/strong&gt; get back. We should use this resource to do something we believe in, do something that makes a difference and we enjoy. I am forever grateful for my experience and time at DTU, I will cherish the moments I had there for the rest of my life. But for me the time for a change is now, it is time to go somewhere else, meet new people, learn, grow and contribute to great things. I look forward to this new path and I am happy for the choice I made.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Part 2: Deep Learning with Closures in R</title>
+      <link>https://gumeo.github.io/post/part-2-deep-learning/</link>
+      <pubDate>Thu, 21 Dec 2017 13:00:00 +0000</pubDate>
+      <guid>https://gumeo.github.io/post/part-2-deep-learning/</guid>
+      <description>&lt;h1 id=&#34;lets-go-on&#34;&gt;Let&amp;rsquo;s go on!&lt;/h1&gt;
+&lt;p&gt;If you just arrived, you can check out the first part 
+&lt;a href=&#34;https://gumeo.github.io/post/part-1-deep-learning-with-closures-in-r/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;here&lt;/a&gt;. The goal of this series is to demonstrate how compactly we can implement an MLP in a functional programming paradigm and how easy it becomes to extend/play around with it. This post is aimed at the R person that wants to get into deep learning or anyone curious about how these things are implemented. Another goal is to visualize what is happening in a neural network during training in hope to get a deeper understanding of what is going on. I posted 
+&lt;a href=&#34;https://imgur.com/EgcQgkh&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;this gif&lt;/a&gt; on the subreddit MachineLearning and dataisbeautiful, I got some constructive criticism on the gif and below is a &lt;em&gt;better&lt;/em&gt; version where I have sped it up and removed the flickering and enhanced the contrast.&lt;/p&gt;
+&lt;center&gt;
+&lt;blockquote class=&#34;imgur-embed-pub&#34; lang=&#34;en&#34; data-id=&#34;a/wIytV&#34;&gt;&lt;a href=&#34;//imgur.com/wIytV&#34;&gt;&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src=&#34;//s.imgur.com/min/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;/center&gt;
+&lt;p&gt;So last time we got away with less than 50 lines of code to create a 
+&lt;a href=&#34;https://en.wikipedia.org/wiki/Factory_%28object-oriented_programming%29&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;factory&lt;/a&gt; for generating fully connected layers. This included a closure for a matrix class, (for making the layer have a mutable state), and an implementation of a forward pass. But the forward pass is basically a wrapper for updating the internals of the layer, we need to implement a forward pass for the whole network, and the same goes for the backwards propagation. This requires creating a function factory that constructs the network environment. This environment needs to have functions that implement forward-, backwards passes and a function for training. The following is a demonstration of such a function:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-{R,&#34;&gt;# The following creates an MLP environment
+# structNet is a vector defining the number of nodes in each layer, ignoring biases.
+mlp &amp;lt;- function(structNet, minibatchSize,activation, initPos =FALSE, initScale=100){
+  num_layers &amp;lt;- length(structNet)
+  # Create the network
+  layers &amp;lt;- list()
+  for(i in 1:num_layers){
+    if(i == 1){ # Input layer
+      layers[[i]] &amp;lt;- Layer(activation, 
+                           minibatchSize, 
+                           c(structNet[1]+1,structNet[2]),
+                           is_input=TRUE,
+                           initPos = initPos,
+                           initScale=initScale)
+    }else if(i == length(structNet)){ # Output layer
+      layers[[i]] &amp;lt;- Layer(softmax, 
+                           minibatchSize, 
+                           c(structNet[num_layers],structNet[num_layers]),
+                           is_output=TRUE,
+                           initPos = initPos,
+                           initScale=initScale)
+    }else{ # Hidden layers
+      layers[[i]] &amp;lt;- Layer(activation, 
+                           minibatchSize, 
+                           c(structNet[i]+1,structNet[i+1]),
+                           initPos = initPos,
+                           initScale=initScale)
+    }
+  }
+  
+  forward_prop &amp;lt;- function(dataBatch){
+    # Add bias to the input
+    layers[[1]]$Z$setter(cbind(dataBatch,rep(1,nrow(dataBatch))))
+    for(i in 1:(num_layers-1)){
+      layers[[i+1]]$S$setter(layers[[i]]$forward_propagate())
+    }
+    return(layers[[num_layers]]$forward_propagate())
+  }
+  
+  backwards_prop &amp;lt;- function(yhat,labels){
+    layers[[num_layers]]$D$setter(t(yhat-labels))
+    for(i in (num_layers-1):2){
+      W_nobias &amp;lt;- layers[[i]]$W$getter()
+      W_nobias &amp;lt;- W_nobias[1:(nrow(W_nobias)-1),]
+      mat &amp;lt;- layers[[i]]$Fp$getter()
+      layers[[i]]$D$setter((W_nobias%*%layers[[i+1]]$D$getter())*mat)
+    }
+  }
+  
+  update_weights &amp;lt;- function(eta){
+    for(i in 1:(num_layers-1)){
+      W_grad &amp;lt;- -eta*t(layers[[i+1]]$D$getter()%*%layers[[i]]$Z$getter())
+      layers[[i]]$W$setter(layers[[i]]$W$getter()+W_grad)
+    }
+  }
+  
+  # Labels here as dummy matrix
+  train &amp;lt;- function(trainData, trainLabels, num_epochs, eta, cvSplit = 0.3){
+    # Code for preparing input
+    for(i in 1:num_epochs){
+      # Loop over epochs
+      for(j in 1:numIter){
+        # Loop over all minibatches
+        # ...
+        # Essential part for training
+        preds &amp;lt;- forward_prop(tDat)
+        backwards_prop(preds,tLab)
+        update_weights(eta = eta)
+      }
+    }
+  }
+  
+  myEnv &amp;lt;- list2env(list(network=layers,
+                         forward_prop=forward_prop,
+                         train = train))
+  class(myEnv) &amp;lt;- &#39;mlp&#39;
+  return(myEnv)
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The &lt;code&gt;mlp&lt;/code&gt; function above starts by constructing the network given the layer configuration that we desire. Most of the implementation of the &lt;code&gt;train&lt;/code&gt; function is omitted to highlight the essential part. The shown part highlights what is needed for stochastic gradient descent. We need to &lt;strong&gt;forward propagate&lt;/strong&gt; the data, then &lt;strong&gt;back propagate&lt;/strong&gt; the error, and finally based on this error we can &lt;strong&gt;update the weights&lt;/strong&gt;. This is the heart and soul of SGD. Instead of using the whole dataset to estimate the gradient, we subsample a &lt;em&gt;minibatch&lt;/em&gt; and estimate the gradient as an average over these samples. Quite a lot of gradient descent based optimization is done as a full batch optimization, specifically when people first learn about it, because SGD just adds an extra layer of complication. SGD allows for online updates, as more data arrives, and it may be computationally more efficient. The only issue is of course the diffculties of scaling the gradient, i.e. choosing the best learning rate, which is also an issue for regular/full battch gradient descent.&lt;/p&gt;
+&lt;p&gt;So the training function is essentially broken up into 3 steps, these steps are abstracted from the training algorithm, so we could easily change the &lt;code&gt;update_weights&lt;/code&gt; function to include a momentum term or other things we might want to try, without changing the &lt;code&gt;train&lt;/code&gt; function.&lt;/p&gt;
+&lt;p&gt;Notice that we take the vector &lt;code&gt;structNet&lt;/code&gt; as input. This design can be extended to take in another vector describing what kind of layers we want and build the network with these different layers. This would generalize the implementation quite significantly. This would of course also require us to change the definition of the &lt;code&gt;Layer&lt;/code&gt; function, or implement new layer functions.&lt;/p&gt;
+&lt;h1 id=&#34;is-deep-learning-simple&#34;&gt;Is deep learning simple?&lt;/h1&gt;
+&lt;p&gt;Now we have an &lt;code&gt;mlp&lt;/code&gt; implementation in roughly 100 lines of code. I think this demonstrates in some way how &lt;em&gt;simple&lt;/em&gt; an mlp really is, but also in contrast the difficulties needed to get to the modern implementations of deep learning. Modern implementations are much more general, where they usually implement a computation graph where all computations can be automatically differentiated. These are also made to target GPU hardware, where matrix-matrix and matrix-vector multiplication can be significantly accelerated. There is a package for R called &lt;code&gt;gpuR&lt;/code&gt;, where one can do matrix calculations on the GPU. I might try that in the future, to see if I can speed this up significantly with minimal change of this code.&lt;/p&gt;
+&lt;h1 id=&#34;how-to-use-this&#34;&gt;How to use this?&lt;/h1&gt;
+&lt;p&gt;First we need to define the activation function we want, the softmax function and a function to create a dummy encoding of factors variables in R. I have now included all of these in the package &lt;code&gt;minstr&lt;/code&gt; available 
+&lt;a href=&#34;https://github.com/gumeo/mnistr&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;here&lt;/a&gt;. So you do not need to define the yourself. Although you can of course define your own activation function as you wish. Take a look at the following to get an idea of how it is done.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-{R,&#34;&gt;# rectified linear unit activation
+# activation functions need a boolean parameter for 
+# calculating the derivative
+reLU &amp;lt;- function(X,deriv=FALSE){
+  if(deriv==FALSE){
+    X[X&amp;lt;0] &amp;lt;- 0 
+    return(X)
+  }else{
+    X[X&amp;lt;0] &amp;lt;- 0
+    X[X&amp;gt;0] &amp;lt;- 1
+    return(X)
+  }
+}
+
+# softmax for output layer
+softmax &amp;lt;- function(X){
+  Z &amp;lt;- rowSums(exp(X))
+  X &amp;lt;- exp(t(X))%*%diag(1/Z)
+  return(t(X))
+}
+
+# Function to represent factor as dummy matrix
+class.ind &amp;lt;- function(cl) {
+  Ik=diag(length(levels(cl)))
+  x=Ik[as.numeric(cl),]
+  dimnames(x) &amp;lt;- list(names(cl), levels(cl))
+  x
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Here is an example of how we can train a network with this. Feel free to play around with some of the parameters, such as the learning rate. If it is too big, nothing will be learned. The current configuration for the network works fine, but you can also try to squeeze it down or remove/add more hidden layers.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-{R,&#34;&gt;# Load mnist dataset, note that you need to download it first
+# mnistr::download_mnist() # This saves to the current working directory
+mnistr::load_mnist()
+
+# Visualize random digit, just to get familiar with the data, in case this is the 
+# first time you see mnist
+randDig &amp;lt;- sample(1:60000,1)
+# Base R, notice that the data is in trainSet$x where each digit is stored as a row vector
+image(matrix(trainSet$x[randDig,],28,28)[,c(28:1),drop=FALSE],main=paste(trainSet$y[randDig]),asp=1)
+# ggplot function from the mnistr package, we can supply the data as a row vector
+mnistr::ggDigit(trainSet$x[randDig,])
+
+# Construct a network with two hidden layers (100 and 50 units) and rectified linear units
+mnw &amp;lt;- mlp(structNet = c(784,100,50,10), 
+           minibatchSize = 100, 
+           activation = reLU,
+           initPos = TRUE,
+           initScale = 100)
+
+# Define the training set
+trainX &amp;lt;- trainSet$x
+trainY &amp;lt;- class.ind(factor(trainSet$y))
+
+# Call train
+mnw$train(trainData = trainX/256,
+          trainLabels = trainY,
+          num_epochs = 3,
+          eta = 0.005, 
+          cvSplit = 0.3)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;no-hidden-layers&#34;&gt;No hidden layers&lt;/h1&gt;
+&lt;p&gt;I wanted to visualize the training when there were no hidden layers. The weights in the gif below correspond to the training over one epoch, where the weights according to the digits are aligned like the matrix below:
+$$
+\begin{bmatrix}
+2 &amp;amp; 5 &amp;amp; 8\&lt;br&gt;
+1 &amp;amp; 4 &amp;amp; 7\&lt;br&gt;
+0 &amp;amp; 3 &amp;amp; 6
+\end{bmatrix}
+$$&lt;/p&gt;
+&lt;center&gt;
+&lt;blockquote class=&#34;imgur-embed-pub&#34; lang=&#34;en&#34; data-id=&#34;a/s29MY&#34;&gt;&lt;a href=&#34;//imgur.com/s29MY&#34;&gt;&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src=&#34;//s.imgur.com/min/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;/center&gt;
+&lt;p&gt;You can clearly see that the weights resemble templates that evolve to capture more and more of the variation present for each digit. The template also counts for making the patch dissimilar to the digits that it is not trying to match. This simple linear approach achieves a little more than 90% accuracy, which is amazing for how simple the method is. But still, for reading digits on checks, having every tenth read wrong is far from acceptable.&lt;/p&gt;
+&lt;h1 id=&#34;decomposing-the-network-with-magrittr&#34;&gt;Decomposing the network with magrittr&lt;/h1&gt;
+&lt;p&gt;Now, one of the main things I wanted to achieve with this implementation was to decompose the network into it&amp;rsquo;s individual components, to demonstrate how simple it truly is. Now I can in a simple manner compose functions that I have trained in order to produce some output. The &lt;code&gt;magrittr&lt;/code&gt; is perfect for this, because then we do not need to nest inside parenthesis the composition of functions, we can just pipe the input through all the layers.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-{R,&#34;&gt;# Needed for pipes
+library(magrittr)
+
+# Get the weight matricies from the network we trained above
+w1 &amp;lt;- mnw$network[[1]]$W$getter()
+w2 &amp;lt;- mnw$network[[2]]$W$getter()
+w3 &amp;lt;- mnw$network[[3]]$W$getter()
+
+set.seed(12345)
+randDig &amp;lt;- sample(1:60000,1) # sample random digit
+testDigit &amp;lt;- matrix(trainSet$x[randDig,]/256,nrow=1,ncol=28*28)
+# Check label, it is a 2 for this seed
+trainSet$y[randDig]
+mnistr::ggDigit(testDigit)
+
+# Add the bias term
+testDigit &amp;lt;- cbind(testDigit,matrix(1,1,1))
+
+# We are passing a single instance
+simple_softmax &amp;lt;- function(X){
+  Z &amp;lt;- sum(exp(X))
+  X &amp;lt;- exp(X)/Z
+  return(X)
+}
+
+# Now pipe it throught the network:
+# Multiply by weights, use activation and then add 1 for bias
+testDigit %&amp;gt;% 
+  multiply_by_matrix(y=w1) %&amp;gt;% reLU %&amp;gt;% cbind(.,matrix(1,1,1)) %&amp;gt;% 
+  multiply_by_matrix(y=w2) %&amp;gt;% reLU %&amp;gt;% cbind(.,matrix(1,1,1)) %&amp;gt;%
+  multiply_by_matrix(y=w3) %&amp;gt;% simple_softmax %&amp;gt;% barplot
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The network I trained is 99.6% certain that this is a two! The &lt;code&gt;magrittr&lt;/code&gt; package allows us to write out the calculations happening inside the MLP in a very understandable way. Note that some networks used today have more than 50 layers, then this is not so useful anymore. In the case of 50plus layers we need other tricks to train it, e.g. skip connections and other optimizers.&lt;/p&gt;
+&lt;h1 id=&#34;code-for-generating-the-gifs&#34;&gt;Code for generating the gifs&lt;/h1&gt;
+&lt;p&gt;If you want to create you own gifs, it is probably easiest to define your own &lt;code&gt;mlp&lt;/code&gt; function, just look at the &lt;code&gt;mnistr&lt;/code&gt; implementation. Then add something similar to the following where the main update is happening. You could of course also save the weights to a matrix outside the environment using the &lt;code&gt;&amp;lt;&amp;lt;-&lt;/code&gt; scope assignment operator.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-{R,&#34;&gt;        # Where we do the SGD steps in the train function part of mlp
+        preds &amp;lt;- forward_prop(tDat)
+        backwards_prop(preds,tLab)
+        update_weights(eta = eta)
+        # The following is code for generating plots
+        layerMat &amp;lt;- layers[[1]]$W$getter()
+        # Removw bias
+        layerMat &amp;lt;- layerMat[-nrow(layerMat),]
+        # Set the number of columns and rows for the image
+        nr &amp;lt;- 10
+        nc &amp;lt;- 10
+        weightsIm &amp;lt;- matrix(0,28*nr,28*nc)
+        w &amp;lt;- 1
+        # Fill the image with the relevant weights
+        for(i in 1:nr){
+          for(m in 1:nc){
+            weightsIm[((i-1)*28+1):(i*28),((m-1)*28+1):(m*28)] &amp;lt;- matrix(layerMat[,w],28,28)[,c(28:1),drop=FALSE]
+            w &amp;lt;- w + 1
+          }
+        }
+        # Save for every fourth minibatch
+        if(j%%4 == 1){
+          data &amp;lt;- c(weightsIm)
+          # Standardize to remove flickering
+          nData &amp;lt;- qnorm(seq(0,1,len=28*28*nr*nc))[rank(data)]
+          nIm &amp;lt;- matrix(nData,28*nr,28*nc)
+          png(paste0(&#39;./plots/&#39;,&#39;reLU&#39;,sprintf(&amp;quot;%08d&amp;quot;, k),&#39;.png&#39;),width=28*nc*2,height=28*nr*2)
+          # Remove margins so it looks nicer
+          par(mar = rep(0, 4))
+          image(nIm,asp=1,col=gray(seq(0,1,by=0.005),1),axes=FALSE)
+          dev.off()
+          k &amp;lt;- k+1
+        }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;next-post&#34;&gt;Next post&lt;/h1&gt;
+&lt;p&gt;For the next post I plan to compare different activation functions and implement dropout for the network. It will probably be the final post until I get new ideas for stuff to implement.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://twitter.com/share?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-share-button&#34; data-size=&#34;large&#34; data-text=&#34;Learning Deep Learning in R&#34; data-url=&#34;https://gumeo.github.io/post/part-2-deep-learning-with-closures-in-r/&#34; data-via=&#34;gumgumeo&#34; data-hashtags=&#34;#rstats #machinelearning #deeplearning&#34; data-lang=&#34;en&#34; data-show-count=&#34;false&#34;&gt;Tweet&lt;/a&gt;&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Part 1: Deep Learning with Closures in R</title>
+      <link>https://gumeo.github.io/post/part-1-1deep-learning/</link>
+      <pubDate>Thu, 14 Dec 2017 13:00:00 +0000</pubDate>
+      <guid>https://gumeo.github.io/post/part-1-1deep-learning/</guid>
+      <description>&lt;h1 id=&#34;start-of-a-small-series&#34;&gt;Start of a small series&lt;/h1&gt;
+&lt;p&gt;The gif below is the evolution of the weights from a neural network trained on the mnist dataset. Mnist is a dataset of handwritten digits, and is kind of the &lt;strong&gt;hello world/FizzBuzz&lt;/strong&gt; of machine learning. It is maybe not a very challenging data set, but you can learn a lot from it. This is a 10 by 10 grid of images, where each individual small patch represents weights going to a single neuron in the first hidden layer of the network. After I saw the content by Grant Sanderson, I wanted to inspect by myself what the network is actually learning. This series is going to outline this development, with an angle towards functional programming.&lt;/p&gt;
+&lt;center&gt;
+&lt;blockquote class=&#34;imgur-embed-pub&#34; lang=&#34;en&#34; data-id=&#34;EgcQgkh&#34;&gt;&lt;a href=&#34;//imgur.com/EgcQgkh&#34;&gt;&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src=&#34;//s.imgur.com/min/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;/center&gt;
+&lt;p&gt;So I received the 
+&lt;a href=&#34;http://www.deeplearningbook.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Deep Learning book&lt;/a&gt; a little more than a month ago, and I have had time to read parts I and II. I think that overall the authors successfully explain and condense a lot of research into something digestable. The reason why I use the word condense is because how much information the book contains. The bibliography is 55 pages, so I almost feel that the book should be called &lt;em&gt;Introduction to Deep Learning Research&lt;/em&gt;, because it is a gateway to so much good material. Another fascinating thing about this book is the discussion it contains. The authors are quite upfront about some criticisms on deep learning and discuss them to a great extent. All in all I look forward to finish reading the book.&lt;/p&gt;
+&lt;p&gt;I have fiddled around with deep learning since I took a summer-school on it in 2014, where 
+&lt;a href=&#34;https://twitter.com/hugo_larochelle?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Hugo Larochelle&lt;/a&gt; was giving lectures and he joined us for an epic sword fighting competition/LARP session in the countryside of Denmark. I have followed the evolution of deep learning since, and what has been most amazing is by how much the barrier of entry has been lowered. The current software frameworks make it so easy to get started. After reading the DL book I found a strong inner urge to implement some of these things myself. I think that a way to get a better understanding of programming concepts, algorithms and data structures, is just to go for it and implement it. Also talking about data-structures, deep learning is also becoming a part of that:&lt;/p&gt;
+&lt;center&gt;
+&lt;blockquote class=&#34;twitter-tweet&#34; data-lang=&#34;en&#34;&gt;&lt;p lang=&#34;en&#34; dir=&#34;ltr&#34;&gt;Jeff Dean and co at GOOG just released a paper showing how machine-learned indexes can replace B-Trees, Hash Indexes, and Bloom Filters. Execute 3x faster than B-Trees, 10-100x less space. Executes on GPU, which are getting faster unlike CPU. Amazing.  &lt;a href=&#34;https://t.co/PPVkrFVKXg&#34;&gt;https://t.co/PPVkrFVKXg&lt;/a&gt;&lt;/p&gt;&amp;mdash; Nick Schrock (@schrockn) &lt;a href=&#34;https://twitter.com/schrockn/status/940037656494317568?ref_src=twsrc%5Etfw&#34;&gt;December 11, 2017&lt;/a&gt;&lt;/blockquote&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;/center&gt;
+&lt;p&gt;After seeing the videos made by 
+&lt;a href=&#34;http://www.3blue1brown.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Grant Sanderson&lt;/a&gt; on deep learning I decided it was time to implement the basics by myself. I wanted to completely understand back-propagation, how it really is a dynamic programming algorithm where we actually do some smart book-keeping and reuse computations. That is one of the major &lt;em&gt;tricks&lt;/em&gt; that makes this algorithm work.&lt;/p&gt;
+&lt;h2 id=&#34;not-another-framework&#34;&gt;Not another framework&lt;/h2&gt;
+&lt;p&gt;But of course implementing a fully fledged DL framework is a feat one should not do, unless you have some very specific reason for it. Many frameworks have been created, and doing this alone &lt;strong&gt;to learn&lt;/strong&gt; should not have that goal in mind. I wanted to make something that would be easily extendable, I also wanted to do it in R (because I really like R), I also made a package at some point called 
+&lt;a href=&#34;https://github.com/gumeo/mnistr&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;mnistr&lt;/a&gt; where I wanted to add some fun examples with neural networks on. When I&amp;rsquo;m done with this series I&amp;rsquo;ll add the implementation to the package and submit it to CRAN.&lt;/p&gt;
+&lt;h2 id=&#34;closures&#34;&gt;Closures&lt;/h2&gt;
+&lt;p&gt;The final reason I had for doing this relates to closures. So deep learning, or deep neural networks, are in it&amp;rsquo;s essance just functions, or rather compositions of functions. These individual functions are usually not that complicated, what makes them complicated is what they learn from complicated data, and how these individual simple things together make something complicated. We do not completely understand what they learn or do. If I can make a representation of a multi-layer percepteron (&lt;em&gt;which is a fully connected neural network&lt;/em&gt;) in a functional programming paradigm, then it might be easier to understand it for others and myself. I will hopefully be able to disentanlge the networks into inidvidual functions and using the 
+&lt;a href=&#34;https://cran.r-project.org/web/packages/magrittr/index.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;magrittr&lt;/a&gt; package to do the function composition in a more obvious manner, which demonstrates that the individual pieces of a neural network are not so complicated, and the final composition does not need to be so complicated either.&lt;/p&gt;
+&lt;h2 id=&#34;but-wait-a-minute-what-are-closures&#34;&gt;But wait a minute? What are closures?&lt;/h2&gt;
+&lt;p&gt;So the 
+&lt;a href=&#34;https://en.wikipedia.org/wiki/Closure_%28computer_programming%29&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;wikipedia article&lt;/a&gt; gives it a pretty good treatment&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;In programming languages, closures (also lexical closures or function closures) are techniques for implementing lexically scoped name binding in languages with first-class functions. Operationally, a closure is a record storing a function[a] together with an environment:[1] a mapping associating each free variable of the function (variables that are used locally, but defined in an enclosing scope) with the value or reference to which the name was bound when the closure was created.[b] A closure—unlike a plain function—allows the function to access those captured variables through the closure&amp;rsquo;s copies of their values or references, even when the function is invoked outside their scope&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;This sounds a lot like object oriented programming, but when the &lt;em&gt;objects&lt;/em&gt; that we are working with, are naturally functions, then this works very nicely. But let&amp;rsquo;s look at a simple example!&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;newBankAccount &amp;lt;- function(){
+  myMoney &amp;lt;- 0
+  putMonyInTheBank &amp;lt;- function(amount){
+    myMoney &amp;lt;&amp;lt;- myMoney + amount
+  }
+  howMuchDoIOwn &amp;lt;- function(){
+    print(paste(&#39;You have:&#39;,myMoney,&#39;bitcoins!&#39;))
+  }
+  return(list2env(list(putMonyInTheBank=putMonyInTheBank,
+                       howMuchDoIOwn=howMuchDoIOwn)))
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now I can use this to create a &lt;em&gt;bank account function&lt;/em&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;&amp;gt; myAccount &amp;lt;- newBankAccount()
+&amp;gt; myAccount$howMuchDoIOwn()
+[1] &amp;quot;You have: 0 bitcoins!&amp;quot;
+&amp;gt; myAccount$putMonyInTheBank(200)
+&amp;gt; myAccount$howMuchDoIOwn()
+[1] &amp;quot;You have: 200 bitcoins!&amp;quot;
+&amp;gt; copyAccount &amp;lt;- myAccount
+&amp;gt; copyAccount$howMuchDoIOwn()
+[1] &amp;quot;You have: 200 bitcoins!&amp;quot;
+&amp;gt; copyAccount$putMonyInTheBank(300)
+&amp;gt; copyAccount$howMuchDoIOwn()
+[1] &amp;quot;You have: 500 bitcoins!&amp;quot;
+&amp;gt; myAccount$howMuchDoIOwn() # Ahh snap, I also received bitcoins!
+[1] &amp;quot;You have: 500 bitcoins!&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So compared to &lt;em&gt;normal&lt;/em&gt; functions, now we have a function (&lt;em&gt;actually an environment&lt;/em&gt;) with a mutable state. Now we can have side-effects when we call the functions from the environment. But if you look at the calls I made above, you may have noticed that when I copied the account, added to the copied account, the original account also had an increased amount in it. So the copied account didn&amp;rsquo;t get the data copied, only the references. So if you make multiple bank accounts, initialize each seperately, don&amp;rsquo;t initialize one prototype and copy it to all the users. Otherwise all the users end up with one big shared account!&lt;/p&gt;
+&lt;p&gt;So be careful, and if you really want to copy environments look at 
+&lt;a href=&#34;https://stackoverflow.com/questions/9965577/r-copy-move-one-environment-to-another&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;this SO post&lt;/a&gt;. If you want to learn more about environments and the functional programming side of R, 
+&lt;a href=&#34;http://adv-r.had.co.nz/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;advanced R&lt;/a&gt; by Hadley Wickham is a great starting point, you might also want to check out 
+&lt;a href=&#34;http://www.lemnica.com/esotericR/Introducing-Closures/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;this blogpost&lt;/a&gt;. Also if you have coded in javascript, you might be familiar with the issue of copying closures there. And btw, I have no bitcoins :(&lt;/p&gt;
+&lt;p&gt;Another important thing that you might have noticed is the assignment operators. If you are not familiar with R, &lt;code&gt;&amp;lt;-&lt;/code&gt; is pretty much the same as &lt;code&gt;=&lt;/code&gt;, they are kind of used interchangably, but they have a very subtle difference that you can read about 
+&lt;a href=&#34;https://stackoverflow.com/questions/1741820/assignment-operators-in-r-and&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;here&lt;/a&gt;. The weird assignment operator that you noticed was probably the &lt;code&gt;&amp;lt;&amp;lt;-&lt;/code&gt;, the scoping assignment. This is the whole trick about closures, best said 
+&lt;a href=&#34;https://stackoverflow.com/questions/2628621/how-do-you-use-scoping-assignment-in-r?rq=1&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;here&lt;/a&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;A closure is a function written by another function. Closures are so called because they enclose the environment of the parent function, and can access all variables and parameters in that function.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;The scoping operator creates the reference needed, such that the returned function encloses the environment of the caller. This is why closures are sometimes called poor man&amp;rsquo;s objects. We are basically emulating the creation of public and private members in some sense, but without the overhead of object oriented structured code. This is an essential part in making the implementation look cleaner and more transparent. The code that you write is more to the point of solving the task as hand, rather the adhearing to a structure of a particular paradigm.&lt;/p&gt;
+&lt;h2 id=&#34;too-the-point-on-deep-learning-again&#34;&gt;Too the point on deep learning again!&lt;/h2&gt;
+&lt;p&gt;For the structure of the implementation I was very inspired by 
+&lt;a href=&#34;http://briandolhansky.com/blog/2014/10/30/artificial-neural-networks-matrix-form-part-5&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;this post&lt;/a&gt; by Brian Dolhansky, where he implements an MLP in python.&lt;/p&gt;
+&lt;p&gt;This structure completely encapsulates what is needed in a layer and how things are connected. Instead of creating a class, I am going to make a closure. So when I say a &lt;strong&gt;layer&lt;/strong&gt;, I mean the activations from the previous layers and the outgoing weights. So the only layer that doesn&amp;rsquo;t have, or doesn&amp;rsquo;t need weights, is the output layer.&lt;/p&gt;
+&lt;p&gt;This closure is therefore a function, or has some functions, which makes sense for a layer in a neural network, which is essentially a function in the mathematical sense. But before we get to the layer, we need what essentially creates the closure, a building block for a matrix:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;matrixInLayer &amp;lt;- function(init = FALSE, rS, cS, initPos = FALSE, initScale = 100){
+  intMat &amp;lt;- matrix(0, nrow=rS, ncol=cS)
+  if(init == TRUE){
+    intMat &amp;lt;- matrix(rnorm(rS*cS)/initScale,nrow = rS,ncol = cS)
+    if(initPos == TRUE){
+      intMat &amp;lt;- abs(intMat)
+    }
+  }
+  getter &amp;lt;- function(){
+    return(intMat)
+  }
+  setter &amp;lt;- function(nMat){
+    intMat &amp;lt;&amp;lt;- nMat
+  }
+  return(list2env(list(setter = setter, getter=getter)))
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We parameterize this function such that we can account for different initialization strategies in the weights, but we can use this to create all the needed matricies in a layer. The layer closure is then just something that encapsulates the internal state of the network, with placeholders for all the data needed to do a forward and backwards pass. The essential trick to make this work is of course the scope assignment in the &lt;code&gt;setter&lt;/code&gt; function. The fully connected layer can now be implemented as:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;Layer &amp;lt;- function(activation, minibatchSize, sizeP, is_input=FALSE, is_output=FALSE, initPos, initScale){
+  # Matrix holding the output values
+  Z &amp;lt;- matrixInLayer(FALSE,minibatchSize,sizeP[1])
+  # Outgoing Weights
+  W &amp;lt;- matrixInLayer(TRUE,sizeP[1],sizeP[2],initPos=initPos, initScale=initScale)
+  # Input to this layer
+  S &amp;lt;- matrixInLayer(FALSE,minibatchSize,sizeP[1])
+  # Deltas for this layer
+  D &amp;lt;- matrixInLayer(FALSE,minibatchSize,sizeP[1])
+  # Matrix holding derivatives of the activation function
+  Fp &amp;lt;- matrixInLayer(FALSE,sizeP[1],minibatchSize)
+  # Propagate minibatch through this layer
+  forward_propagate &amp;lt;- function(){
+    if(is_input == TRUE){
+      return(Z$getter()%*%W$getter())
+    }
+    Z$setter(activation(S$getter()))
+    if(is_output == TRUE){
+      return(Z$getter())
+    }else{
+      # Add bias for the hidden layer
+      Z$setter(cbind(Z$getter(),rep(1,nrow(Z$getter()))))
+      # Calculate the derivative
+      Fp$setter(t(activation(S$getter(),deriv = TRUE))) 
+      return(Z$getter()%*%W$getter())
+    }
+  }
+  # Return a list of these functions
+  myEnv &amp;lt;- list2env(list(forward_propagate=forward_propagate, S = S,
+                         D = D, Fp = Fp, W = W, Z = Z))
+  class(myEnv) &amp;lt;- &#39;Layer&#39;
+  return(myEnv)
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The layer function includes all the things needed for doing the book-keeping of the calculations for backpropagation. With very little extra code we have the ability to have arbitrary minibatch sizes and arbitrary activation functions. The activation function just needs and extra boolean parameter to determine whether we are evaluating the function or calculating the deivative. (&lt;em&gt;I&amp;rsquo;ll go in more detail in the next post about what a minibatch is when I cover stocastic gradient descent&lt;/em&gt;). We can protype these activation functions on the fly, because R is a functional language. So in less than 50 lines of code we have already created the heart of a multilayer percepteron, with some generalizability. So what does this layer do? It takes input from the activations of the neurons in the previous layer as a vector, multiplies it with a matrix and element-wise applies the activation. In essance it is this:
+$$
+\sigma(\mathbf{W}\cdot \mathbf{x})
+$$
+where $\mathbf{W}$ is the weight matrix, $\mathbf{x}$ is the input and $\sigma$ is the activation function. The problem of deep learning is then to find good parameters for the weights $\mathbf{W}$ when these functions are composed.&lt;/p&gt;
+&lt;h2 id=&#34;next-post&#34;&gt;Next post&lt;/h2&gt;
+&lt;p&gt;This ended up being a lot longer than I anticipated, but for the next post I aim at finishing the implementation for the MLP, going through backpropagation and simple training on mnist. For the last post the goal is to show how something like dropout can very easily be incorporated in this implementation and how we can disentangle a network using the magrittr package. Implementing other kinds of layers and different optimization strategies is also on the drawing board.&lt;/p&gt;
+&lt;p&gt;If you like this post I would greatly appreciate a tweet, my twitter handle is @gumgumeo :)&lt;/p&gt;
+&lt;div class=&#34;center&#34;&gt;
+&lt;a href=&#34;https://twitter.com/share?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-share-button&#34; data-size=&#34;large&#34; data-text=&#34;Learning Deep Learning in R&#34; data-url=&#34;https://gumeo.github.io/post/part-1-deep-learning-with-closures-in-r/&#34; data-via=&#34;gumgumeo&#34; data-hashtags=&#34;#rstats #machinelearning #deeplearning&#34; data-lang=&#34;en&#34; data-show-count=&#34;false&#34;&gt;Tweet&lt;/a&gt;&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Visualizing Strange Attractors</title>
+      <link>https://gumeo.github.io/post/visualizing-strange-attractors/</link>
+      <pubDate>Wed, 22 Nov 2017 13:00:00 +0000</pubDate>
+      <guid>https://gumeo.github.io/post/visualizing-strange-attractors/</guid>
+      <description>&lt;h1 id=&#34;what-is-a-strange-attractor&#34;&gt;What is a strange attractor?&lt;/h1&gt;
+&lt;p&gt;The 
+&lt;a href=&#34;https://en.wikipedia.org/wiki/Attractor#Strange_attractor&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;wikipedia article&lt;/a&gt; on attractors gives the following definition/explanation:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;An attractor is called strange if it has a fractal structure. This is often the case when the dynamics on it are chaotic, but strange nonchaotic attractors also exist. If a strange attractor is chaotic, exhibiting sensitive dependence on initial conditions, then any two arbitrarily close alternative initial points on the attractor, after any of various numbers of iterations, will lead to points that are arbitrarily far apart (subject to the confines of the attractor), and after any of various other numbers of iterations will lead to points that are arbitrarily close together. Thus a dynamic system with a chaotic attractor is locally unstable yet globally stable: once some sequences have entered the attractor, nearby points diverge from one another but never depart from the attractor.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;So for a dynamical system, which is usually a solution to a system of differential equations, we have some solutions which are called attractors. The attractors, attract a particle, or something moving in the system, meaning that when the particle falls into the attractor, it stays there. A relatable example is an asteroid that is moving in space and then starts orbiting a planet, and is then stuck in orbit, which is an attractor.&lt;/p&gt;
+&lt;p&gt;Some simple equations, like the 
+&lt;a href=&#34;https://en.wikipedia.org/wiki/Lorenz_system&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Lorenz system&lt;/a&gt; are chaotic. This means that if you change the initial conditions slightly, what you get out after a certain number of steps, (you iterate the solution in steps usually), is going to be vastly different. When scientists model something, this is not a very attractive property. We would like our system to be robust to minor initial perturbations, but this is not always possible. Many physical systems that we model have this chaotic nature, most notably the weather, it is very hard to make weather forecasts far into the future with good accuracy.&lt;/p&gt;
+&lt;p&gt;Although attractors are commonly associated with solutions of differential equations, they can also appear in general with an iterative system. An iterative system is a function, or a tuple of functions, where we iteratively feed the output in as input and &lt;em&gt;iterate&lt;/em&gt; the solution in this way. This is also how you numerically find solutions to differential equations, where no analytical solution exists, or we can&amp;rsquo;t find one.&lt;/p&gt;
+&lt;p&gt;In case I have piqued your interest in dynamical system, I took some 
+&lt;a href=&#34;http://www.imm.dtu.dk/~guei/linfell.pdf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;lecture notes&lt;/a&gt; in a course I took some years ago. These notes are not quite finished, but should give you a rough idea about the basics and where to go from there.&lt;/p&gt;
+&lt;h1 id=&#34;why-is-this-post-tagged-as-graphics&#34;&gt;Why is this post tagged as Graphics?&lt;/h1&gt;
+&lt;p&gt;Ok, so the point is that these attractors often look very nice. You can render them, but it can be a bit heavy computationally. I saw a very cool tweet by 
+&lt;a href=&#34;https://www.data-imaginist.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Thomas Lin Pedersen&lt;/a&gt; where he was rendering particles in a very nice way in R:&lt;/p&gt;
+&lt;center&gt;
+&lt;blockquote class=&#34;twitter-tweet&#34; data-lang=&#34;en&#34;&gt;&lt;p lang=&#34;und&#34; dir=&#34;ltr&#34;&gt;&lt;a href=&#34;https://twitter.com/hashtag/generative?src=hash&amp;amp;ref_src=twsrc%5Etfw&#34;&gt;#generative&lt;/a&gt; &lt;a href=&#34;https://twitter.com/hashtag/rstats?src=hash&amp;amp;ref_src=twsrc%5Etfw&#34;&gt;#rstats&lt;/a&gt; &lt;a href=&#34;https://t.co/h4vDmbrOX8&#34;&gt;pic.twitter.com/h4vDmbrOX8&lt;/a&gt;&lt;/p&gt;&amp;mdash; Thomas Lin Pedersen (@thomasp85) &lt;a href=&#34;https://twitter.com/thomasp85/status/912754660867497984?ref_src=twsrc%5Etfw&#34;&gt;September 26, 2017&lt;/a&gt;&lt;/blockquote&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;/center&gt;
+&lt;p&gt;At that point I was inspired to do some cool visualizations myself, and learn how to make these aesthetically pleasing renderings. I also wanted to be able to make gifs or screen savers with these things.&lt;/p&gt;
+&lt;p&gt;I found 
+&lt;a href=&#34;https://fronkonstin.com/2017/11/07/drawing-10-million-points-with-ggplot-clifford-attractors/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;this&lt;/a&gt; post about rendering strange attractors in R, using Rcpp. The Rcpp code for generating the points is actually very fast, what is the bottleneck here is the rendering with ggplot. So if you implement a rendering stack for a gif with this, the development time when you need to tweak many parameters is going to be rather slow.&lt;/p&gt;
+&lt;h1 id=&#34;the-clifford-attractor&#34;&gt;The Clifford attractor&lt;/h1&gt;
+&lt;p&gt;So the attractor in the post I linked to above is called a Clifford attractor. What is interesting about the way it is generated is that the shape is controlled by four parameters $a,b,c$ and $d$. The shape is in some sense continuous in these parameters, meaning that if I make small adjustments in the parameters, the shape will not change too much. With this in mind I wanted to make a gif with it, I.e. we make a loop in the parameters space and render images for equally spaced parameters along this curve. For a small enough spacing, this will give me a continuously deforming shape and I will be able to loop it, because the curve in parameter space is a loop.&lt;/p&gt;
+&lt;p&gt;Not all parameters give us nice looking attractors, so I need a way to iterate this process fast, for different sets of parameters, to see what works. I talked to some of my colleagues that know about computer graphics, and they said that they way to go forward would be to use openGL. I actually found a tutorial of exactly what I needed 
+&lt;a href=&#34;https://nathanselikoff.com/training/tutorial-strange-attractors-in-c-and-opengl&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;here&lt;/a&gt;. This is a tutorial on how to render multiple points, with point smoothing and good anti-aliasing, and this guy actually uses the Clifford attractor, &lt;strong&gt;nice!&lt;/strong&gt;. What I was missing was ways to save intermediate plots, then I was just going to use ImageMagick to combine it into a gif.&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;https://stackoverflow.com/questions/3191978/how-to-use-glut-opengl-to-render-to-a-file&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;The highest voted answer in this SO thread&lt;/a&gt; had everything I needed for saving the images. Now I just had to combine these things together!&lt;/p&gt;
+&lt;p&gt;After saving the images I used the bash command &lt;code&gt;mogrify&lt;/code&gt; to change them into png images and finally ImageMagick to create the gif:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;mogrify -format png *.*
+convert -delay 120 -loop 0 *.png animated.gif
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Here you can see the results on imgur:&lt;/p&gt;
+&lt;center&gt;
+&lt;blockquote class=&#34;imgur-embed-pub&#34; lang=&#34;en&#34; data-id=&#34;a/ZFpHB&#34;&gt;&lt;a href=&#34;//imgur.com/ZFpHB&#34;&gt;Strange attractors&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src=&#34;//s.imgur.com/min/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;/center&gt;
+&lt;p&gt;
+&lt;a href=&#34;https://github.com/gumeo/movingAttractor&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;The code is also now on github&lt;/a&gt; in case you want to play around with it!&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Got some new books!</title>
+      <link>https://gumeo.github.io/post/got-some-new-books/</link>
+      <pubDate>Wed, 08 Nov 2017 13:00:00 +0000</pubDate>
+      <guid>https://gumeo.github.io/post/got-some-new-books/</guid>
+      <description>&lt;p&gt;I have been waiting to read these for a while now!&lt;/p&gt;
+&lt;center&gt;
+&lt;blockquote class=&#34;twitter-tweet&#34; data-lang=&#34;en&#34;&gt;&lt;p lang=&#34;en&#34; dir=&#34;ltr&#34;&gt;Let the reading commence &lt;a href=&#34;https://twitter.com/hashtag/rstats?src=hash&amp;amp;ref_src=twsrc%5Etfw&#34;&gt;#rstats&lt;/a&gt; &lt;a href=&#34;https://twitter.com/hashtag/MachineLearning?src=hash&amp;amp;ref_src=twsrc%5Etfw&#34;&gt;#MachineLearning&lt;/a&gt; &lt;a href=&#34;https://t.co/Lqx2IcTENI&#34;&gt;pic.twitter.com/Lqx2IcTENI&lt;/a&gt;&lt;/p&gt;&amp;mdash; Gudmundur Einarsson (@gumgumeo) &lt;a href=&#34;https://twitter.com/gumgumeo/status/928251371865956354?ref_src=twsrc%5Etfw&#34;&gt;November 8, 2017&lt;/a&gt;&lt;/blockquote&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;/center&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>First Post!</title>
+      <link>https://gumeo.github.io/post/first-post/</link>
+      <pubDate>Wed, 01 Nov 2017 13:40:00 +0000</pubDate>
+      <guid>https://gumeo.github.io/post/first-post/</guid>
+      <description>&lt;h1 id=&#34;starting-a-blog&#34;&gt;Starting a blog&lt;/h1&gt;
+&lt;p&gt;The plan is to try to do weekly to monthly blogposts about something interesting I learn. I might also write up technical details about setting something up as a reference for my future self.&lt;/p&gt;
+&lt;p&gt;I chose to use the 
+&lt;a href=&#34;https://bookdown.org/yihui/blogdown/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;blogdown&lt;/a&gt; package to manage this blog, with the hugo theme 
+&lt;a href=&#34;http://dplesca.github.io/purehugo/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;purehugo&lt;/code&gt;&lt;/a&gt;. The main reason I chose this is because I think it scales well for mobile devices and it looks clean and minimal. I will probably add an about section and some other stuff/fluff later.&lt;/p&gt;
+&lt;p&gt;This is not the first time that I start a blog, I also have my own 
+&lt;a href=&#34;http://www.imm.dtu.dk/~guei/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;academic page/blog&lt;/a&gt;. I just don&amp;rsquo;t post there regularly. Removing some of the overhead, by managing the content/posts as Rmarkdown documents, will hopefully make me more productive as a blogger.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://gumeo.github.io/about/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://gumeo.github.io/about/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

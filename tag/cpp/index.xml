@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>cpp | Gudmundur Blog&amp;Bio</title>
+    <link>https://gumeo.github.io/tag/cpp/</link>
+      <atom:link href="https://gumeo.github.io/tag/cpp/index.xml" rel="self" type="application/rss+xml" />
+    <description>cpp</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2020</copyright><lastBuildDate>Mon, 11 May 2020 13:00:00 +0000</lastBuildDate>
+    <image>
+      <url>https://gumeo.github.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
+      <title>cpp</title>
+      <link>https://gumeo.github.io/tag/cpp/</link>
+    </image>
+    
+    <item>
+      <title>emplace_back vs push_back</title>
+      <link>https://gumeo.github.io/post/emplace-back/</link>
+      <pubDate>Mon, 11 May 2020 13:00:00 +0000</pubDate>
+      <guid>https://gumeo.github.io/post/emplace-back/</guid>
+      <description>&lt;p&gt;tl;dr &lt;code&gt;emplace_back&lt;/code&gt; is often mistaken as a faster &lt;code&gt;push_back&lt;/code&gt;, while it is in fact just a different tool. Do not blindly replace &lt;code&gt;push_back&lt;/code&gt; by &lt;code&gt;emplace_back&lt;/code&gt;, be careful of how you use &lt;code&gt;emplace_back&lt;/code&gt;, since it can have unexpected consequences.&lt;/p&gt;
+&lt;p&gt;I have repeatedly run into the choice of using &lt;code&gt;emplace_back&lt;/code&gt; instead of &lt;code&gt;push_back&lt;/code&gt; in C++. This short blog post serves as my take on this decision.&lt;/p&gt;
+&lt;p&gt;Both of the methods in the title, along with &lt;code&gt;insert&lt;/code&gt; and &lt;code&gt;emplace&lt;/code&gt;, are ways to insert data into standard library containers. &lt;code&gt;emplace_back&lt;/code&gt; is for adding a single element to the dynamic array &lt;code&gt;std::vector&lt;/code&gt;. There is a somewhat subtle difference between the two:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;push_back&lt;/code&gt; calls the constructor of the data that you intend to push and then pushes it to the container.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;emplace_back&lt;/code&gt; &amp;ldquo;constructs in place&amp;rdquo;, so one skips an extra move operation, potentially creating faster bytecode. This is done by forwarding the arguments to the container&amp;rsquo;s template type constructor.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;On the surface, &lt;code&gt;emplace_back&lt;/code&gt; might look like a faster &lt;code&gt;push_back&lt;/code&gt;, but there is a subtle difference contained in the act of forwarding arguments. Searching for the problem online yields a lengthy discussion on the 
+&lt;a href=&#34;https://stackoverflow.com/questions/4303513/push-back-vs-emplace-back&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;issue (emplace_back vs push_back)&lt;/a&gt;. In summary, the discussion leans towards choosing &lt;code&gt;emplace_back&lt;/code&gt; to insert data into your container, however the reason is not completely clear.&lt;/p&gt;
+&lt;h2 id=&#34;be-careful&#34;&gt;Be careful&lt;/h2&gt;
+&lt;p&gt;After searching a bit more I found 
+&lt;a href=&#34;https://abseil.io/tips/112&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;this post&lt;/a&gt;, which stresses how careful one should be. To further stress the ambiguity of the matter, the google c++ style guide does not provide an explicit preference. The reason they don&amp;rsquo;t state a preference, is because these are simply slightly different tools, and you should not use &lt;code&gt;emplace_back&lt;/code&gt; unless you properly understand it, and there is a proper reason for it.&lt;/p&gt;
+&lt;p&gt;The following code should make it clear how &lt;code&gt;emplace_back&lt;/code&gt; is different from &lt;code&gt;push_back&lt;/code&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-{cpp}&#34;&gt;#include&amp;lt;vector&amp;gt;
+#include&amp;lt;iostream&amp;gt;
+
+int main(){
+  // Basic example
+  std::vector&amp;lt;int&amp;gt; foo;
+  foo.push_back(10);
+  foo.emplace_back(20);
+
+  // More tricky example
+  std::vector&amp;lt;std::vector&amp;lt;int&amp;gt;&amp;gt; foo_bar;
+  //foo_bar.push_back(10); // Throws error!!!!
+  foo_bar.emplace_back(20); // Compiles with no issue
+  std::cout &amp;lt;&amp;lt; &amp;quot;foo_bar size: &amp;quot; &amp;lt;&amp;lt; foo_bar.size() &amp;lt;&amp;lt; &amp;quot;\n&amp;quot;;
+  std::cout &amp;lt;&amp;lt; &amp;quot;foo_bar[0] size: &amp;quot; &amp;lt;&amp;lt; foo_bar[0].size() &amp;lt;&amp;lt; &amp;quot;\n&amp;quot;;
+  return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Uncommenting the line &lt;code&gt;foo_bar.push_back(10)&lt;/code&gt; yields the following compilation error.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ g++ test.cpp -o test
+test.cpp: In function ‘int main()’:
+test.cpp:11:24: error: no matching function for call to ‘std::vector&amp;lt;std::vector&amp;lt;int&amp;gt; &amp;gt;::push_back(int)’
+   foo_bar.push_back(10);
+                        ^
+... Some more verbose diagnostic
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So we get an error. An extra diagnostic provides us with the following: &lt;code&gt;no known conversion for argument 1 from ‘int’ to ‘const value_type&amp;amp; {aka const std::vector&amp;lt;int&amp;gt;&amp;amp;}’&lt;/code&gt;. So it seems there is no conversion here that makes sense.&lt;/p&gt;
+&lt;p&gt;The compilation completes without errors if we comment out the trouble line. Running the code yields the following result:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ ./test
+foo_bar size: 1
+foo_bar[0] size: 20
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;What is the difference? For &lt;code&gt;emplace_back&lt;/code&gt; we &lt;strong&gt;forward the arguments to the constructor&lt;/strong&gt;, adding a new &lt;code&gt;std::vector&amp;lt;int&amp;gt; new_vector_to_add(20)&lt;/code&gt; to &lt;code&gt;foo_bar&lt;/code&gt;. This is the critical difference. So if you are using &lt;code&gt;emplace_back&lt;/code&gt; you need to be a bit extra careful in double checking types.&lt;/p&gt;
+&lt;h2 id=&#34;another-example-with-conversion&#34;&gt;Another example with conversion&lt;/h2&gt;
+&lt;p&gt;The example above is very simple and shows the difference of forwarding arguments to the value type constructor or not. The following example I added in an 
+&lt;a href=&#34;https://stackoverflow.com/questions/61592849/no-narrowing-warnings-when-using-emplace-back-instead-of-push-back&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;SO question&lt;/a&gt; shows a bit more subtle case where &lt;code&gt;emplace_back&lt;/code&gt; could make us miss catching a narrowing conversion from &lt;code&gt;double&lt;/code&gt; to &lt;code&gt;int&lt;/code&gt;.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-{cpp}&#34;&gt;#include &amp;lt;vector&amp;gt;
+class A {
+ public:
+  explicit A(int /*unused*/) {}
+};
+int main() {
+  double foo = 4.5;
+  std::vector&amp;lt;A&amp;gt; a_vec{};
+  a_vec.emplace_back(foo); // No warning with Wconversion
+  //A a(foo); // Gives compiler warning with Wconversion as expected
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;why-is-this-a-problem&#34;&gt;Why is this a problem?&lt;/h2&gt;
+&lt;p&gt;The problem is that we are unaware of the problem at compile-time. If this was not the intended behavior, we have caused a runtime error, which is generally harder to fix. Let us catch the issue somehow. You might wonder that some warning flags, e.g., &lt;code&gt;-Wall&lt;/code&gt; could reveal the issue. However, the program compiles fine with &lt;code&gt;-Wall&lt;/code&gt;. &lt;code&gt;-Wall&lt;/code&gt; contains narrowing, but it does not contain conversion. Further, adding &lt;code&gt;-Wconversion&lt;/code&gt; yields no warnings.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ g++ -Wall -Wconversion test_2.cpp -o test
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The problem is that this conversion is happening in a system header, so we also need &lt;code&gt;-Wsystem-headers&lt;/code&gt; to catch the issue.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ g++ -Wconversion -Wsystem-headers test_2.cpp 
+In file included from /usr/include/c++/7/vector:60:0,
+                 from test_2.cpp:1:
+/usr/include/c++/7/bits/stl_algobase.h: In function ‘constexpr int std::__lg(int)’:
+/usr/include/c++/7/bits/stl_algobase.h:1001:44: warning: conversion to ‘int’ from ‘long unsigned int’ may alter its value [-Wconversion]
+   { return sizeof(int) * __CHAR_BIT__  - 1 - __builtin_clz(__n); }
+                                            ^
+/usr/include/c++/7/bits/stl_algobase.h: In function ‘constexpr unsigned int std::__lg(unsigned int)’:
+/usr/include/c++/7/bits/stl_algobase.h:1005:44: warning: conversion to ‘unsigned int’ from ‘long unsigned int’ may alter its value [-Wconversion]
+   { return sizeof(int) * __CHAR_BIT__  - 1 - __builtin_clz(__n); }
+                                            ^
+In file included from /usr/include/x86_64-linux-gnu/c++/7/bits/c++allocator.h:33:0,
+                 from /usr/include/c++/7/bits/allocator.h:46,
+                 from /usr/include/c++/7/vector:61,
+                 from test_2.cpp:1:
+/usr/include/c++/7/ext/new_allocator.h: In instantiation of ‘void __gnu_cxx::new_allocator&amp;lt;_Tp&amp;gt;::construct(_Up*, _Args&amp;amp;&amp;amp; ...) [with _Up = A; _Args = {double&amp;amp;}; _Tp = A]’:
+/usr/include/c++/7/bits/alloc_traits.h:475:4:   required from ‘static void std::allocator_traits&amp;lt;std::allocator&amp;lt;_Tp1&amp;gt; &amp;gt;::construct(std::allocator_traits&amp;lt;std::allocator&amp;lt;_Tp1&amp;gt; &amp;gt;::allocator_type&amp;amp;, _Up*, _Args&amp;amp;&amp;amp; ...) [with _Up = A; _Args = {double&amp;amp;}; _Tp = A; std::allocator_traits&amp;lt;std::allocator&amp;lt;_Tp1&amp;gt; &amp;gt;::allocator_type = std::allocator&amp;lt;A&amp;gt;]’
+/usr/include/c++/7/bits/vector.tcc💯30:   required from ‘void std::vector&amp;lt;_Tp, _Alloc&amp;gt;::emplace_back(_Args&amp;amp;&amp;amp; ...) [with _Args = {double&amp;amp;}; _Tp = A; _Alloc = std::allocator&amp;lt;A&amp;gt;]’
+test_2.cpp:9:25:   required from here
+/usr/include/c++/7/ext/new_allocator.h:136:4: warning: conversion to ‘int’ from ‘double’ may alter its value [-Wfloat-conversion]
+  { ::new((void *)__p) _Up(std::forward&amp;lt;_Args&amp;gt;(__args)...); }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And there you have it - look at all the verbose output. The problem is not apparent from this wall of text for the uninitiated.&lt;/p&gt;
+&lt;h2 id=&#34;so-when-should-you-use-emplace_back&#34;&gt;So when should you use &lt;code&gt;emplace_back&lt;/code&gt;?&lt;/h2&gt;
+&lt;p&gt;One reason to use &lt;code&gt;emplace_back&lt;/code&gt; is when the move operation that we can save, is actually quite expensive. Consider the following example:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;class Image {
+  Image(size_t w, size_t h);
+};
+
+std::vector&amp;lt;Image&amp;gt; images;
+images.emplace_back(2000, 1000);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Instead of moving the image, which consists of potentially a lot of data, we construct it in place, and forward the constructor arguments in order to do that. These kind of cases are quite special, we should already be aware that this is &lt;em&gt;large&lt;/em&gt; data that we are adding to the container.&lt;/p&gt;
+&lt;p&gt;Another case for using &lt;code&gt;emplace_back&lt;/code&gt; was added in C++17. Then &lt;code&gt;emplace_back&lt;/code&gt; returns a reference to the inserted element, this is not possible at all with &lt;code&gt;push_back&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;emplace_back-is-a-potential-premature-optimization&#34;&gt;&lt;code&gt;emplace_back&lt;/code&gt; is a potential premature optimization.&lt;/h2&gt;
+&lt;p&gt;Going from &lt;code&gt;push_back&lt;/code&gt; to &lt;code&gt;emplace_back&lt;/code&gt; is a small change that can usually wait, and like the image case, it is usually quite apparent when we want to use it. If you want to use &lt;code&gt;emplace_back&lt;/code&gt; from the start, then make sure you understand the differences. This is not just a faster &lt;code&gt;push_back&lt;/code&gt;. For safety, reliability, and maintainability reasons, it is better to write the code with &lt;code&gt;push_back&lt;/code&gt; when in doubt. This choice reduces the chance of pushing an unwanted hard to find implicit conversion into the codebase, but you should weigh that risk against the potential speedups, these speedups should then ideally be evaluated when profiling.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Visualizing Strange Attractors</title>
+      <link>https://gumeo.github.io/post/visualizing-strange-attractors/</link>
+      <pubDate>Wed, 22 Nov 2017 13:00:00 +0000</pubDate>
+      <guid>https://gumeo.github.io/post/visualizing-strange-attractors/</guid>
+      <description>&lt;h1 id=&#34;what-is-a-strange-attractor&#34;&gt;What is a strange attractor?&lt;/h1&gt;
+&lt;p&gt;The 
+&lt;a href=&#34;https://en.wikipedia.org/wiki/Attractor#Strange_attractor&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;wikipedia article&lt;/a&gt; on attractors gives the following definition/explanation:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;An attractor is called strange if it has a fractal structure. This is often the case when the dynamics on it are chaotic, but strange nonchaotic attractors also exist. If a strange attractor is chaotic, exhibiting sensitive dependence on initial conditions, then any two arbitrarily close alternative initial points on the attractor, after any of various numbers of iterations, will lead to points that are arbitrarily far apart (subject to the confines of the attractor), and after any of various other numbers of iterations will lead to points that are arbitrarily close together. Thus a dynamic system with a chaotic attractor is locally unstable yet globally stable: once some sequences have entered the attractor, nearby points diverge from one another but never depart from the attractor.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;So for a dynamical system, which is usually a solution to a system of differential equations, we have some solutions which are called attractors. The attractors, attract a particle, or something moving in the system, meaning that when the particle falls into the attractor, it stays there. A relatable example is an asteroid that is moving in space and then starts orbiting a planet, and is then stuck in orbit, which is an attractor.&lt;/p&gt;
+&lt;p&gt;Some simple equations, like the 
+&lt;a href=&#34;https://en.wikipedia.org/wiki/Lorenz_system&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Lorenz system&lt;/a&gt; are chaotic. This means that if you change the initial conditions slightly, what you get out after a certain number of steps, (you iterate the solution in steps usually), is going to be vastly different. When scientists model something, this is not a very attractive property. We would like our system to be robust to minor initial perturbations, but this is not always possible. Many physical systems that we model have this chaotic nature, most notably the weather, it is very hard to make weather forecasts far into the future with good accuracy.&lt;/p&gt;
+&lt;p&gt;Although attractors are commonly associated with solutions of differential equations, they can also appear in general with an iterative system. An iterative system is a function, or a tuple of functions, where we iteratively feed the output in as input and &lt;em&gt;iterate&lt;/em&gt; the solution in this way. This is also how you numerically find solutions to differential equations, where no analytical solution exists, or we can&amp;rsquo;t find one.&lt;/p&gt;
+&lt;p&gt;In case I have piqued your interest in dynamical system, I took some 
+&lt;a href=&#34;http://www.imm.dtu.dk/~guei/linfell.pdf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;lecture notes&lt;/a&gt; in a course I took some years ago. These notes are not quite finished, but should give you a rough idea about the basics and where to go from there.&lt;/p&gt;
+&lt;h1 id=&#34;why-is-this-post-tagged-as-graphics&#34;&gt;Why is this post tagged as Graphics?&lt;/h1&gt;
+&lt;p&gt;Ok, so the point is that these attractors often look very nice. You can render them, but it can be a bit heavy computationally. I saw a very cool tweet by 
+&lt;a href=&#34;https://www.data-imaginist.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Thomas Lin Pedersen&lt;/a&gt; where he was rendering particles in a very nice way in R:&lt;/p&gt;
+&lt;center&gt;
+&lt;blockquote class=&#34;twitter-tweet&#34; data-lang=&#34;en&#34;&gt;&lt;p lang=&#34;und&#34; dir=&#34;ltr&#34;&gt;&lt;a href=&#34;https://twitter.com/hashtag/generative?src=hash&amp;amp;ref_src=twsrc%5Etfw&#34;&gt;#generative&lt;/a&gt; &lt;a href=&#34;https://twitter.com/hashtag/rstats?src=hash&amp;amp;ref_src=twsrc%5Etfw&#34;&gt;#rstats&lt;/a&gt; &lt;a href=&#34;https://t.co/h4vDmbrOX8&#34;&gt;pic.twitter.com/h4vDmbrOX8&lt;/a&gt;&lt;/p&gt;&amp;mdash; Thomas Lin Pedersen (@thomasp85) &lt;a href=&#34;https://twitter.com/thomasp85/status/912754660867497984?ref_src=twsrc%5Etfw&#34;&gt;September 26, 2017&lt;/a&gt;&lt;/blockquote&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;/center&gt;
+&lt;p&gt;At that point I was inspired to do some cool visualizations myself, and learn how to make these aesthetically pleasing renderings. I also wanted to be able to make gifs or screen savers with these things.&lt;/p&gt;
+&lt;p&gt;I found 
+&lt;a href=&#34;https://fronkonstin.com/2017/11/07/drawing-10-million-points-with-ggplot-clifford-attractors/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;this&lt;/a&gt; post about rendering strange attractors in R, using Rcpp. The Rcpp code for generating the points is actually very fast, what is the bottleneck here is the rendering with ggplot. So if you implement a rendering stack for a gif with this, the development time when you need to tweak many parameters is going to be rather slow.&lt;/p&gt;
+&lt;h1 id=&#34;the-clifford-attractor&#34;&gt;The Clifford attractor&lt;/h1&gt;
+&lt;p&gt;So the attractor in the post I linked to above is called a Clifford attractor. What is interesting about the way it is generated is that the shape is controlled by four parameters $a,b,c$ and $d$. The shape is in some sense continuous in these parameters, meaning that if I make small adjustments in the parameters, the shape will not change too much. With this in mind I wanted to make a gif with it, I.e. we make a loop in the parameters space and render images for equally spaced parameters along this curve. For a small enough spacing, this will give me a continuously deforming shape and I will be able to loop it, because the curve in parameter space is a loop.&lt;/p&gt;
+&lt;p&gt;Not all parameters give us nice looking attractors, so I need a way to iterate this process fast, for different sets of parameters, to see what works. I talked to some of my colleagues that know about computer graphics, and they said that they way to go forward would be to use openGL. I actually found a tutorial of exactly what I needed 
+&lt;a href=&#34;https://nathanselikoff.com/training/tutorial-strange-attractors-in-c-and-opengl&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;here&lt;/a&gt;. This is a tutorial on how to render multiple points, with point smoothing and good anti-aliasing, and this guy actually uses the Clifford attractor, &lt;strong&gt;nice!&lt;/strong&gt;. What I was missing was ways to save intermediate plots, then I was just going to use ImageMagick to combine it into a gif.&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;https://stackoverflow.com/questions/3191978/how-to-use-glut-opengl-to-render-to-a-file&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;The highest voted answer in this SO thread&lt;/a&gt; had everything I needed for saving the images. Now I just had to combine these things together!&lt;/p&gt;
+&lt;p&gt;After saving the images I used the bash command &lt;code&gt;mogrify&lt;/code&gt; to change them into png images and finally ImageMagick to create the gif:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;mogrify -format png *.*
+convert -delay 120 -loop 0 *.png animated.gif
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Here you can see the results on imgur:&lt;/p&gt;
+&lt;center&gt;
+&lt;blockquote class=&#34;imgur-embed-pub&#34; lang=&#34;en&#34; data-id=&#34;a/ZFpHB&#34;&gt;&lt;a href=&#34;//imgur.com/ZFpHB&#34;&gt;Strange attractors&lt;/a&gt;&lt;/blockquote&gt;&lt;script async src=&#34;//s.imgur.com/min/embed.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;/center&gt;
+&lt;p&gt;
+&lt;a href=&#34;https://github.com/gumeo/movingAttractor&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;The code is also now on github&lt;/a&gt; in case you want to play around with it!&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

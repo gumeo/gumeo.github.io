@@ -1,0 +1,3 @@
+User-agent: *
+
+Sitemap: https://gumeo.github.io/sitemap.xml

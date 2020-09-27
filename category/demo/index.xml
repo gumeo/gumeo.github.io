@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Demo | Gudmundur Blog&amp;Bio</title>
+    <link>https://gumeo.github.io/category/demo/</link>
+      <atom:link href="https://gumeo.github.io/category/demo/index.xml" rel="self" type="application/rss+xml" />
+    <description>Demo</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2020</copyright><lastBuildDate>Wed, 01 Nov 2017 13:40:00 +0000</lastBuildDate>
+    <image>
+      <url>https://gumeo.github.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
+      <title>Demo</title>
+      <link>https://gumeo.github.io/category/demo/</link>
+    </image>
+    
+    <item>
+      <title>First Post!</title>
+      <link>https://gumeo.github.io/post/first-post/</link>
+      <pubDate>Wed, 01 Nov 2017 13:40:00 +0000</pubDate>
+      <guid>https://gumeo.github.io/post/first-post/</guid>
+      <description>&lt;h1 id=&#34;starting-a-blog&#34;&gt;Starting a blog&lt;/h1&gt;
+&lt;p&gt;The plan is to try to do weekly to monthly blogposts about something interesting I learn. I might also write up technical details about setting something up as a reference for my future self.&lt;/p&gt;
+&lt;p&gt;I chose to use the 
+&lt;a href=&#34;https://bookdown.org/yihui/blogdown/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;blogdown&lt;/a&gt; package to manage this blog, with the hugo theme 
+&lt;a href=&#34;http://dplesca.github.io/purehugo/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;purehugo&lt;/code&gt;&lt;/a&gt;. The main reason I chose this is because I think it scales well for mobile devices and it looks clean and minimal. I will probably add an about section and some other stuff/fluff later.&lt;/p&gt;
+&lt;p&gt;This is not the first time that I start a blog, I also have my own 
+&lt;a href=&#34;http://www.imm.dtu.dk/~guei/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;academic page/blog&lt;/a&gt;. I just don&amp;rsquo;t post there regularly. Removing some of the overhead, by managing the content/posts as Rmarkdown documents, will hopefully make me more productive as a blogger.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

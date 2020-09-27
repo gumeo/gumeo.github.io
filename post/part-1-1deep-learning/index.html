@@ -1,0 +1,1245 @@
+<!DOCTYPE html><html lang="en-us" >
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.8.0">
+
+  
+
+  
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="Guðmundur Einarsson">
+
+  
+  
+  
+    
+  
+  <meta name="description" content="Start of a small series The gif below is the evolution of the weights from a neural network trained on the mnist dataset. Mnist is a dataset of handwritten digits, and is kind of the hello world/FizzBuzz of machine learning.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://gumeo.github.io/post/part-1-1deep-learning/">
+
+  
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+
+  
+  
+  
+  
+    
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha256-FMvZuGapsJLjouA6k7Eo2lusoAX9i0ShlWFG6qt7SLc=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+        
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+    
+      
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap">
+    
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-110075286-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url, target) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           if (target !== '_blank') {
+             document.location = url;
+           }
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target, event.target.getAttribute('target'));  
+  }
+
+  gtag('js', new Date());
+  gtag('config', 'UA-110075286-1', {});
+
+  
+  document.addEventListener('click', onClickCallback, false);
+</script>
+
+
+  
+
+
+  
+  
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="https://gumeo.github.io/post/part-1-1deep-learning/">
+
+  
+  
+  
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="Gudmundur Blog&amp;Bio">
+  <meta property="og:url" content="https://gumeo.github.io/post/part-1-1deep-learning/">
+  <meta property="og:title" content="Part 1: Deep Learning with Closures in R | Gudmundur Blog&amp;Bio">
+  <meta property="og:description" content="Start of a small series The gif below is the evolution of the weights from a neural network trained on the mnist dataset. Mnist is a dataset of handwritten digits, and is kind of the hello world/FizzBuzz of machine learning."><meta property="og:image" content="https://gumeo.github.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png">
+  <meta property="twitter:image" content="https://gumeo.github.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png"><meta property="og:locale" content="en-us">
+  
+    
+      <meta property="article:published_time" content="2017-12-14T13:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2017-12-14T13:00:00&#43;00:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://gumeo.github.io/post/part-1-1deep-learning/"
+  },
+  "headline": "Part 1: Deep Learning with Closures in R",
+  
+  "datePublished": "2017-12-14T13:00:00Z",
+  "dateModified": "2017-12-14T13:00:00Z",
+  
+  "author": {
+    "@type": "Person",
+    "name": "Guðmundur Einarsson"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "Gudmundur Blog\u0026Bio",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://gumeo.github.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png"
+    }
+  },
+  "description": "Start of a small series The gif below is the evolution of the weights from a neural network trained on the mnist dataset. Mnist is a dataset of handwritten digits, and is kind of the hello world/FizzBuzz of machine learning."
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>Part 1: Deep Learning with Closures in R | Gudmundur Blog&amp;Bio</title>
+
+</head>
+
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" class=" ">
+
+  
+  
+  
+    <script>window.staDarkLightChooser = true;</script>
+  
+  
+    <script>const isSiteThemeDark = false;</script>
+  
+  
+  <script src="/js/load-theme.js"></script>
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search" class="form-control">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-center" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+
+        
+
+        
+        
+        
+        
+
+        
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/"><span>Home</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+
+        
+        
+        
+        
+
+        
+          
+            
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/about/"><span>About</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#" aria-label="Search"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item dropdown theme-dropdown">
+        <a href="#" class="nav-link js-theme-selector" data-toggle="dropdown" aria-haspopup="true">
+          <i class="fas fa-palette" aria-hidden="true"></i>
+        </a>
+        <div class="dropdown-menu">
+          <a href="#" class="dropdown-item js-set-theme-light">
+            <span>Light</span>
+          </a>
+          <a href="#" class="dropdown-item js-set-theme-dark">
+            <span>Dark</span>
+          </a>
+          <a href="#" class="dropdown-item js-set-theme-auto">
+            <span>Automatic</span>
+          </a>
+        </div>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>Part 1: Deep Learning with Closures in R</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+  
+  
+  <div>
+    
+
+  
+  <span ><a href="/author/gu%C3%B0mundur-einarsson/">Guðmundur Einarsson</a></span>
+  </div>
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    Dec 14, 2017
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    10 min read
+  </span>
+  
+
+  
+  
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <span class="article-categories">
+    <i class="fas fa-folder mr-1"></i><a href="/category/programming/">Programming</a></span>
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      <h1 id="start-of-a-small-series">Start of a small series</h1>
+<p>The gif below is the evolution of the weights from a neural network trained on the mnist dataset. Mnist is a dataset of handwritten digits, and is kind of the <strong>hello world/FizzBuzz</strong> of machine learning. It is maybe not a very challenging data set, but you can learn a lot from it. This is a 10 by 10 grid of images, where each individual small patch represents weights going to a single neuron in the first hidden layer of the network. After I saw the content by Grant Sanderson, I wanted to inspect by myself what the network is actually learning. This series is going to outline this development, with an angle towards functional programming.</p>
+<center>
+<blockquote class="imgur-embed-pub" lang="en" data-id="EgcQgkh"><a href="//imgur.com/EgcQgkh"></a></blockquote><script async src="//s.imgur.com/min/embed.js" charset="utf-8"></script>
+</center>
+<p>So I received the 
+<a href="http://www.deeplearningbook.org/" target="_blank" rel="noopener">Deep Learning book</a> a little more than a month ago, and I have had time to read parts I and II. I think that overall the authors successfully explain and condense a lot of research into something digestable. The reason why I use the word condense is because how much information the book contains. The bibliography is 55 pages, so I almost feel that the book should be called <em>Introduction to Deep Learning Research</em>, because it is a gateway to so much good material. Another fascinating thing about this book is the discussion it contains. The authors are quite upfront about some criticisms on deep learning and discuss them to a great extent. All in all I look forward to finish reading the book.</p>
+<p>I have fiddled around with deep learning since I took a summer-school on it in 2014, where 
+<a href="https://twitter.com/hugo_larochelle?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor" target="_blank" rel="noopener">Hugo Larochelle</a> was giving lectures and he joined us for an epic sword fighting competition/LARP session in the countryside of Denmark. I have followed the evolution of deep learning since, and what has been most amazing is by how much the barrier of entry has been lowered. The current software frameworks make it so easy to get started. After reading the DL book I found a strong inner urge to implement some of these things myself. I think that a way to get a better understanding of programming concepts, algorithms and data structures, is just to go for it and implement it. Also talking about data-structures, deep learning is also becoming a part of that:</p>
+<center>
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Jeff Dean and co at GOOG just released a paper showing how machine-learned indexes can replace B-Trees, Hash Indexes, and Bloom Filters. Execute 3x faster than B-Trees, 10-100x less space. Executes on GPU, which are getting faster unlike CPU. Amazing.  <a href="https://t.co/PPVkrFVKXg">https://t.co/PPVkrFVKXg</a></p>&mdash; Nick Schrock (@schrockn) <a href="https://twitter.com/schrockn/status/940037656494317568?ref_src=twsrc%5Etfw">December 11, 2017</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</center>
+<p>After seeing the videos made by 
+<a href="http://www.3blue1brown.com/" target="_blank" rel="noopener">Grant Sanderson</a> on deep learning I decided it was time to implement the basics by myself. I wanted to completely understand back-propagation, how it really is a dynamic programming algorithm where we actually do some smart book-keeping and reuse computations. That is one of the major <em>tricks</em> that makes this algorithm work.</p>
+<h2 id="not-another-framework">Not another framework</h2>
+<p>But of course implementing a fully fledged DL framework is a feat one should not do, unless you have some very specific reason for it. Many frameworks have been created, and doing this alone <strong>to learn</strong> should not have that goal in mind. I wanted to make something that would be easily extendable, I also wanted to do it in R (because I really like R), I also made a package at some point called 
+<a href="https://github.com/gumeo/mnistr" target="_blank" rel="noopener">mnistr</a> where I wanted to add some fun examples with neural networks on. When I&rsquo;m done with this series I&rsquo;ll add the implementation to the package and submit it to CRAN.</p>
+<h2 id="closures">Closures</h2>
+<p>The final reason I had for doing this relates to closures. So deep learning, or deep neural networks, are in it&rsquo;s essance just functions, or rather compositions of functions. These individual functions are usually not that complicated, what makes them complicated is what they learn from complicated data, and how these individual simple things together make something complicated. We do not completely understand what they learn or do. If I can make a representation of a multi-layer percepteron (<em>which is a fully connected neural network</em>) in a functional programming paradigm, then it might be easier to understand it for others and myself. I will hopefully be able to disentanlge the networks into inidvidual functions and using the 
+<a href="https://cran.r-project.org/web/packages/magrittr/index.html" target="_blank" rel="noopener">magrittr</a> package to do the function composition in a more obvious manner, which demonstrates that the individual pieces of a neural network are not so complicated, and the final composition does not need to be so complicated either.</p>
+<h2 id="but-wait-a-minute-what-are-closures">But wait a minute? What are closures?</h2>
+<p>So the 
+<a href="https://en.wikipedia.org/wiki/Closure_%28computer_programming%29" target="_blank" rel="noopener">wikipedia article</a> gives it a pretty good treatment</p>
+<blockquote>
+<p>In programming languages, closures (also lexical closures or function closures) are techniques for implementing lexically scoped name binding in languages with first-class functions. Operationally, a closure is a record storing a function[a] together with an environment:[1] a mapping associating each free variable of the function (variables that are used locally, but defined in an enclosing scope) with the value or reference to which the name was bound when the closure was created.[b] A closure—unlike a plain function—allows the function to access those captured variables through the closure&rsquo;s copies of their values or references, even when the function is invoked outside their scope</p>
+</blockquote>
+<p>This sounds a lot like object oriented programming, but when the <em>objects</em> that we are working with, are naturally functions, then this works very nicely. But let&rsquo;s look at a simple example!</p>
+<pre><code class="language-r">newBankAccount &lt;- function(){
+  myMoney &lt;- 0
+  putMonyInTheBank &lt;- function(amount){
+    myMoney &lt;&lt;- myMoney + amount
+  }
+  howMuchDoIOwn &lt;- function(){
+    print(paste('You have:',myMoney,'bitcoins!'))
+  }
+  return(list2env(list(putMonyInTheBank=putMonyInTheBank,
+                       howMuchDoIOwn=howMuchDoIOwn)))
+}
+</code></pre>
+<p>Now I can use this to create a <em>bank account function</em></p>
+<pre><code class="language-r">&gt; myAccount &lt;- newBankAccount()
+&gt; myAccount$howMuchDoIOwn()
+[1] &quot;You have: 0 bitcoins!&quot;
+&gt; myAccount$putMonyInTheBank(200)
+&gt; myAccount$howMuchDoIOwn()
+[1] &quot;You have: 200 bitcoins!&quot;
+&gt; copyAccount &lt;- myAccount
+&gt; copyAccount$howMuchDoIOwn()
+[1] &quot;You have: 200 bitcoins!&quot;
+&gt; copyAccount$putMonyInTheBank(300)
+&gt; copyAccount$howMuchDoIOwn()
+[1] &quot;You have: 500 bitcoins!&quot;
+&gt; myAccount$howMuchDoIOwn() # Ahh snap, I also received bitcoins!
+[1] &quot;You have: 500 bitcoins!&quot;
+</code></pre>
+<p>So compared to <em>normal</em> functions, now we have a function (<em>actually an environment</em>) with a mutable state. Now we can have side-effects when we call the functions from the environment. But if you look at the calls I made above, you may have noticed that when I copied the account, added to the copied account, the original account also had an increased amount in it. So the copied account didn&rsquo;t get the data copied, only the references. So if you make multiple bank accounts, initialize each seperately, don&rsquo;t initialize one prototype and copy it to all the users. Otherwise all the users end up with one big shared account!</p>
+<p>So be careful, and if you really want to copy environments look at 
+<a href="https://stackoverflow.com/questions/9965577/r-copy-move-one-environment-to-another" target="_blank" rel="noopener">this SO post</a>. If you want to learn more about environments and the functional programming side of R, 
+<a href="http://adv-r.had.co.nz/" target="_blank" rel="noopener">advanced R</a> by Hadley Wickham is a great starting point, you might also want to check out 
+<a href="http://www.lemnica.com/esotericR/Introducing-Closures/" target="_blank" rel="noopener">this blogpost</a>. Also if you have coded in javascript, you might be familiar with the issue of copying closures there. And btw, I have no bitcoins :(</p>
+<p>Another important thing that you might have noticed is the assignment operators. If you are not familiar with R, <code>&lt;-</code> is pretty much the same as <code>=</code>, they are kind of used interchangably, but they have a very subtle difference that you can read about 
+<a href="https://stackoverflow.com/questions/1741820/assignment-operators-in-r-and" target="_blank" rel="noopener">here</a>. The weird assignment operator that you noticed was probably the <code>&lt;&lt;-</code>, the scoping assignment. This is the whole trick about closures, best said 
+<a href="https://stackoverflow.com/questions/2628621/how-do-you-use-scoping-assignment-in-r?rq=1" target="_blank" rel="noopener">here</a>:</p>
+<blockquote>
+<p>A closure is a function written by another function. Closures are so called because they enclose the environment of the parent function, and can access all variables and parameters in that function.</p>
+</blockquote>
+<p>The scoping operator creates the reference needed, such that the returned function encloses the environment of the caller. This is why closures are sometimes called poor man&rsquo;s objects. We are basically emulating the creation of public and private members in some sense, but without the overhead of object oriented structured code. This is an essential part in making the implementation look cleaner and more transparent. The code that you write is more to the point of solving the task as hand, rather the adhearing to a structure of a particular paradigm.</p>
+<h2 id="too-the-point-on-deep-learning-again">Too the point on deep learning again!</h2>
+<p>For the structure of the implementation I was very inspired by 
+<a href="http://briandolhansky.com/blog/2014/10/30/artificial-neural-networks-matrix-form-part-5" target="_blank" rel="noopener">this post</a> by Brian Dolhansky, where he implements an MLP in python.</p>
+<p>This structure completely encapsulates what is needed in a layer and how things are connected. Instead of creating a class, I am going to make a closure. So when I say a <strong>layer</strong>, I mean the activations from the previous layers and the outgoing weights. So the only layer that doesn&rsquo;t have, or doesn&rsquo;t need weights, is the output layer.</p>
+<p>This closure is therefore a function, or has some functions, which makes sense for a layer in a neural network, which is essentially a function in the mathematical sense. But before we get to the layer, we need what essentially creates the closure, a building block for a matrix:</p>
+<pre><code class="language-r">matrixInLayer &lt;- function(init = FALSE, rS, cS, initPos = FALSE, initScale = 100){
+  intMat &lt;- matrix(0, nrow=rS, ncol=cS)
+  if(init == TRUE){
+    intMat &lt;- matrix(rnorm(rS*cS)/initScale,nrow = rS,ncol = cS)
+    if(initPos == TRUE){
+      intMat &lt;- abs(intMat)
+    }
+  }
+  getter &lt;- function(){
+    return(intMat)
+  }
+  setter &lt;- function(nMat){
+    intMat &lt;&lt;- nMat
+  }
+  return(list2env(list(setter = setter, getter=getter)))
+}
+</code></pre>
+<p>We parameterize this function such that we can account for different initialization strategies in the weights, but we can use this to create all the needed matricies in a layer. The layer closure is then just something that encapsulates the internal state of the network, with placeholders for all the data needed to do a forward and backwards pass. The essential trick to make this work is of course the scope assignment in the <code>setter</code> function. The fully connected layer can now be implemented as:</p>
+<pre><code class="language-r">Layer &lt;- function(activation, minibatchSize, sizeP, is_input=FALSE, is_output=FALSE, initPos, initScale){
+  # Matrix holding the output values
+  Z &lt;- matrixInLayer(FALSE,minibatchSize,sizeP[1])
+  # Outgoing Weights
+  W &lt;- matrixInLayer(TRUE,sizeP[1],sizeP[2],initPos=initPos, initScale=initScale)
+  # Input to this layer
+  S &lt;- matrixInLayer(FALSE,minibatchSize,sizeP[1])
+  # Deltas for this layer
+  D &lt;- matrixInLayer(FALSE,minibatchSize,sizeP[1])
+  # Matrix holding derivatives of the activation function
+  Fp &lt;- matrixInLayer(FALSE,sizeP[1],minibatchSize)
+  # Propagate minibatch through this layer
+  forward_propagate &lt;- function(){
+    if(is_input == TRUE){
+      return(Z$getter()%*%W$getter())
+    }
+    Z$setter(activation(S$getter()))
+    if(is_output == TRUE){
+      return(Z$getter())
+    }else{
+      # Add bias for the hidden layer
+      Z$setter(cbind(Z$getter(),rep(1,nrow(Z$getter()))))
+      # Calculate the derivative
+      Fp$setter(t(activation(S$getter(),deriv = TRUE))) 
+      return(Z$getter()%*%W$getter())
+    }
+  }
+  # Return a list of these functions
+  myEnv &lt;- list2env(list(forward_propagate=forward_propagate, S = S,
+                         D = D, Fp = Fp, W = W, Z = Z))
+  class(myEnv) &lt;- 'Layer'
+  return(myEnv)
+}
+</code></pre>
+<p>The layer function includes all the things needed for doing the book-keeping of the calculations for backpropagation. With very little extra code we have the ability to have arbitrary minibatch sizes and arbitrary activation functions. The activation function just needs and extra boolean parameter to determine whether we are evaluating the function or calculating the deivative. (<em>I&rsquo;ll go in more detail in the next post about what a minibatch is when I cover stocastic gradient descent</em>). We can protype these activation functions on the fly, because R is a functional language. So in less than 50 lines of code we have already created the heart of a multilayer percepteron, with some generalizability. So what does this layer do? It takes input from the activations of the neurons in the previous layer as a vector, multiplies it with a matrix and element-wise applies the activation. In essance it is this:
+$$
+\sigma(\mathbf{W}\cdot \mathbf{x})
+$$
+where $\mathbf{W}$ is the weight matrix, $\mathbf{x}$ is the input and $\sigma$ is the activation function. The problem of deep learning is then to find good parameters for the weights $\mathbf{W}$ when these functions are composed.</p>
+<h2 id="next-post">Next post</h2>
+<p>This ended up being a lot longer than I anticipated, but for the next post I aim at finishing the implementation for the MLP, going through backpropagation and simple training on mnist. For the last post the goal is to show how something like dropout can very easily be incorporated in this implementation and how we can disentangle a network using the magrittr package. Implementing other kinds of layers and different optimization strategies is also on the drawing board.</p>
+<p>If you like this post I would greatly appreciate a tweet, my twitter handle is @gumgumeo :)</p>
+<div class="center">
+<a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-size="large" data-text="Learning Deep Learning in R" data-url="https://gumeo.github.io/post/part-1-deep-learning-with-closures-in-r/" data-via="gumgumeo" data-hashtags="#rstats #machinelearning #deeplearning" data-lang="en" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</div>
+
+    </div>
+
+    
+
+
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tag/r/">R</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=https://gumeo.github.io/post/part-1-1deep-learning/&amp;text=Part%201:%20Deep%20Learning%20with%20Closures%20in%20R" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=https://gumeo.github.io/post/part-1-1deep-learning/&amp;t=Part%201:%20Deep%20Learning%20with%20Closures%20in%20R" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=Part%201:%20Deep%20Learning%20with%20Closures%20in%20R&amp;body=https://gumeo.github.io/post/part-1-1deep-learning/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=https://gumeo.github.io/post/part-1-1deep-learning/&amp;title=Part%201:%20Deep%20Learning%20with%20Closures%20in%20R" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="whatsapp://send?text=Part%201:%20Deep%20Learning%20with%20Closures%20in%20R%20https://gumeo.github.io/post/part-1-1deep-learning/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=https://gumeo.github.io/post/part-1-1deep-learning/&amp;title=Part%201:%20Deep%20Learning%20with%20Closures%20in%20R" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+
+
+
+
+
+  
+    
+    
+    
+      
+    
+    
+    
+    <div class="media author-card content-widget-hr">
+      
+        
+        <img class="avatar mr-3 avatar-circle" src="/author/gu%C3%B0mundur-einarsson/avatar_hu2e8155c65b026b8f773011166b8edcd9_836272_270x270_fill_lanczos_center_2.png" alt="Guðmundur Einarsson">
+      
+
+      <div class="media-body">
+        <h5 class="card-title"><a href="https://gumeo.github.io/">Guðmundur Einarsson</a></h5>
+        <h6 class="card-subtitle">Research Scientist</h6>
+        <p class="card-text">I am interested in statistics, genetics and machine learning.</p>
+        <ul class="network-icon" aria-hidden="true">
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+    <li>
+      <a href="mailto:gudmundur.einarsson.phd@gmail.com" >
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://twitter.com/gumgumeo" target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://github.com/gumeo" target="_blank" rel="noopener">
+        <i class="fab fa-github"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://www.linkedin.com/in/gudmundureinarsson/" target="_blank" rel="noopener">
+        <i class="fab fa-linkedin"></i>
+      </a>
+    </li>
+  
+</ul>
+
+      </div>
+    </div>
+  
+
+
+  
+
+
+
+
+
+
+
+
+<div class="article-widget">
+  
+<div class="post-nav">
+  
+  
+  
+  <div class="post-nav-item">
+    <div class="meta-nav">Next</div>
+    <a href="/post/part-2-deep-learning/" rel="next">Part 2: Deep Learning with Closures in R</a>
+  </div>
+  
+  
+  
+  <div class="post-nav-item">
+    <div class="meta-nav">Previous</div>
+    <a href="/post/visualizing-strange-attractors/" rel="prev">Visualizing Strange Attractors</a>
+  </div>
+  
+</div>
+
+</div>
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/post/part-2-deep-learning/">Part 2: Deep Learning with Closures in R</a></li>
+      
+      <li><a href="/post/emplace-back/">emplace_back vs push_back</a></li>
+      
+      <li><a href="/post/visualizing-strange-attractors/">Visualizing Strange Attractors</a></li>
+      
+      <li><a href="/post/got-some-new-books/">Got some new books!</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.1.0/instantpage.min.js" integrity="sha512-1+qUtKoh9XZW7j+6LhRMAyOrgSQKenQ4mluTR+cvxXjP1Z54RxZuzstR/H9kgPXQsVB8IW7DMDFUJpzLjvhGSQ==" crossorigin="anonymous"></script>
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/8.4.8/mermaid.min.js" integrity="sha256-lyWCDMnMeZiXRi7Zl54sZGKYmgQs4izcT7+tKc+KUBk=" crossorigin="anonymous" title="mermaid"></script>
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/highlight.min.js" integrity="sha512-7t8APmYpzEsZP7CYoA7RfMPV9Bb+PJHa9x2WiUnDXZx3XHveuyWUtvNOexhkierl5flZ3tr92dP1mMS+SGlD+A==" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks",
+        'slides' : "Slides"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.3b2b658c61ebd725bd5fc606c89fe44c.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    © 2020
+  </p>
+
+  
+  
+
+
+
+
+
+
+  <p class="powered-by">
+    
+    Published with
+    <a href="https://wowchemy.com" target="_blank" rel="noopener">Wowchemy Website Builder</a>
+    
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
