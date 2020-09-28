@@ -18,8 +18,8 @@
       <pubDate>Sun, 27 Sep 2020 13:00:00 +0000</pubDate>
       <guid>https://gumeo.github.io/post/updating-blog/</guid>
       <description>&lt;h1 id=&#34;updating-the-blog&#34;&gt;Updating the blog&amp;hellip;&lt;/h1&gt;
-&lt;p&gt;I finally moved back to Iceland, and I will probably have some more time not to jot down what goes through my mind. I recently started a new position as a research scientist at deCODE genetics, so expect some new posts about genetics!&lt;/p&gt;
-&lt;p&gt;I was lagging very far behind on Hugo version, went from &lt;code&gt;0.4&lt;/code&gt; to &lt;code&gt;0.75&lt;/code&gt;, and the academic theme had changed a lot. I decided to slim this down into a more simple version of the theme, which is essentially &lt;em&gt;just&lt;/em&gt; a blog. That suits my needs perfectly.&lt;/p&gt;
+&lt;p&gt;I finally moved back to Iceland, and I will probably have some more time to jot down what goes through my mind. I recently started a new position as a research scientist at deCODE genetics, so expect some new posts about genetics and statistics! I hope I will also have time to work more on C++ projects, I think it will probably be in relation to R package development.&lt;/p&gt;
+&lt;p&gt;Regarding the blog&amp;hellip; I was lagging very far behind on Hugo version, went from &lt;code&gt;0.4&lt;/code&gt; to &lt;code&gt;0.75&lt;/code&gt;, and the academic theme had changed a lot, (FYI hugo is a static webpage generator writtin in &lt;code&gt;golang&lt;/code&gt;, simple and easy to use). I decided to slim this down into a more simple version of the academic theme, which is essentially &lt;em&gt;just&lt;/em&gt; a blog. That suits my needs perfectly. I needed the extended version of hugo for this, I still need to look into what more is in this extended version, but it seems to be some more CSS support.&lt;/p&gt;
 </description>
     </item>
     
