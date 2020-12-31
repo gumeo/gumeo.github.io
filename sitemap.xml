@@ -3,11 +3,6 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://gumeo.github.io/post/speculations-2021/</loc>
-    <lastmod>2020-12-30T13:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://gumeo.github.io/authors/</loc>
     <lastmod>2020-12-30T13:00:00+00:00</lastmod>
   </url>
@@ -39,6 +34,11 @@
   
   <url>
     <loc>https://gumeo.github.io/post/</loc>
+    <lastmod>2020-12-30T13:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://gumeo.github.io/post/speculations-2021/</loc>
     <lastmod>2020-12-30T13:00:00+00:00</lastmod>
   </url>
   
