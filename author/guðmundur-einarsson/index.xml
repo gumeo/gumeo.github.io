@@ -5,12 +5,66 @@
     <link>https://gumeo.github.io/author/gu%C3%B0mundur-einarsson/</link>
       <atom:link href="https://gumeo.github.io/author/gu%C3%B0mundur-einarsson/index.xml" rel="self" type="application/rss+xml" />
     <description>Guðmundur Einarsson</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2020</copyright><lastBuildDate>Sun, 27 Sep 2020 13:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2020</copyright><lastBuildDate>Wed, 30 Dec 2020 13:00:00 +0000</lastBuildDate>
     <image>
       <url>https://gumeo.github.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
       <title>Guðmundur Einarsson</title>
       <link>https://gumeo.github.io/author/gu%C3%B0mundur-einarsson/</link>
     </image>
+    
+    <item>
+      <title>2021 Speculations</title>
+      <link>https://gumeo.github.io/post/iceland-quarantine-zone/</link>
+      <pubDate>Wed, 30 Dec 2020 13:00:00 +0000</pubDate>
+      <guid>https://gumeo.github.io/post/iceland-quarantine-zone/</guid>
+      <description>&lt;h1 id=&#34;what-does-the-future-behold&#34;&gt;What does the future behold?&lt;/h1&gt;
+&lt;p&gt;&lt;em&gt;Disclaimer:&lt;/em&gt; I am not an expert on covid and I am interested in learning more about what the future might hold for us in 2021.&lt;/p&gt;
+&lt;p&gt;This year has been quite eventful, (covid-19), but then again, this overextended staycation has also in some sense made it uneventful for many (
+&lt;a href=&#34;https://www.youtube.com/watch?v=FS1DDn2eklU&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;good example from german ad&lt;/a&gt;). Covid-19 has been a true reality curve ball. A global pandemic is certainly a ticking time bomb, and given the historic rarity of such events, it is not something that you frequently consider. This is the truly rare event that messes up the economy and causes global recession. I really like speculating about the future, and it is interesting to ponder how 2021 will follow up on these interesting times.&lt;/p&gt;
+&lt;h2 id=&#34;the-three-phases&#34;&gt;The three phases&lt;/h2&gt;
+&lt;p&gt;Our fight against this pandemic can be summarised into three rough phases, first two being&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The sudden reality blow and implementation of measures to deal with the spread.&lt;/li&gt;
+&lt;li&gt;The waiting game for the vaccine.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This is an oversimplification, but in these terms, we are entering the third phase, &lt;strong&gt;the distribution of the vaccine&lt;/strong&gt;. I find this an interesting phase, since currently the vaccine is probably the most sought after product on this planet. The manufacturers of the vaccine face some extreme challenges in terms of scaling up production, but also the logistics of transporting the goods.&lt;/p&gt;
+&lt;p&gt;Countries need to deal with their own vaccine strategies. I have mostly been following the news in Iceland and for the EU. The general trend is to minimize the amount of casualties and hospitalizations, and keeping the frontline of health care workers protected. There will still be quite some time until whole populations of countries will reach herd immunity, since that requires at least 60% of the population to be vaccinated (
+&lt;a href=&#34;https://www.thelancet.com/article/S0140-6736%2820%2932318-7/fulltext&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;lower bound from this Lancet article&lt;/a&gt;). The global economy will suffer until we have vaccined enough people to achieve close to global herd imunity. I do not expect this to happen in 2021, and it might even take a few years, since the virus is so widespread and contagious.&lt;/p&gt;
+&lt;p&gt;There are at least two possible scenarios:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Everyone equally ramps up vaccination and the whole world reaches herd immunity almost simultaneously.&lt;/li&gt;
+&lt;li&gt;Some countries will reach herd immunity before others.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;I think it is safe to say that option one will most certainly not happen. So given that some countries will reach herd immunity well before others, what are the implications? The following are my speculations.&lt;/p&gt;
+&lt;h2 id=&#34;different-vaccine-strategies&#34;&gt;Different vaccine strategies&lt;/h2&gt;
+&lt;p&gt;Not all countries will implement the same vaccine strategies. When deciding on what strategy to pursue, we need to take into consideration how the vaccine works. The effects of the vaccine are twofold&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Local&lt;/strong&gt;: Protection of a single individual.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Global&lt;/strong&gt;: Herd immunity.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Most countries will not receive enough vaccine to reach herd immunity fast, so they will need to prioritize the first groups to get vaccinated. In Europe these are almost exclusively older sensitive individuals and frontline health care workers. This is a smart approach, protecting the more sensitive individuals will lower the number of hospitalizations in case of another wave, and protecting health care workers will make the health care system more robust against increased spread.&lt;/p&gt;
+&lt;p&gt;I have not seen any alternatives to this general trend of strategies. Mirroring the local and global effects of the vaccine, we have two objectives along the way&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Protect&lt;/strong&gt; sensitive and weak individuals.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Maximize&lt;/strong&gt; effectiveness to achieve herd immunity.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;I argue that these are somewhat opposing objectives. In order to understand why, we will need to consider how disease like covid-19 spread. The 
+&lt;a href=&#34;https://en.wikipedia.org/wiki/Basic_reproduction_number&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;basic reproduction number&lt;/a&gt;, $R_0$ or &lt;em&gt;R nought&lt;/em&gt; is a number that represents the rate of spread for a disease. This number is fairly simple to interpret, if the value is 2, then it means that each infected individual will on average infect two others. If the value is less than 1, the spread is declining, and if it is above 1, it is increasing.&lt;/p&gt;
+&lt;p&gt;For covid-19 $R_0$ has been evaluated to be in the range $3.28-5.7$. Note that lockdown measures will affect $R_0$, also wearing masks and other sanitary measures. This means that the value is dependent on the rules and regulations that people follow in general.&lt;/p&gt;
+&lt;p&gt;So $R_0$ is in this sense a dynamic value, that we can control to mitigate the spread. But remember that it is defined as an average. To consider the bigger picture we can consider individuals as nodes in a graph, and nodes are connected by a weighted edge if there is some positive likelihood of spread if individuals get infected. Let&amp;rsquo;s call the graph the &lt;em&gt;spread graph&lt;/em&gt;. The weight of the edge between two nodes would imply the probability of transmission, thus there would be high weights between very connected individuals, e.g. within families, and the weight would decrease fast with geographic distance.&lt;/p&gt;
+&lt;p&gt;This very complicated spread graph is what we are changing with all the measures that we are taking against covid-19. The measures will either remove edges from the graph, or decrease the weights dramatically. To maximize the effectivess of the vaccine in terms of herd immunity, we would ideally find the most connected nodes in this graph and sort them by number of outwards connections (weighted by probability of transmission) and start vaccinating these highly connected individuals. This would mean that we change the graph be removing the maximum number of edges at a time. This scenario is however impossible, since there is no way for us to get a complete picture of this graph.&lt;/p&gt;
+&lt;p&gt;Now it might be clear why the two objectives of protecting sensitive individuals and maximizing progress towards herd immunity could be competing. I.e. if sensitive individuals have few outgoing edges in the spread graph, then vaccinating them will mostly focus on the first objective. It is also impossible to reach herd immunity if we do not have enough of the vaccine, so it is absolutely critical to start by protecting the sensitive individuals and health care workers.&lt;/p&gt;
+&lt;p&gt;When we have protected the sensitive individuals, we might start trying to find highly connected individuals, and vaccinating them, e.g. hairdressers, store clerks, fitness trainers etc. But where do you draw the line of when we have protected the sensitive individuals? This is a highly ethical matter.&lt;/p&gt;
+&lt;h2 id=&#34;incentives-to-help&#34;&gt;Incentives to help&lt;/h2&gt;
+&lt;p&gt;Some countries will reach herd immunity faster and in some cases will have an abundance of the vaccine. They will be incentivised to help other countries to faster make a recovery for the global economy. The countries they choose to help will be the countries that they are most dependent in relation to the economy. This will be a political debate in some countries since it will not be a clear choice on who should receive their extra doses.&lt;/p&gt;
+&lt;p&gt;Here I would very much like to see a foundation created (or e.g. Melinda Gates foundation) to take care of this, (which might become a logistic nightmare). Ideally the extra doses of vaccine should be redistributed as fast as possible, and no political debate should be able to delay it. A centralized non-profit foundation could do wonders here to make the resdistribution more effective. This will require an abundance of funds.&lt;/p&gt;
+&lt;h2 id=&#34;quarantine-zones&#34;&gt;Quarantine zones&lt;/h2&gt;
+&lt;p&gt;The countries that reach herd immunity fast will in some sense be the safest places to travel to. People traveling from these countries will face minimum restrictions in terms of being quarantined. People moving between countries could also hop to a quarantine zone country and stay there for a week in order to avoid being quarantined in a hotelroom or something similar for a week. This could result in a kickstart for global tourism and global passenger flight.&lt;/p&gt;
+&lt;p&gt;Smaller popluations might reach herd immunity earlier. Having these herd immunity spots around the world will create value for the global logistics chain and will also help us understand the long term effectivess of the vaccines.&lt;/p&gt;
+&lt;h2 id=&#34;speculations&#34;&gt;Speculations&lt;/h2&gt;
+&lt;p&gt;My words here are mere speculations, only time can tell how things will eventually pan out. I look forward to better times and a bright future that I believe in.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Simplifying blog</title>
