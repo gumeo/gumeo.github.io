@@ -5,12 +5,32 @@
     <link>https://gumeo.github.io/post/</link>
       <atom:link href="https://gumeo.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     <description>Posts</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2020</copyright><lastBuildDate>Wed, 30 Dec 2020 13:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2020</copyright><lastBuildDate>Tue, 25 Jan 2022 13:00:00 +0000</lastBuildDate>
     <image>
       <url>https://gumeo.github.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
       <title>Posts</title>
       <link>https://gumeo.github.io/post/</link>
     </image>
+    
+    <item>
+      <title>fastqq R package</title>
+      <link>https://gumeo.github.io/post/made_r_package/</link>
+      <pubDate>Tue, 25 Jan 2022 13:00:00 +0000</pubDate>
+      <guid>https://gumeo.github.io/post/made_r_package/</guid>
+      <description>&lt;h1 id=&#34;creating-quantile-quantile-plots-faster&#34;&gt;Creating quantile quantile plots faster&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;TLDR&lt;/strong&gt;: This is a wrap-up of a small project I made in 2021, where I managed to speed up the creation of QQ-plots by a factor 80 in the case I was working on, (
+&lt;a href=&#34;https://github.com/gumeo/fastqq&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;project on Github&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;In 2021 I created some 
+&lt;a href=&#34;https://en.wikipedia.org/wiki/Q%E2%80%93Q_plot&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;quantile-quantile plots&lt;/a&gt; at work, mainly using packages such as 
+&lt;a href=&#34;https://cran.r-project.org/web/packages/qqman/vignettes/qqman.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;qqman&lt;/code&gt;&lt;/a&gt;. It is an analysis plot that compares data distribution from another distribution (typically a theoretical distribution). You can use these kinds of plots to informally answer questions like: &amp;ldquo;&lt;em&gt;is my data from a normal distribution?&lt;/em&gt;&amp;rdquo; or &amp;ldquo;&lt;em&gt;Are all these p-values just random?&lt;/em&gt;&amp;rdquo;. QQ-plots are not a statistical test, but a quick way to gauge whether the question about the similarity of these distributions should be investigated further.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;qqman&lt;/code&gt; package is implemented in R, targeted for Genome Wide Association Studies (GWAS). A GWAS has millions of &lt;em&gt;p&lt;/em&gt;-values, where one of the objectives of a quantile-quantile analysis is to compare the distribution of the GWAS p-values to a uniform distribution. Suppose there is a great deviance from a uniform distribution (enrichment of strong associations). In that case, we informally assume that the associations from the GWAS are not just some noise, and that there are possibly some biologically relevant signals in the data. When the &lt;code&gt;qqman&lt;/code&gt; package was implemented, the number of associations in a typical GWAS was not as large as today, and more and more genetic variants are continuously being discovered and added to these analyses.&lt;/p&gt;
+&lt;p&gt;The scatter plot function in R has a constant time and memory overhead for each added point, meaning that for tens of millions of p-values, it took more than 10 minutes to create one of these plots. A typical modern GWAS (year 2022 when this is written) will have 20-100 million &lt;em&gt;p&lt;/em&gt;-values. Another issue is that the object created contains all the underlying data. This object is bulky and if I was using Rstudio, then it could crash or hang.&lt;/p&gt;
+&lt;p&gt;I decided to take the matter into my own hands and implement a solution. Looking at the QQ-plots, it is obvious that a lot of the points are redundant. The points are plotted so close to each other, that removing many of them will have no visible impact on the final plot. Because I had always wanted to release a package on CRAN with part of the implementation in C++, I decided to make this pruning part in C++, using RCpp. I also added drop-in replacement functions for the &lt;code&gt;qqnorm&lt;/code&gt; and &lt;code&gt;qqplot&lt;/code&gt; functions from the &lt;code&gt;stats&lt;/code&gt; package.&lt;/p&gt;
+&lt;p&gt;The package is now on 
+&lt;a href=&#34;https://cran.r-project.org/web/packages/fastqq/index.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CRAN&lt;/a&gt;, and the development version is on 
+&lt;a href=&#34;https://github.com/gumeo/fastqq&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Github&lt;/a&gt;. I do not plan any major changes, but please post issues or feature requests on Github.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Speculations on 2021</title>

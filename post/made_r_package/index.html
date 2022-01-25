@@ -30,10 +30,10 @@
   
     
   
-  <meta name="description" content="Research Scientist">
+  <meta name="description" content="Creating quantile quantile plots faster TLDR: This is a wrap-up of a small project I made in 2021, where I managed to speed up the creation of QQ-plots by a factor 80 in the case I was working on, ( project on Github).">
 
   
-  <link rel="alternate" hreflang="en-us" href="https://gumeo.github.io/categories/">
+  <link rel="alternate" hreflang="en-us" href="https://gumeo.github.io/post/made_r_package/">
 
   
 
@@ -287,14 +287,12 @@
   
 
   
-  <link rel="alternate" href="/categories/index.xml" type="application/rss+xml" title="Gudmundur Blog&amp;Bio">
-  
 
   <link rel="manifest" href="/index.webmanifest">
   <link rel="icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_32x32_fill_lanczos_center_2.png">
   <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png">
 
-  <link rel="canonical" href="https://gumeo.github.io/categories/">
+  <link rel="canonical" href="https://gumeo.github.io/post/made_r_package/">
 
   
   
@@ -310,18 +308,63 @@
   <meta property="twitter:card" content="summary">
   
   <meta property="og:site_name" content="Gudmundur Blog&amp;Bio">
-  <meta property="og:url" content="https://gumeo.github.io/categories/">
-  <meta property="og:title" content="Categories | Gudmundur Blog&amp;Bio">
-  <meta property="og:description" content="Research Scientist"><meta property="og:image" content="https://gumeo.github.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png">
+  <meta property="og:url" content="https://gumeo.github.io/post/made_r_package/">
+  <meta property="og:title" content="fastqq R package | Gudmundur Blog&amp;Bio">
+  <meta property="og:description" content="Creating quantile quantile plots faster TLDR: This is a wrap-up of a small project I made in 2021, where I managed to speed up the creation of QQ-plots by a factor 80 in the case I was working on, ( project on Github)."><meta property="og:image" content="https://gumeo.github.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png">
   <meta property="twitter:image" content="https://gumeo.github.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png"><meta property="og:locale" content="en-us">
   
-    <meta property="og:updated_time" content="2022-01-25T13:00:00&#43;00:00">
+    
+      <meta property="article:published_time" content="2022-01-25T13:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2022-01-25T13:00:00&#43;00:00">
   
 
   
 
 
+    
 
+
+
+
+
+
+  
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://gumeo.github.io/post/made_r_package/"
+  },
+  "headline": "fastqq R package",
+  
+  "datePublished": "2022-01-25T13:00:00Z",
+  "dateModified": "2022-01-25T13:00:00Z",
+  
+  "author": {
+    "@type": "Person",
+    "name": "Guðmundur Einarsson"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "Gudmundur Blog\u0026Bio",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://gumeo.github.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png"
+    }
+  },
+  "description": "Creating quantile quantile plots faster TLDR: This is a wrap-up of a small project I made in 2021, where I managed to speed up the creation of QQ-plots by a factor 80 in the case I was working on, ( project on Github)."
+}
+</script>
+
+  
 
   
 
@@ -329,10 +372,13 @@
   
 
 
+  
 
 
 
-  <title>Categories | Gudmundur Blog&amp;Bio</title>
+
+
+  <title>fastqq R package | Gudmundur Blog&amp;Bio</title>
 
 </head>
 
@@ -513,95 +559,379 @@
 
 
 
-  
-
-
-
-
-
-
-
-
-
-
-
+  <article class="article">
 
   
 
+
+
+
+
+
+
+
+
+
+
+
+  
+
   
   
+  
+<div class="article-container pt-3">
+  <h1>fastqq R package</h1>
+
+  
+
   
     
-  
-<div class="universal-wrapper pt-3">
-  <h1>Categories</h1>
+
+
+<div class="article-metadata">
 
   
+  
+  
+  
+  <div>
+    
+
+  
+  <span ><a href="/author/gu%C3%B0mundur-einarsson/">Guðmundur Einarsson</a></span>
+  </div>
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    Jan 25, 2022
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    3 min read
+  </span>
+  
+
+  
+  
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <span class="article-categories">
+    <i class="fas fa-folder mr-1"></i><a href="/category/blog/">Blog</a></span>
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   
 </div>
 
 
 
-<div class="universal-wrapper">
+  <div class="article-container">
+
+    <div class="article-style">
+      <h1 id="creating-quantile-quantile-plots-faster">Creating quantile quantile plots faster</h1>
+<p><strong>TLDR</strong>: This is a wrap-up of a small project I made in 2021, where I managed to speed up the creation of QQ-plots by a factor 80 in the case I was working on, (
+<a href="https://github.com/gumeo/fastqq" target="_blank" rel="noopener">project on Github</a>).</p>
+<p>In 2021 I created some 
+<a href="https://en.wikipedia.org/wiki/Q%E2%80%93Q_plot" target="_blank" rel="noopener">quantile-quantile plots</a> at work, mainly using packages such as 
+<a href="https://cran.r-project.org/web/packages/qqman/vignettes/qqman.html" target="_blank" rel="noopener"><code>qqman</code></a>. It is an analysis plot that compares data distribution from another distribution (typically a theoretical distribution). You can use these kinds of plots to informally answer questions like: &ldquo;<em>is my data from a normal distribution?</em>&rdquo; or &ldquo;<em>Are all these p-values just random?</em>&rdquo;. QQ-plots are not a statistical test, but a quick way to gauge whether the question about the similarity of these distributions should be investigated further.</p>
+<p>The <code>qqman</code> package is implemented in R, targeted for Genome Wide Association Studies (GWAS). A GWAS has millions of <em>p</em>-values, where one of the objectives of a quantile-quantile analysis is to compare the distribution of the GWAS p-values to a uniform distribution. Suppose there is a great deviance from a uniform distribution (enrichment of strong associations). In that case, we informally assume that the associations from the GWAS are not just some noise, and that there are possibly some biologically relevant signals in the data. When the <code>qqman</code> package was implemented, the number of associations in a typical GWAS was not as large as today, and more and more genetic variants are continuously being discovered and added to these analyses.</p>
+<p>The scatter plot function in R has a constant time and memory overhead for each added point, meaning that for tens of millions of p-values, it took more than 10 minutes to create one of these plots. A typical modern GWAS (year 2022 when this is written) will have 20-100 million <em>p</em>-values. Another issue is that the object created contains all the underlying data. This object is bulky and if I was using Rstudio, then it could crash or hang.</p>
+<p>I decided to take the matter into my own hands and implement a solution. Looking at the QQ-plots, it is obvious that a lot of the points are redundant. The points are plotted so close to each other, that removing many of them will have no visible impact on the final plot. Because I had always wanted to release a package on CRAN with part of the implementation in C++, I decided to make this pruning part in C++, using RCpp. I also added drop-in replacement functions for the <code>qqnorm</code> and <code>qqplot</code> functions from the <code>stats</code> package.</p>
+<p>The package is now on 
+<a href="https://cran.r-project.org/web/packages/fastqq/index.html" target="_blank" rel="noopener">CRAN</a>, and the development version is on 
+<a href="https://github.com/gumeo/fastqq" target="_blank" rel="noopener">Github</a>. I do not plan any major changes, but please post issues or feature requests on Github.</p>
+
+    </div>
+
+    
+
+
+
+
+
+
+<div class="article-tags">
   
+  <a class="badge badge-light" href="/tag/blog/">Blog</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=https://gumeo.github.io/post/made_r_package/&amp;text=fastqq%20R%20package" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=https://gumeo.github.io/post/made_r_package/&amp;t=fastqq%20R%20package" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=fastqq%20R%20package&amp;body=https://gumeo.github.io/post/made_r_package/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=https://gumeo.github.io/post/made_r_package/&amp;title=fastqq%20R%20package" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="whatsapp://send?text=fastqq%20R%20package%20https://gumeo.github.io/post/made_r_package/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=https://gumeo.github.io/post/made_r_package/&amp;title=fastqq%20R%20package" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
 
   
+    
+    
+
+
+
+
+
   
     
     
     
-    <div>
-      <h2><a href="/category/blog/" >Blog</a></h2>
-      <div class="article-style">
+      
+    
+    
+    
+    <div class="media author-card content-widget-hr">
+      
         
-      </div>
-    </div>
+        <img class="avatar mr-3 avatar-circle" src="/author/gu%C3%B0mundur-einarsson/avatar_hu2e8155c65b026b8f773011166b8edcd9_836272_270x270_fill_lanczos_center_2.png" alt="Guðmundur Einarsson">
+      
+
+      <div class="media-body">
+        <h5 class="card-title"><a href="https://gumeo.github.io/">Guðmundur Einarsson</a></h5>
+        <h6 class="card-subtitle">Research Scientist</h6>
+        <p class="card-text">I am interested in statistics, genetics and machine learning.</p>
+        <ul class="network-icon" aria-hidden="true">
   
     
     
     
-    <div>
-      <h2><a href="/category/programming/" >Programming</a></h2>
-      <div class="article-style">
-        
-      </div>
-    </div>
+      
+    
+    
+    
+    
+    
+    <li>
+      <a href="mailto:gudmundur.einarsson.phd@gmail.com" >
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
   
     
     
     
-    <div>
-      <h2><a href="/category/diet/" >diet</a></h2>
-      <div class="article-style">
-        
-      </div>
-    </div>
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://twitter.com/gumgumeo" target="_blank" rel="noopener">
+        <i class="fab fa-twitter"></i>
+      </a>
+    </li>
   
     
     
     
-    <div>
-      <h2><a href="/category/academia/" >Academia</a></h2>
-      <div class="article-style">
-        
-      </div>
-    </div>
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://github.com/gumeo" target="_blank" rel="noopener">
+        <i class="fab fa-github"></i>
+      </a>
+    </li>
   
     
     
     
-    <div>
-      <h2><a href="/category/demo/" >Demo</a></h2>
-      <div class="article-style">
-        
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://www.linkedin.com/in/gudmundureinarsson/" target="_blank" rel="noopener">
+        <i class="fab fa-linkedin"></i>
+      </a>
+    </li>
+  
+</ul>
+
       </div>
     </div>
   
 
+
   
+
+
+
+
+
+
+
+
+<div class="article-widget">
+  
+<div class="post-nav">
+  
+  
+  
+  <div class="post-nav-item">
+    <div class="meta-nav">Previous</div>
+    <a href="/post/speculations-2021/" rel="prev">Speculations on 2021</a>
+  </div>
+  
+</div>
 
 </div>
+
+
+
+
+
+  
+  
+  <div class="article-widget content-widget-hr">
+    <h3>Related</h3>
+    <ul>
+      
+      <li><a href="/post/speculations-2021/">Speculations on 2021</a></li>
+      
+      <li><a href="/post/updating-blog/">Simplifying blog</a></li>
+      
+    </ul>
+  </div>
+  
+
+
+
+
+
+  </div>
+</article>
 
       
 
