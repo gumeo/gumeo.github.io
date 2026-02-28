@@ -1,1355 +1,249 @@
-<!DOCTYPE html><html lang="en-us" >
-
-<head>
-
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="generator" content="Source Themes Academic 4.8.0">
-
-  
-
-  
-  
-
-  
-  
-  
-  
-  
-    
-    
-    
-  
-  
-
-  <meta name="author" content="Guðmundur Einarsson">
-
-  
-  
-  
-    
-  
-  <meta name="description" content="Let&rsquo;s go on! If you just arrived, you can check out the first part here. The goal of this series is to demonstrate how compactly we can implement an MLP in a functional programming paradigm and how easy it becomes to extend/play around with it.">
-
-  
-  <link rel="alternate" hreflang="en-us" href="https://gumeo.github.io/post/part-2-deep-learning/">
-
-  
-
-
-
-
-
-
-
-  
-
-
-
-
-  
-  
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  
-
-  
-  
-  
-  <meta name="theme-color" content="#2962ff">
-  
-
-  
-  
-  
-  <script src="/js/mathjax-config.js"></script>
-  
-
-  
-  
-  
-  
-    
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha256-FMvZuGapsJLjouA6k7Eo2lusoAX9i0ShlWFG6qt7SLc=" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
-
-    
-    
-    
-      
-    
-    
-      
-      
-        
-          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/styles/github.min.css" crossorigin="anonymous" title="hl-light">
-          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
-        
-      
-    
-
-    
-
-    
-
-    
-    
-      
-
-      
-      
-
-      
-    
-      
-
-      
-      
-
-      
-    
-      
-
-      
-      
-
-      
-    
-      
-
-      
-      
-
-      
-    
-      
-
-      
-      
-
-      
-    
-      
-
-      
-      
-
-      
-    
-      
-
-      
-      
-
-      
-    
-      
-
-      
-      
-
-      
-    
-      
-
-      
-      
-
-      
-    
-      
-
-      
-      
-
-      
-    
-      
-
-      
-      
-
-      
-    
-      
-
-      
-      
-
-      
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
-      
-    
-      
-
-      
-      
-
-      
-    
-      
-
-      
-      
-
-      
-    
-      
-
-      
-      
-
-      
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" integrity="" crossorigin="anonymous" async></script>
-      
-    
-      
-
-      
-      
-
-      
-    
-      
-
-      
-      
-
-      
-    
-
-  
-
-  
-  
-  
-    
-      
-      
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap">
-    
-  
-
-  
-  
-  
-  
-  <link rel="stylesheet" href="/css/academic.css">
-
-  
-
-
-
-
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-110075286-1"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-
-  function gtag() {
-      dataLayer.push(arguments);
-  }
-
-  function trackOutboundLink(url, target) {
-    gtag('event', 'click', {
-         'event_category': 'outbound',
-         'event_label': url,
-         'transport_type': 'beacon',
-         'event_callback': function () {
-           if (target !== '_blank') {
-             document.location = url;
-           }
-         }
-    });
-    console.debug("Outbound link clicked: " + url);
-  }
-
-  function onClickCallback(event) {
-    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
-      return;
-    }
-    trackOutboundLink(event.target, event.target.getAttribute('target'));  
-  }
-
-  gtag('js', new Date());
-  gtag('config', 'UA-110075286-1', {});
-
-  
-  document.addEventListener('click', onClickCallback, false);
-</script>
-
-
-  
-
-
-  
-  
-
-  
-
-  <link rel="manifest" href="/index.webmanifest">
-  <link rel="icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_32x32_fill_lanczos_center_2.png">
-  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png">
-
-  <link rel="canonical" href="https://gumeo.github.io/post/part-2-deep-learning/">
-
-  
-  
-  
-  
-  
-  
-  
-    
-    
-  
-  
-  <meta property="twitter:card" content="summary">
-  
-  <meta property="og:site_name" content="Gudmundur Blog&amp;Bio">
-  <meta property="og:url" content="https://gumeo.github.io/post/part-2-deep-learning/">
-  <meta property="og:title" content="Part 2: Deep Learning with Closures in R | Gudmundur Blog&amp;Bio">
-  <meta property="og:description" content="Let&rsquo;s go on! If you just arrived, you can check out the first part here. The goal of this series is to demonstrate how compactly we can implement an MLP in a functional programming paradigm and how easy it becomes to extend/play around with it."><meta property="og:image" content="https://gumeo.github.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png">
-  <meta property="twitter:image" content="https://gumeo.github.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png"><meta property="og:locale" content="en-us">
-  
-    
-      <meta property="article:published_time" content="2017-12-21T13:00:00&#43;00:00">
-    
-    <meta property="article:modified_time" content="2017-12-21T13:00:00&#43;00:00">
-  
-
-  
-
-
-    
-
-
-
-
-
-
-  
-
-
-
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  "mainEntityOfPage": {
-    "@type": "WebPage",
-    "@id": "https://gumeo.github.io/post/part-2-deep-learning/"
-  },
-  "headline": "Part 2: Deep Learning with Closures in R",
-  
-  "datePublished": "2017-12-21T13:00:00Z",
-  "dateModified": "2017-12-21T13:00:00Z",
-  
-  "author": {
-    "@type": "Person",
-    "name": "Guðmundur Einarsson"
-  },
-  
-  "publisher": {
-    "@type": "Organization",
-    "name": "Gudmundur Blog\u0026Bio",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https://gumeo.github.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png"
-    }
-  },
-  "description": "Let\u0026rsquo;s go on! If you just arrived, you can check out the first part here. The goal of this series is to demonstrate how compactly we can implement an MLP in a functional programming paradigm and how easy it becomes to extend/play around with it."
-}
-</script>
-
-  
-
-  
-
-
-  
-
-
-  
-
-
-
-
-
-  <title>Part 2: Deep Learning with Closures in R | Gudmundur Blog&amp;Bio</title>
-
-</head>
-
-
-<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" class=" ">
-
-  
-  
-  
-    <script>window.staDarkLightChooser = true;</script>
-  
-  
-    <script>const isSiteThemeDark = false;</script>
-  
-  
-  <script src="/js/load-theme.js"></script>
-
-  <aside class="search-results" id="search">
-  <div class="container">
-    <section class="search-header">
-
-      <div class="row no-gutters justify-content-between mb-3">
-        <div class="col-6">
-          <h1>Search</h1>
-        </div>
-        <div class="col-6 col-search-close">
-          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
-        </div>
-      </div>
-
-      <div id="search-box">
-        
-        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
-        autocomplete="off" autocorrect="off" spellcheck="false" type="search" class="form-control">
-        
-      </div>
-
-    </section>
-    <section class="section-search-results">
-
-      <div id="search-hits">
-        
-      </div>
-
-    </section>
-  </div>
-</aside>
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
-  <div class="container">
-
-    
-
-    
-    <button type="button" class="navbar-toggler" data-toggle="collapse"
-            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
-    <span><i class="fas fa-bars"></i></span>
-    </button>
-    
-
-    
-
-    
-    
-    <div class="navbar-collapse main-menu-item collapse justify-content-center" id="navbar-content">
-
-      
-      <ul class="navbar-nav d-md-inline-flex">
-        
-
-        
-
-        
-        
-        
-
-        
-
-        
-        
-        
-        
-
-        
-          
-          
-        
-
-        <li class="nav-item">
-          <a class="nav-link " href="/"><span>Home</span></a>
-        </li>
-
-        
-        
-
-        
-
-        
-        
-        
-          
-        
-
-        
-
-        
-        
-        
-        
-
-        
-          
-            
-            
-          
-          
-        
-
-        <li class="nav-item">
-          <a class="nav-link " href="/about/"><span>About</span></a>
-        </li>
-
-        
-        
-
-      
-
-        
-      </ul>
-    </div>
-
-    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
-      
-      <li class="nav-item">
-        <a class="nav-link js-search" href="#" aria-label="Search"><i class="fas fa-search" aria-hidden="true"></i></a>
-      </li>
-      
-
-      
-      <li class="nav-item dropdown theme-dropdown">
-        <a href="#" class="nav-link js-theme-selector" data-toggle="dropdown" aria-haspopup="true">
-          <i class="fas fa-palette" aria-hidden="true"></i>
-        </a>
-        <div class="dropdown-menu">
-          <a href="#" class="dropdown-item js-set-theme-light">
-            <span>Light</span>
-          </a>
-          <a href="#" class="dropdown-item js-set-theme-dark">
-            <span>Dark</span>
-          </a>
-          <a href="#" class="dropdown-item js-set-theme-auto">
-            <span>Automatic</span>
-          </a>
-        </div>
-      </li>
-      
-
-      
-
-    </ul>
-
-  </div>
-</nav>
-
-
-
-  <article class="article">
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  
-  
-  
-<div class="article-container pt-3">
-  <h1>Part 2: Deep Learning with Closures in R</h1>
-
-  
-
-  
-    
-
-
-<div class="article-metadata">
-
-  
-  
-  
-  
-  <div>
-    
-
-  
-  <span ><a href="/author/gu%C3%B0mundur-einarsson/">Guðmundur Einarsson</a></span>
-  </div>
-  
-  
-
-  
-  <span class="article-date">
-    
-    
-      
-    
-    Dec 21, 2017
-  </span>
-  
-
-  
-
-  
-  <span class="middot-divider"></span>
-  <span class="article-reading-time">
-    9 min read
-  </span>
-  
-
-  
-  
-  
-
-  
-  
-  <span class="middot-divider"></span>
-  <span class="article-categories">
-    <i class="fas fa-folder mr-1"></i><a href="/category/programming/">Programming</a></span>
-  
-
-</div>
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-</div>
-
-
-
-  <div class="article-container">
-
-    <div class="article-style">
-      <h1 id="lets-go-on">Let&rsquo;s go on!</h1>
-<p>If you just arrived, you can check out the first part 
-<a href="https://gumeo.github.io/post/part-1-deep-learning-with-closures-in-r/" target="_blank" rel="noopener">here</a>. The goal of this series is to demonstrate how compactly we can implement an MLP in a functional programming paradigm and how easy it becomes to extend/play around with it. This post is aimed at the R person that wants to get into deep learning or anyone curious about how these things are implemented. Another goal is to visualize what is happening in a neural network during training in hope to get a deeper understanding of what is going on. I posted 
-<a href="https://imgur.com/EgcQgkh" target="_blank" rel="noopener">this gif</a> on the subreddit MachineLearning and dataisbeautiful, I got some constructive criticism on the gif and below is a <em>better</em> version where I have sped it up and removed the flickering and enhanced the contrast.</p>
+<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Guðmundur Einarsson — statistics, genetics and machine learning."><title>Part 2: Deep Learning with Closures in R | Guðmundur Einarsson</title><link rel="icon" type="image/png" href="/avatar.png"><!-- KaTeX CSS (build-time math rendering still uses this for styling) --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous"><!-- Prevent FOUC: apply stored or system theme before first paint --><script>
+    (function() {
+      var stored = localStorage.getItem('theme');
+      var sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', stored || sys);
+    })();
+  </script><style>.tag-list[data-astro-cid-lga65v7i]{display:flex;flex-wrap:wrap;gap:.4rem;list-style:none;padding:0;margin:0}.tag[data-astro-cid-lga65v7i]{background:var(--tag-bg);color:var(--tag-text);font-size:.75rem;font-weight:500;padding:.2rem .55rem;border-radius:9999px}
+</style>
+<link rel="stylesheet" href="/_astro/_slug_.mZzpy39r.css">
+<style>.author-bio[data-astro-cid-ynhdph36]{display:flex;gap:1rem;align-items:flex-start;padding:1.25rem;border:1px solid var(--border);border-radius:8px;background:var(--bg-secondary);margin-top:3rem}.avatar[data-astro-cid-ynhdph36]{width:60px;height:60px;border-radius:50%;object-fit:cover;flex-shrink:0}.author-info[data-astro-cid-ynhdph36]{display:flex;flex-direction:column;gap:.25rem}.author-name[data-astro-cid-ynhdph36]{font-size:1rem;font-weight:600}.author-role[data-astro-cid-ynhdph36]{font-size:.85rem;color:var(--text-muted);margin:0}.author-blurb[data-astro-cid-ynhdph36]{font-size:.85rem;color:var(--text-muted);margin:.25rem 0;line-height:1.5}.author-links[data-astro-cid-ynhdph36]{display:flex;gap:.75rem;flex-wrap:wrap}.author-links[data-astro-cid-ynhdph36] a[data-astro-cid-ynhdph36]{font-size:.8rem;color:var(--accent)}.post-header[data-astro-cid-gjtny2mx]{margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}.post-meta[data-astro-cid-gjtny2mx]{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:.75rem}time[data-astro-cid-gjtny2mx]{font-size:.85rem;color:var(--text-muted)}h1[data-astro-cid-gjtny2mx]{font-size:2rem;line-height:1.25;margin:0}.post-nav[data-astro-cid-gjtny2mx]{display:flex;justify-content:space-between;gap:1rem;margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border)}.post-nav[data-astro-cid-gjtny2mx] a[data-astro-cid-gjtny2mx]{display:flex;flex-direction:column;gap:.25rem;max-width:48%;text-decoration:none;color:var(--text)}.post-nav-next[data-astro-cid-gjtny2mx]{text-align:right;margin-left:auto}.nav-label[data-astro-cid-gjtny2mx]{font-size:.75rem;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:.05em}.nav-title[data-astro-cid-gjtny2mx]{font-size:.95rem;font-weight:600;color:var(--accent)}.post-nav[data-astro-cid-gjtny2mx] a[data-astro-cid-gjtny2mx]:hover .nav-title[data-astro-cid-gjtny2mx]{color:var(--accent-hover)}
+</style><script type="module">const e=document.getElementById("theme-toggle");e?.addEventListener("click",()=>{const t=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",t),localStorage.setItem("theme",t)});
+</script></head> <body> <nav data-astro-cid-dmqpwcec> <div class="nav-inner" data-astro-cid-dmqpwcec> <a href="/" class="nav-brand" data-astro-cid-dmqpwcec>Guðmundur Einarsson</a> <div class="nav-links" data-astro-cid-dmqpwcec> <a href="/blog/" data-astro-cid-dmqpwcec>Blog</a> <a href="/about/" data-astro-cid-dmqpwcec>About</a> <a href="/subscribe/" data-astro-cid-dmqpwcec>Subscribe</a> <button id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode" data-astro-cid-x3pjskd3> <!-- Sun icon (shown in dark mode, click to go light) --> <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-astro-cid-x3pjskd3> <circle cx="12" cy="12" r="5" data-astro-cid-x3pjskd3></circle> <line x1="12" y1="1" x2="12" y2="3" data-astro-cid-x3pjskd3></line> <line x1="12" y1="21" x2="12" y2="23" data-astro-cid-x3pjskd3></line> <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" data-astro-cid-x3pjskd3></line> <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" data-astro-cid-x3pjskd3></line> <line x1="1" y1="12" x2="3" y2="12" data-astro-cid-x3pjskd3></line> <line x1="21" y1="12" x2="23" y2="12" data-astro-cid-x3pjskd3></line> <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" data-astro-cid-x3pjskd3></line> <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" data-astro-cid-x3pjskd3></line> </svg> <!-- Moon icon (shown in light mode, click to go dark) --> <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-astro-cid-x3pjskd3> <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" data-astro-cid-x3pjskd3></path> </svg> </button>   </div> </div> </nav>  <main>  <article data-astro-cid-gjtny2mx> <header class="post-header" data-astro-cid-gjtny2mx> <div class="post-meta" data-astro-cid-gjtny2mx> <time datetime="2017-12-21T13:00:00.000Z" data-astro-cid-gjtny2mx>December 21, 2017</time> <ul class="tag-list" data-astro-cid-lga65v7i><li data-astro-cid-lga65v7i><span class="tag" data-astro-cid-lga65v7i>R</span></li></ul> </div> <h1 data-astro-cid-gjtny2mx>Part 2: Deep Learning with Closures in R</h1> </header> <div class="prose" data-astro-cid-gjtny2mx>  <h1 id="lets-go-on">Let’s go on!</h1>
+<p>If you just arrived, you can check out the first part <a href="https://gumeo.github.io/post/part-1-1deep-learning/">here</a>. The goal of this series is to demonstrate how compactly we can implement an MLP in a functional programming paradigm and how easy it becomes to extend/play around with it. This post is aimed at the R person that wants to get into deep learning or anyone curious about how these things are implemented. Another goal is to visualize what is happening in a neural network during training in hope to get a deeper understanding of what is going on. I posted <a href="https://imgur.com/EgcQgkh">this gif</a> on the subreddit MachineLearning and dataisbeautiful, I got some constructive criticism on the gif and below is a <em>better</em> version where I have sped it up and removed the flickering and enhanced the contrast.</p>
 <center>
 <blockquote class="imgur-embed-pub" lang="en" data-id="a/wIytV"><a href="//imgur.com/wIytV"></a></blockquote><script async src="//s.imgur.com/min/embed.js" charset="utf-8"></script>
 </center>
-<p>So last time we got away with less than 50 lines of code to create a 
-<a href="https://en.wikipedia.org/wiki/Factory_%28object-oriented_programming%29" target="_blank" rel="noopener">factory</a> for generating fully connected layers. This included a closure for a matrix class, (for making the layer have a mutable state), and an implementation of a forward pass. But the forward pass is basically a wrapper for updating the internals of the layer, we need to implement a forward pass for the whole network, and the same goes for the backwards propagation. This requires creating a function factory that constructs the network environment. This environment needs to have functions that implement forward-, backwards passes and a function for training. The following is a demonstration of such a function:</p>
-<pre><code class="language-{R,"># The following creates an MLP environment
-# structNet is a vector defining the number of nodes in each layer, ignoring biases.
-mlp &lt;- function(structNet, minibatchSize,activation, initPos =FALSE, initScale=100){
-  num_layers &lt;- length(structNet)
-  # Create the network
-  layers &lt;- list()
-  for(i in 1:num_layers){
-    if(i == 1){ # Input layer
-      layers[[i]] &lt;- Layer(activation, 
-                           minibatchSize, 
-                           c(structNet[1]+1,structNet[2]),
-                           is_input=TRUE,
-                           initPos = initPos,
-                           initScale=initScale)
-    }else if(i == length(structNet)){ # Output layer
-      layers[[i]] &lt;- Layer(softmax, 
-                           minibatchSize, 
-                           c(structNet[num_layers],structNet[num_layers]),
-                           is_output=TRUE,
-                           initPos = initPos,
-                           initScale=initScale)
-    }else{ # Hidden layers
-      layers[[i]] &lt;- Layer(activation, 
-                           minibatchSize, 
-                           c(structNet[i]+1,structNet[i+1]),
-                           initPos = initPos,
-                           initScale=initScale)
-    }
-  }
-  
-  forward_prop &lt;- function(dataBatch){
-    # Add bias to the input
-    layers[[1]]$Z$setter(cbind(dataBatch,rep(1,nrow(dataBatch))))
-    for(i in 1:(num_layers-1)){
-      layers[[i+1]]$S$setter(layers[[i]]$forward_propagate())
-    }
-    return(layers[[num_layers]]$forward_propagate())
-  }
-  
-  backwards_prop &lt;- function(yhat,labels){
-    layers[[num_layers]]$D$setter(t(yhat-labels))
-    for(i in (num_layers-1):2){
-      W_nobias &lt;- layers[[i]]$W$getter()
-      W_nobias &lt;- W_nobias[1:(nrow(W_nobias)-1),]
-      mat &lt;- layers[[i]]$Fp$getter()
-      layers[[i]]$D$setter((W_nobias%*%layers[[i+1]]$D$getter())*mat)
-    }
-  }
-  
-  update_weights &lt;- function(eta){
-    for(i in 1:(num_layers-1)){
-      W_grad &lt;- -eta*t(layers[[i+1]]$D$getter()%*%layers[[i]]$Z$getter())
-      layers[[i]]$W$setter(layers[[i]]$W$getter()+W_grad)
-    }
-  }
-  
-  # Labels here as dummy matrix
-  train &lt;- function(trainData, trainLabels, num_epochs, eta, cvSplit = 0.3){
-    # Code for preparing input
-    for(i in 1:num_epochs){
-      # Loop over epochs
-      for(j in 1:numIter){
-        # Loop over all minibatches
-        # ...
-        # Essential part for training
-        preds &lt;- forward_prop(tDat)
-        backwards_prop(preds,tLab)
-        update_weights(eta = eta)
-      }
-    }
-  }
-  
-  myEnv &lt;- list2env(list(network=layers,
-                         forward_prop=forward_prop,
-                         train = train))
-  class(myEnv) &lt;- 'mlp'
-  return(myEnv)
-}
-</code></pre>
+<p>So last time we got away with less than 50 lines of code to create a <a href="https://en.wikipedia.org/wiki/Factory_(object-oriented_programming)">factory</a> for generating fully connected layers. This included a closure for a matrix class, (for making the layer have a mutable state), and an implementation of a forward pass. But the forward pass is basically a wrapper for updating the internals of the layer, we need to implement a forward pass for the whole network, and the same goes for the backwards propagation. This requires creating a function factory that constructs the network environment. This environment needs to have functions that implement forward-, backwards passes and a function for training. The following is a demonstration of such a function:</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf; overflow-x: auto;" tabindex="0" data-language="r"><code><span class="line"><span style="color:#7F848E;font-style:italic"># The following creates an MLP environment</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># structNet is a vector defining the number of nodes in each layer, ignoring biases.</span></span>
+<span class="line"><span style="color:#61AFEF">mlp</span><span style="color:#56B6C2"> &#x3C;-</span><span style="color:#C678DD"> function</span><span style="color:#ABB2BF">(structNet, minibatchSize,activation, </span><span style="color:#E06C75;font-style:italic">initPos</span><span style="color:#56B6C2"> =</span><span style="color:#D19A66">FALSE</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75;font-style:italic">initScale</span><span style="color:#56B6C2">=</span><span style="color:#D19A66">100</span><span style="color:#ABB2BF">){</span></span>
+<span class="line"><span style="color:#ABB2BF">  num_layers </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#56B6C2"> length</span><span style="color:#ABB2BF">(structNet)</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  # Create the network</span></span>
+<span class="line"><span style="color:#ABB2BF">  layers </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#C678DD"> list</span><span style="color:#ABB2BF">()</span></span>
+<span class="line"><span style="color:#C678DD">  for</span><span style="color:#ABB2BF">(i </span><span style="color:#C678DD">in</span><span style="color:#D19A66"> 1</span><span style="color:#C678DD">:</span><span style="color:#ABB2BF">num_layers){</span></span>
+<span class="line"><span style="color:#C678DD">    if</span><span style="color:#ABB2BF">(i </span><span style="color:#56B6C2">==</span><span style="color:#D19A66"> 1</span><span style="color:#ABB2BF">){ </span><span style="color:#7F848E;font-style:italic"># Input layer</span></span>
+<span class="line"><span style="color:#ABB2BF">      layers[[i]] </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#61AFEF"> Layer</span><span style="color:#ABB2BF">(activation,</span></span>
+<span class="line"><span style="color:#ABB2BF">                           minibatchSize,</span></span>
+<span class="line"><span style="color:#56B6C2">                           c</span><span style="color:#ABB2BF">(structNet[</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">]</span><span style="color:#56B6C2">+</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">,structNet[</span><span style="color:#D19A66">2</span><span style="color:#ABB2BF">]),</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">                           is_input</span><span style="color:#56B6C2">=</span><span style="color:#D19A66">TRUE</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">                           initPos</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> initPos,</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">                           initScale</span><span style="color:#56B6C2">=</span><span style="color:#ABB2BF">initScale)</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span><span style="color:#C678DD">else</span><span style="color:#C678DD"> if</span><span style="color:#ABB2BF">(i </span><span style="color:#56B6C2">==</span><span style="color:#56B6C2"> length</span><span style="color:#ABB2BF">(structNet)){ </span><span style="color:#7F848E;font-style:italic"># Output layer</span></span>
+<span class="line"><span style="color:#ABB2BF">      layers[[i]] </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#61AFEF"> Layer</span><span style="color:#ABB2BF">(softmax,</span></span>
+<span class="line"><span style="color:#ABB2BF">                           minibatchSize,</span></span>
+<span class="line"><span style="color:#56B6C2">                           c</span><span style="color:#ABB2BF">(structNet[num_layers],structNet[num_layers]),</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">                           is_output</span><span style="color:#56B6C2">=</span><span style="color:#D19A66">TRUE</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">                           initPos</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> initPos,</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">                           initScale</span><span style="color:#56B6C2">=</span><span style="color:#ABB2BF">initScale)</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span><span style="color:#C678DD">else</span><span style="color:#ABB2BF">{ </span><span style="color:#7F848E;font-style:italic"># Hidden layers</span></span>
+<span class="line"><span style="color:#ABB2BF">      layers[[i]] </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#61AFEF"> Layer</span><span style="color:#ABB2BF">(activation,</span></span>
+<span class="line"><span style="color:#ABB2BF">                           minibatchSize,</span></span>
+<span class="line"><span style="color:#56B6C2">                           c</span><span style="color:#ABB2BF">(structNet[i]</span><span style="color:#56B6C2">+</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">,structNet[i</span><span style="color:#56B6C2">+</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">]),</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">                           initPos</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> initPos,</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">                           initScale</span><span style="color:#56B6C2">=</span><span style="color:#ABB2BF">initScale)</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">  forward_prop</span><span style="color:#56B6C2"> &#x3C;-</span><span style="color:#C678DD"> function</span><span style="color:#ABB2BF">(dataBatch){</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    # Add bias to the input</span></span>
+<span class="line"><span style="color:#ABB2BF">    layers[[</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">]]</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">Z</span><span style="color:#C678DD">$</span><span style="color:#61AFEF">setter</span><span style="color:#ABB2BF">(</span><span style="color:#56B6C2">cbind</span><span style="color:#ABB2BF">(dataBatch,</span><span style="color:#56B6C2">rep</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">,</span><span style="color:#56B6C2">nrow</span><span style="color:#ABB2BF">(dataBatch))))</span></span>
+<span class="line"><span style="color:#C678DD">    for</span><span style="color:#ABB2BF">(i </span><span style="color:#C678DD">in</span><span style="color:#D19A66"> 1</span><span style="color:#C678DD">:</span><span style="color:#ABB2BF">(num_layers</span><span style="color:#56B6C2">-</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">)){</span></span>
+<span class="line"><span style="color:#ABB2BF">      layers[[i</span><span style="color:#56B6C2">+</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">]]</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">S</span><span style="color:#C678DD">$</span><span style="color:#61AFEF">setter</span><span style="color:#ABB2BF">(layers[[i]]</span><span style="color:#C678DD">$</span><span style="color:#61AFEF">forward_propagate</span><span style="color:#ABB2BF">())</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#C678DD">    return</span><span style="color:#ABB2BF">(layers[[num_layers]]</span><span style="color:#C678DD">$</span><span style="color:#61AFEF">forward_propagate</span><span style="color:#ABB2BF">())</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">  backwards_prop</span><span style="color:#56B6C2"> &#x3C;-</span><span style="color:#C678DD"> function</span><span style="color:#ABB2BF">(yhat,labels){</span></span>
+<span class="line"><span style="color:#ABB2BF">    layers[[num_layers]]</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">D</span><span style="color:#C678DD">$</span><span style="color:#61AFEF">setter</span><span style="color:#ABB2BF">(</span><span style="color:#56B6C2">t</span><span style="color:#ABB2BF">(yhat</span><span style="color:#56B6C2">-</span><span style="color:#ABB2BF">labels))</span></span>
+<span class="line"><span style="color:#C678DD">    for</span><span style="color:#ABB2BF">(i </span><span style="color:#C678DD">in</span><span style="color:#ABB2BF"> (num_layers</span><span style="color:#56B6C2">-</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">)</span><span style="color:#C678DD">:</span><span style="color:#D19A66">2</span><span style="color:#ABB2BF">){</span></span>
+<span class="line"><span style="color:#ABB2BF">      W_nobias </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#ABB2BF"> layers[[i]]</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">W</span><span style="color:#C678DD">$</span><span style="color:#61AFEF">getter</span><span style="color:#ABB2BF">()</span></span>
+<span class="line"><span style="color:#ABB2BF">      W_nobias </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#ABB2BF"> W_nobias[</span><span style="color:#D19A66">1</span><span style="color:#C678DD">:</span><span style="color:#ABB2BF">(</span><span style="color:#56B6C2">nrow</span><span style="color:#ABB2BF">(W_nobias)</span><span style="color:#56B6C2">-</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">),]</span></span>
+<span class="line"><span style="color:#ABB2BF">      mat </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#ABB2BF"> layers[[i]]</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">Fp</span><span style="color:#C678DD">$</span><span style="color:#61AFEF">getter</span><span style="color:#ABB2BF">()</span></span>
+<span class="line"><span style="color:#ABB2BF">      layers[[i]]</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">D</span><span style="color:#C678DD">$</span><span style="color:#61AFEF">setter</span><span style="color:#ABB2BF">((W_nobias</span><span style="color:#56B6C2">%*%</span><span style="color:#ABB2BF">layers[[i</span><span style="color:#56B6C2">+</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">]]</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">D</span><span style="color:#C678DD">$</span><span style="color:#61AFEF">getter</span><span style="color:#ABB2BF">())</span><span style="color:#56B6C2">*</span><span style="color:#ABB2BF">mat)</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">  update_weights</span><span style="color:#56B6C2"> &#x3C;-</span><span style="color:#C678DD"> function</span><span style="color:#ABB2BF">(eta){</span></span>
+<span class="line"><span style="color:#C678DD">    for</span><span style="color:#ABB2BF">(i </span><span style="color:#C678DD">in</span><span style="color:#D19A66"> 1</span><span style="color:#C678DD">:</span><span style="color:#ABB2BF">(num_layers</span><span style="color:#56B6C2">-</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">)){</span></span>
+<span class="line"><span style="color:#ABB2BF">      W_grad </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#56B6C2"> -</span><span style="color:#ABB2BF">eta</span><span style="color:#56B6C2">*t</span><span style="color:#ABB2BF">(layers[[i</span><span style="color:#56B6C2">+</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">]]</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">D</span><span style="color:#C678DD">$</span><span style="color:#61AFEF">getter</span><span style="color:#ABB2BF">()</span><span style="color:#56B6C2">%*%</span><span style="color:#ABB2BF">layers[[i]]</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">Z</span><span style="color:#C678DD">$</span><span style="color:#61AFEF">getter</span><span style="color:#ABB2BF">())</span></span>
+<span class="line"><span style="color:#ABB2BF">      layers[[i]]</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">W</span><span style="color:#C678DD">$</span><span style="color:#61AFEF">setter</span><span style="color:#ABB2BF">(layers[[i]]</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">W</span><span style="color:#C678DD">$</span><span style="color:#61AFEF">getter</span><span style="color:#ABB2BF">()</span><span style="color:#56B6C2">+</span><span style="color:#ABB2BF">W_grad)</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  # Labels here as dummy matrix</span></span>
+<span class="line"><span style="color:#61AFEF">  train</span><span style="color:#56B6C2"> &#x3C;-</span><span style="color:#C678DD"> function</span><span style="color:#ABB2BF">(trainData, trainLabels, num_epochs, eta, </span><span style="color:#E06C75;font-style:italic">cvSplit</span><span style="color:#56B6C2"> =</span><span style="color:#D19A66"> 0.3</span><span style="color:#ABB2BF">){</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    # Code for preparing input</span></span>
+<span class="line"><span style="color:#C678DD">    for</span><span style="color:#ABB2BF">(i </span><span style="color:#C678DD">in</span><span style="color:#D19A66"> 1</span><span style="color:#C678DD">:</span><span style="color:#ABB2BF">num_epochs){</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">      # Loop over epochs</span></span>
+<span class="line"><span style="color:#C678DD">      for</span><span style="color:#ABB2BF">(j </span><span style="color:#C678DD">in</span><span style="color:#D19A66"> 1</span><span style="color:#C678DD">:</span><span style="color:#ABB2BF">numIter){</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">        # Loop over all minibatches</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">        # ...</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">        # Essential part for training</span></span>
+<span class="line"><span style="color:#ABB2BF">        preds </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#61AFEF"> forward_prop</span><span style="color:#ABB2BF">(tDat)</span></span>
+<span class="line"><span style="color:#61AFEF">        backwards_prop</span><span style="color:#ABB2BF">(preds,tLab)</span></span>
+<span class="line"><span style="color:#61AFEF">        update_weights</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">eta</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> eta)</span></span>
+<span class="line"><span style="color:#ABB2BF">      }</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">  myEnv </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#56B6C2"> list2env</span><span style="color:#ABB2BF">(</span><span style="color:#C678DD">list</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">network</span><span style="color:#56B6C2">=</span><span style="color:#ABB2BF">layers,</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">                         forward_prop</span><span style="color:#56B6C2">=</span><span style="color:#ABB2BF">forward_prop,</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">                         train</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> train))</span></span>
+<span class="line"><span style="color:#56B6C2">  class</span><span style="color:#ABB2BF">(myEnv) </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#98C379"> 'mlp'</span></span>
+<span class="line"><span style="color:#C678DD">  return</span><span style="color:#ABB2BF">(myEnv)</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
 <p>The <code>mlp</code> function above starts by constructing the network given the layer configuration that we desire. Most of the implementation of the <code>train</code> function is omitted to highlight the essential part. The shown part highlights what is needed for stochastic gradient descent. We need to <strong>forward propagate</strong> the data, then <strong>back propagate</strong> the error, and finally based on this error we can <strong>update the weights</strong>. This is the heart and soul of SGD. Instead of using the whole dataset to estimate the gradient, we subsample a <em>minibatch</em> and estimate the gradient as an average over these samples. Quite a lot of gradient descent based optimization is done as a full batch optimization, specifically when people first learn about it, because SGD just adds an extra layer of complication. SGD allows for online updates, as more data arrives, and it may be computationally more efficient. The only issue is of course the diffculties of scaling the gradient, i.e. choosing the best learning rate, which is also an issue for regular/full battch gradient descent.</p>
 <p>So the training function is essentially broken up into 3 steps, these steps are abstracted from the training algorithm, so we could easily change the <code>update_weights</code> function to include a momentum term or other things we might want to try, without changing the <code>train</code> function.</p>
 <p>Notice that we take the vector <code>structNet</code> as input. This design can be extended to take in another vector describing what kind of layers we want and build the network with these different layers. This would generalize the implementation quite significantly. This would of course also require us to change the definition of the <code>Layer</code> function, or implement new layer functions.</p>
 <h1 id="is-deep-learning-simple">Is deep learning simple?</h1>
 <p>Now we have an <code>mlp</code> implementation in roughly 100 lines of code. I think this demonstrates in some way how <em>simple</em> an mlp really is, but also in contrast the difficulties needed to get to the modern implementations of deep learning. Modern implementations are much more general, where they usually implement a computation graph where all computations can be automatically differentiated. These are also made to target GPU hardware, where matrix-matrix and matrix-vector multiplication can be significantly accelerated. There is a package for R called <code>gpuR</code>, where one can do matrix calculations on the GPU. I might try that in the future, to see if I can speed this up significantly with minimal change of this code.</p>
 <h1 id="how-to-use-this">How to use this?</h1>
-<p>First we need to define the activation function we want, the softmax function and a function to create a dummy encoding of factors variables in R. I have now included all of these in the package <code>minstr</code> available 
-<a href="https://github.com/gumeo/mnistr" target="_blank" rel="noopener">here</a>. So you do not need to define the yourself. Although you can of course define your own activation function as you wish. Take a look at the following to get an idea of how it is done.</p>
-<pre><code class="language-{R,"># rectified linear unit activation
-# activation functions need a boolean parameter for 
-# calculating the derivative
-reLU &lt;- function(X,deriv=FALSE){
-  if(deriv==FALSE){
-    X[X&lt;0] &lt;- 0 
-    return(X)
-  }else{
-    X[X&lt;0] &lt;- 0
-    X[X&gt;0] &lt;- 1
-    return(X)
-  }
-}
-
-# softmax for output layer
-softmax &lt;- function(X){
-  Z &lt;- rowSums(exp(X))
-  X &lt;- exp(t(X))%*%diag(1/Z)
-  return(t(X))
-}
-
-# Function to represent factor as dummy matrix
-class.ind &lt;- function(cl) {
-  Ik=diag(length(levels(cl)))
-  x=Ik[as.numeric(cl),]
-  dimnames(x) &lt;- list(names(cl), levels(cl))
-  x
-}
-</code></pre>
+<p>First we need to define the activation function we want, the softmax function and a function to create a dummy encoding of factors variables in R. I have now included all of these in the package <code>minstr</code> available <a href="https://github.com/gumeo/mnistr">here</a>. So you do not need to define the yourself. Although you can of course define your own activation function as you wish. Take a look at the following to get an idea of how it is done.</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf; overflow-x: auto;" tabindex="0" data-language="r"><code><span class="line"><span style="color:#7F848E;font-style:italic"># rectified linear unit activation</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># activation functions need a boolean parameter for</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># calculating the derivative</span></span>
+<span class="line"><span style="color:#61AFEF">reLU</span><span style="color:#56B6C2"> &#x3C;-</span><span style="color:#C678DD"> function</span><span style="color:#ABB2BF">(X,</span><span style="color:#E06C75;font-style:italic">deriv</span><span style="color:#56B6C2">=</span><span style="color:#D19A66">FALSE</span><span style="color:#ABB2BF">){</span></span>
+<span class="line"><span style="color:#C678DD">  if</span><span style="color:#ABB2BF">(deriv</span><span style="color:#56B6C2">==</span><span style="color:#D19A66">FALSE</span><span style="color:#ABB2BF">){</span></span>
+<span class="line"><span style="color:#ABB2BF">    X[X</span><span style="color:#56B6C2">&#x3C;</span><span style="color:#D19A66">0</span><span style="color:#ABB2BF">] </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#D19A66"> 0</span></span>
+<span class="line"><span style="color:#C678DD">    return</span><span style="color:#ABB2BF">(X)</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span><span style="color:#C678DD">else</span><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#ABB2BF">    X[X</span><span style="color:#56B6C2">&#x3C;</span><span style="color:#D19A66">0</span><span style="color:#ABB2BF">] </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#D19A66"> 0</span></span>
+<span class="line"><span style="color:#ABB2BF">    X[X</span><span style="color:#56B6C2">></span><span style="color:#D19A66">0</span><span style="color:#ABB2BF">] </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#D19A66"> 1</span></span>
+<span class="line"><span style="color:#C678DD">    return</span><span style="color:#ABB2BF">(X)</span></span>
+<span class="line"><span style="color:#ABB2BF">  }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># softmax for output layer</span></span>
+<span class="line"><span style="color:#61AFEF">softmax</span><span style="color:#56B6C2"> &#x3C;-</span><span style="color:#C678DD"> function</span><span style="color:#ABB2BF">(X){</span></span>
+<span class="line"><span style="color:#ABB2BF">  Z </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#56B6C2"> rowSums</span><span style="color:#ABB2BF">(</span><span style="color:#56B6C2">exp</span><span style="color:#ABB2BF">(X))</span></span>
+<span class="line"><span style="color:#ABB2BF">  X </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#56B6C2"> exp</span><span style="color:#ABB2BF">(</span><span style="color:#56B6C2">t</span><span style="color:#ABB2BF">(X))</span><span style="color:#56B6C2">%*%diag</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">1</span><span style="color:#56B6C2">/</span><span style="color:#ABB2BF">Z)</span></span>
+<span class="line"><span style="color:#C678DD">  return</span><span style="color:#ABB2BF">(</span><span style="color:#56B6C2">t</span><span style="color:#ABB2BF">(X))</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># Function to represent factor as dummy matrix</span></span>
+<span class="line"><span style="color:#61AFEF">class.ind</span><span style="color:#56B6C2"> &#x3C;-</span><span style="color:#C678DD"> function</span><span style="color:#ABB2BF">(cl) {</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">  Ik</span><span style="color:#56B6C2">=diag</span><span style="color:#ABB2BF">(</span><span style="color:#56B6C2">length</span><span style="color:#ABB2BF">(</span><span style="color:#56B6C2">levels</span><span style="color:#ABB2BF">(cl)))</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">  x</span><span style="color:#56B6C2">=</span><span style="color:#ABB2BF">Ik[</span><span style="color:#56B6C2">as.numeric</span><span style="color:#ABB2BF">(cl),]</span></span>
+<span class="line"><span style="color:#56B6C2">  dimnames</span><span style="color:#ABB2BF">(x) </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#C678DD"> list</span><span style="color:#ABB2BF">(</span><span style="color:#56B6C2">names</span><span style="color:#ABB2BF">(cl), </span><span style="color:#56B6C2">levels</span><span style="color:#ABB2BF">(cl))</span></span>
+<span class="line"><span style="color:#ABB2BF">  x</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span></code></pre>
 <p>Here is an example of how we can train a network with this. Feel free to play around with some of the parameters, such as the learning rate. If it is too big, nothing will be learned. The current configuration for the network works fine, but you can also try to squeeze it down or remove/add more hidden layers.</p>
-<pre><code class="language-{R,"># Load mnist dataset, note that you need to download it first
-# mnistr::download_mnist() # This saves to the current working directory
-mnistr::load_mnist()
-
-# Visualize random digit, just to get familiar with the data, in case this is the 
-# first time you see mnist
-randDig &lt;- sample(1:60000,1)
-# Base R, notice that the data is in trainSet$x where each digit is stored as a row vector
-image(matrix(trainSet$x[randDig,],28,28)[,c(28:1),drop=FALSE],main=paste(trainSet$y[randDig]),asp=1)
-# ggplot function from the mnistr package, we can supply the data as a row vector
-mnistr::ggDigit(trainSet$x[randDig,])
-
-# Construct a network with two hidden layers (100 and 50 units) and rectified linear units
-mnw &lt;- mlp(structNet = c(784,100,50,10), 
-           minibatchSize = 100, 
-           activation = reLU,
-           initPos = TRUE,
-           initScale = 100)
-
-# Define the training set
-trainX &lt;- trainSet$x
-trainY &lt;- class.ind(factor(trainSet$y))
-
-# Call train
-mnw$train(trainData = trainX/256,
-          trainLabels = trainY,
-          num_epochs = 3,
-          eta = 0.005, 
-          cvSplit = 0.3)
-</code></pre>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf; overflow-x: auto;" tabindex="0" data-language="r"><code><span class="line"><span style="color:#7F848E;font-style:italic"># Load mnist dataset, note that you need to download it first</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># mnistr::download_mnist() # This saves to the current working directory</span></span>
+<span class="line"><span style="color:#ABB2BF">mnistr</span><span style="color:#C678DD">::</span><span style="color:#61AFEF">load_mnist</span><span style="color:#ABB2BF">()</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># Visualize random digit, just to get familiar with the data, in case this is the</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># first time you see mnist</span></span>
+<span class="line"><span style="color:#ABB2BF">randDig </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#56B6C2"> sample</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">1</span><span style="color:#C678DD">:</span><span style="color:#D19A66">60000</span><span style="color:#ABB2BF">,</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># Base R, notice that the data is in trainSet$x where each digit is stored as a row vector</span></span>
+<span class="line"><span style="color:#56B6C2">image</span><span style="color:#ABB2BF">(</span><span style="color:#56B6C2">matrix</span><span style="color:#ABB2BF">(trainSet</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">x[randDig,],</span><span style="color:#D19A66">28</span><span style="color:#ABB2BF">,</span><span style="color:#D19A66">28</span><span style="color:#ABB2BF">)[,</span><span style="color:#56B6C2">c</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">28</span><span style="color:#C678DD">:</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">),</span><span style="color:#E06C75;font-style:italic">drop</span><span style="color:#56B6C2">=</span><span style="color:#D19A66">FALSE</span><span style="color:#ABB2BF">],</span><span style="color:#E06C75;font-style:italic">main</span><span style="color:#56B6C2">=paste</span><span style="color:#ABB2BF">(trainSet</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">y[randDig]),</span><span style="color:#E06C75;font-style:italic">asp</span><span style="color:#56B6C2">=</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># ggplot function from the mnistr package, we can supply the data as a row vector</span></span>
+<span class="line"><span style="color:#ABB2BF">mnistr</span><span style="color:#C678DD">::</span><span style="color:#61AFEF">ggDigit</span><span style="color:#ABB2BF">(trainSet</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">x[randDig,])</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># Construct a network with two hidden layers (100 and 50 units) and rectified linear units</span></span>
+<span class="line"><span style="color:#ABB2BF">mnw </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#61AFEF"> mlp</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">structNet</span><span style="color:#56B6C2"> =</span><span style="color:#56B6C2"> c</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">784</span><span style="color:#ABB2BF">,</span><span style="color:#D19A66">100</span><span style="color:#ABB2BF">,</span><span style="color:#D19A66">50</span><span style="color:#ABB2BF">,</span><span style="color:#D19A66">10</span><span style="color:#ABB2BF">),</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">           minibatchSize</span><span style="color:#56B6C2"> =</span><span style="color:#D19A66"> 100</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">           activation</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> reLU,</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">           initPos</span><span style="color:#56B6C2"> =</span><span style="color:#D19A66"> TRUE</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">           initScale</span><span style="color:#56B6C2"> =</span><span style="color:#D19A66"> 100</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># Define the training set</span></span>
+<span class="line"><span style="color:#ABB2BF">trainX </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#ABB2BF"> trainSet</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">x</span></span>
+<span class="line"><span style="color:#ABB2BF">trainY </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#61AFEF"> class.ind</span><span style="color:#ABB2BF">(</span><span style="color:#56B6C2">factor</span><span style="color:#ABB2BF">(trainSet</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">y))</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># Call train</span></span>
+<span class="line"><span style="color:#ABB2BF">mnw</span><span style="color:#C678DD">$</span><span style="color:#61AFEF">train</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">trainData</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> trainX</span><span style="color:#56B6C2">/</span><span style="color:#D19A66">256</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">          trainLabels</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> trainY,</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">          num_epochs</span><span style="color:#56B6C2"> =</span><span style="color:#D19A66"> 3</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">          eta</span><span style="color:#56B6C2"> =</span><span style="color:#D19A66"> 0.005</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75;font-style:italic">          cvSplit</span><span style="color:#56B6C2"> =</span><span style="color:#D19A66"> 0.3</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"></span></code></pre>
 <h1 id="no-hidden-layers">No hidden layers</h1>
-<p>I wanted to visualize the training when there were no hidden layers. The weights in the gif below correspond to the training over one epoch, where the weights according to the digits are aligned like the matrix below:
-$$
-\begin{bmatrix}
-2 &amp; 5 &amp; 8\<br>
-1 &amp; 4 &amp; 7\<br>
-0 &amp; 3 &amp; 6
-\end{bmatrix}
-$$</p>
+<p>I wanted to visualize the training when there were no hidden layers. The weights in the gif below correspond to the training over one epoch, where the weights according to the digits are aligned like the matrix below:</p>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mo fence="true">[</mo><mtable rowspacing="0.16em" columnalign="center center center" columnspacing="1em"><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>2</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>5</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>8</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>1</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>4</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>7</mn></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>0</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>3</mn></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mn>6</mn></mstyle></mtd></mtr></mtable><mo fence="true">]</mo></mrow><annotation encoding="application/x-tex">  \begin{bmatrix}
+    2 &#x26; 5 &#x26; 8\\
+    1 &#x26; 4 &#x26; 7\\
+    0 &#x26; 3 &#x26; 6
+  \end{bmatrix}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:3.6em;vertical-align:-1.55em;"></span><span class="minner"><span class="mopen"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.05em;"><span style="top:-4.05em;"><span class="pstrut" style="height:5.6em;"></span><span style="width:0.667em;height:3.600em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.667em" height="3.600em" viewBox="0 0 667 3600"><path d="M403 1759 V84 H666 V0 H319 V1759 v0 v1759 h347 v-84
+H403z M403 1759 V0 H319 V1759 v0 v1759 h84z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.55em;"><span></span></span></span></span></span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.05em;"><span style="top:-4.21em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.01em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span><span style="top:-1.81em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.55em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.05em;"><span style="top:-4.21em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">5</span></span></span><span style="top:-3.01em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">4</span></span></span><span style="top:-1.81em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.55em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.05em;"><span style="top:-4.21em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">8</span></span></span><span style="top:-3.01em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">7</span></span></span><span style="top:-1.81em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">6</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.55em;"><span></span></span></span></span></span></span></span><span class="mclose"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.05em;"><span style="top:-4.05em;"><span class="pstrut" style="height:5.6em;"></span><span style="width:0.667em;height:3.600em;"><svg xmlns="http://www.w3.org/2000/svg" width="0.667em" height="3.600em" viewBox="0 0 667 3600"><path d="M347 1759 V0 H0 V84 H263 V1759 v0 v1759 H0 v84 H347z
+M347 1759 V0 H263 V1759 v0 v1759 h84z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.55em;"><span></span></span></span></span></span></span></span></span></span></span></span>
 <center>
 <blockquote class="imgur-embed-pub" lang="en" data-id="a/s29MY"><a href="//imgur.com/s29MY"></a></blockquote><script async src="//s.imgur.com/min/embed.js" charset="utf-8"></script>
 </center>
 <p>You can clearly see that the weights resemble templates that evolve to capture more and more of the variation present for each digit. The template also counts for making the patch dissimilar to the digits that it is not trying to match. This simple linear approach achieves a little more than 90% accuracy, which is amazing for how simple the method is. But still, for reading digits on checks, having every tenth read wrong is far from acceptable.</p>
 <h1 id="decomposing-the-network-with-magrittr">Decomposing the network with magrittr</h1>
-<p>Now, one of the main things I wanted to achieve with this implementation was to decompose the network into it&rsquo;s individual components, to demonstrate how simple it truly is. Now I can in a simple manner compose functions that I have trained in order to produce some output. The <code>magrittr</code> is perfect for this, because then we do not need to nest inside parenthesis the composition of functions, we can just pipe the input through all the layers.</p>
-<pre><code class="language-{R,"># Needed for pipes
-library(magrittr)
-
-# Get the weight matricies from the network we trained above
-w1 &lt;- mnw$network[[1]]$W$getter()
-w2 &lt;- mnw$network[[2]]$W$getter()
-w3 &lt;- mnw$network[[3]]$W$getter()
-
-set.seed(12345)
-randDig &lt;- sample(1:60000,1) # sample random digit
-testDigit &lt;- matrix(trainSet$x[randDig,]/256,nrow=1,ncol=28*28)
-# Check label, it is a 2 for this seed
-trainSet$y[randDig]
-mnistr::ggDigit(testDigit)
-
-# Add the bias term
-testDigit &lt;- cbind(testDigit,matrix(1,1,1))
-
-# We are passing a single instance
-simple_softmax &lt;- function(X){
-  Z &lt;- sum(exp(X))
-  X &lt;- exp(X)/Z
-  return(X)
-}
-
-# Now pipe it throught the network:
-# Multiply by weights, use activation and then add 1 for bias
-testDigit %&gt;% 
-  multiply_by_matrix(y=w1) %&gt;% reLU %&gt;% cbind(.,matrix(1,1,1)) %&gt;% 
-  multiply_by_matrix(y=w2) %&gt;% reLU %&gt;% cbind(.,matrix(1,1,1)) %&gt;%
-  multiply_by_matrix(y=w3) %&gt;% simple_softmax %&gt;% barplot
-</code></pre>
+<p>Now, one of the main things I wanted to achieve with this implementation was to decompose the network into it’s individual components, to demonstrate how simple it truly is. Now I can in a simple manner compose functions that I have trained in order to produce some output. The <code>magrittr</code> is perfect for this, because then we do not need to nest inside parenthesis the composition of functions, we can just pipe the input through all the layers.</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf; overflow-x: auto;" tabindex="0" data-language="r"><code><span class="line"><span style="color:#7F848E;font-style:italic"># Needed for pipes</span></span>
+<span class="line"><span style="color:#56B6C2">library</span><span style="color:#ABB2BF">(magrittr)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># Get the weight matricies from the network we trained above</span></span>
+<span class="line"><span style="color:#ABB2BF">w1 </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#ABB2BF"> mnw</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">network[[</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">]]</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">W</span><span style="color:#C678DD">$</span><span style="color:#61AFEF">getter</span><span style="color:#ABB2BF">()</span></span>
+<span class="line"><span style="color:#ABB2BF">w2 </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#ABB2BF"> mnw</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">network[[</span><span style="color:#D19A66">2</span><span style="color:#ABB2BF">]]</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">W</span><span style="color:#C678DD">$</span><span style="color:#61AFEF">getter</span><span style="color:#ABB2BF">()</span></span>
+<span class="line"><span style="color:#ABB2BF">w3 </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#ABB2BF"> mnw</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">network[[</span><span style="color:#D19A66">3</span><span style="color:#ABB2BF">]]</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">W</span><span style="color:#C678DD">$</span><span style="color:#61AFEF">getter</span><span style="color:#ABB2BF">()</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#56B6C2">set.seed</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">12345</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"><span style="color:#ABB2BF">randDig </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#56B6C2"> sample</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">1</span><span style="color:#C678DD">:</span><span style="color:#D19A66">60000</span><span style="color:#ABB2BF">,</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">) </span><span style="color:#7F848E;font-style:italic"># sample random digit</span></span>
+<span class="line"><span style="color:#ABB2BF">testDigit </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#56B6C2"> matrix</span><span style="color:#ABB2BF">(trainSet</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">x[randDig,]</span><span style="color:#56B6C2">/</span><span style="color:#D19A66">256</span><span style="color:#ABB2BF">,</span><span style="color:#E06C75;font-style:italic">nrow</span><span style="color:#56B6C2">=</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">,</span><span style="color:#E06C75;font-style:italic">ncol</span><span style="color:#56B6C2">=</span><span style="color:#D19A66">28</span><span style="color:#56B6C2">*</span><span style="color:#D19A66">28</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># Check label, it is a 2 for this seed</span></span>
+<span class="line"><span style="color:#ABB2BF">trainSet</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">y[randDig]</span></span>
+<span class="line"><span style="color:#ABB2BF">mnistr</span><span style="color:#C678DD">::</span><span style="color:#61AFEF">ggDigit</span><span style="color:#ABB2BF">(testDigit)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># Add the bias term</span></span>
+<span class="line"><span style="color:#ABB2BF">testDigit </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#56B6C2"> cbind</span><span style="color:#ABB2BF">(testDigit,</span><span style="color:#56B6C2">matrix</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">,</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">,</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">))</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># We are passing a single instance</span></span>
+<span class="line"><span style="color:#61AFEF">simple_softmax</span><span style="color:#56B6C2"> &#x3C;-</span><span style="color:#C678DD"> function</span><span style="color:#ABB2BF">(X){</span></span>
+<span class="line"><span style="color:#ABB2BF">  Z </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#56B6C2"> sum</span><span style="color:#ABB2BF">(</span><span style="color:#56B6C2">exp</span><span style="color:#ABB2BF">(X))</span></span>
+<span class="line"><span style="color:#ABB2BF">  X </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#56B6C2"> exp</span><span style="color:#ABB2BF">(X)</span><span style="color:#56B6C2">/</span><span style="color:#ABB2BF">Z</span></span>
+<span class="line"><span style="color:#C678DD">  return</span><span style="color:#ABB2BF">(X)</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># Now pipe it throught the network:</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># Multiply by weights, use activation and then add 1 for bias</span></span>
+<span class="line"><span style="color:#ABB2BF">testDigit %>%</span></span>
+<span class="line"><span style="color:#61AFEF">  multiply_by_matrix</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">y</span><span style="color:#56B6C2">=</span><span style="color:#ABB2BF">w1) %>% reLU %>% </span><span style="color:#56B6C2">cbind</span><span style="color:#ABB2BF">(.,</span><span style="color:#56B6C2">matrix</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">,</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">,</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">)) %>%</span></span>
+<span class="line"><span style="color:#61AFEF">  multiply_by_matrix</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">y</span><span style="color:#56B6C2">=</span><span style="color:#ABB2BF">w2) %>% reLU %>% </span><span style="color:#56B6C2">cbind</span><span style="color:#ABB2BF">(.,</span><span style="color:#56B6C2">matrix</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">,</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">,</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">)) %>%</span></span>
+<span class="line"><span style="color:#61AFEF">  multiply_by_matrix</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">y</span><span style="color:#56B6C2">=</span><span style="color:#ABB2BF">w3) %>% simple_softmax %>% barplot</span></span>
+<span class="line"></span></code></pre>
 <p>The network I trained is 99.6% certain that this is a two! The <code>magrittr</code> package allows us to write out the calculations happening inside the MLP in a very understandable way. Note that some networks used today have more than 50 layers, then this is not so useful anymore. In the case of 50plus layers we need other tricks to train it, e.g. skip connections and other optimizers.</p>
 <h1 id="code-for-generating-the-gifs">Code for generating the gifs</h1>
-<p>If you want to create you own gifs, it is probably easiest to define your own <code>mlp</code> function, just look at the <code>mnistr</code> implementation. Then add something similar to the following where the main update is happening. You could of course also save the weights to a matrix outside the environment using the <code>&lt;&lt;-</code> scope assignment operator.</p>
-<pre><code class="language-{R,">        # Where we do the SGD steps in the train function part of mlp
-        preds &lt;- forward_prop(tDat)
-        backwards_prop(preds,tLab)
-        update_weights(eta = eta)
-        # The following is code for generating plots
-        layerMat &lt;- layers[[1]]$W$getter()
-        # Removw bias
-        layerMat &lt;- layerMat[-nrow(layerMat),]
-        # Set the number of columns and rows for the image
-        nr &lt;- 10
-        nc &lt;- 10
-        weightsIm &lt;- matrix(0,28*nr,28*nc)
-        w &lt;- 1
-        # Fill the image with the relevant weights
-        for(i in 1:nr){
-          for(m in 1:nc){
-            weightsIm[((i-1)*28+1):(i*28),((m-1)*28+1):(m*28)] &lt;- matrix(layerMat[,w],28,28)[,c(28:1),drop=FALSE]
-            w &lt;- w + 1
-          }
-        }
-        # Save for every fourth minibatch
-        if(j%%4 == 1){
-          data &lt;- c(weightsIm)
-          # Standardize to remove flickering
-          nData &lt;- qnorm(seq(0,1,len=28*28*nr*nc))[rank(data)]
-          nIm &lt;- matrix(nData,28*nr,28*nc)
-          png(paste0('./plots/','reLU',sprintf(&quot;%08d&quot;, k),'.png'),width=28*nc*2,height=28*nr*2)
-          # Remove margins so it looks nicer
-          par(mar = rep(0, 4))
-          image(nIm,asp=1,col=gray(seq(0,1,by=0.005),1),axes=FALSE)
-          dev.off()
-          k &lt;- k+1
-        }
-</code></pre>
+<p>If you want to create you own gifs, it is probably easiest to define your own <code>mlp</code> function, just look at the <code>mnistr</code> implementation. Then add something similar to the following where the main update is happening. You could of course also save the weights to a matrix outside the environment using the <code>&#x3C;&#x3C;-</code> scope assignment operator.</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf; overflow-x: auto;" tabindex="0" data-language="r"><code><span class="line"><span style="color:#7F848E;font-style:italic">        # Where we do the SGD steps in the train function part of mlp</span></span>
+<span class="line"><span style="color:#ABB2BF">        preds </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#61AFEF"> forward_prop</span><span style="color:#ABB2BF">(tDat)</span></span>
+<span class="line"><span style="color:#61AFEF">        backwards_prop</span><span style="color:#ABB2BF">(preds,tLab)</span></span>
+<span class="line"><span style="color:#61AFEF">        update_weights</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">eta</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> eta)</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">        # The following is code for generating plots</span></span>
+<span class="line"><span style="color:#ABB2BF">        layerMat </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#ABB2BF"> layers[[</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">]]</span><span style="color:#C678DD">$</span><span style="color:#ABB2BF">W</span><span style="color:#C678DD">$</span><span style="color:#61AFEF">getter</span><span style="color:#ABB2BF">()</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">        # Removw bias</span></span>
+<span class="line"><span style="color:#ABB2BF">        layerMat </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#ABB2BF"> layerMat[</span><span style="color:#56B6C2">-nrow</span><span style="color:#ABB2BF">(layerMat),]</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">        # Set the number of columns and rows for the image</span></span>
+<span class="line"><span style="color:#ABB2BF">        nr </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#D19A66"> 10</span></span>
+<span class="line"><span style="color:#ABB2BF">        nc </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#D19A66"> 10</span></span>
+<span class="line"><span style="color:#ABB2BF">        weightsIm </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#56B6C2"> matrix</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">0</span><span style="color:#ABB2BF">,</span><span style="color:#D19A66">28</span><span style="color:#56B6C2">*</span><span style="color:#ABB2BF">nr,</span><span style="color:#D19A66">28</span><span style="color:#56B6C2">*</span><span style="color:#ABB2BF">nc)</span></span>
+<span class="line"><span style="color:#ABB2BF">        w </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#D19A66"> 1</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">        # Fill the image with the relevant weights</span></span>
+<span class="line"><span style="color:#C678DD">        for</span><span style="color:#ABB2BF">(i </span><span style="color:#C678DD">in</span><span style="color:#D19A66"> 1</span><span style="color:#C678DD">:</span><span style="color:#ABB2BF">nr){</span></span>
+<span class="line"><span style="color:#C678DD">          for</span><span style="color:#ABB2BF">(m </span><span style="color:#C678DD">in</span><span style="color:#D19A66"> 1</span><span style="color:#C678DD">:</span><span style="color:#ABB2BF">nc){</span></span>
+<span class="line"><span style="color:#ABB2BF">            weightsIm[((i</span><span style="color:#56B6C2">-</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">)</span><span style="color:#56B6C2">*</span><span style="color:#D19A66">28</span><span style="color:#56B6C2">+</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">)</span><span style="color:#C678DD">:</span><span style="color:#ABB2BF">(i</span><span style="color:#56B6C2">*</span><span style="color:#D19A66">28</span><span style="color:#ABB2BF">),((m</span><span style="color:#56B6C2">-</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">)</span><span style="color:#56B6C2">*</span><span style="color:#D19A66">28</span><span style="color:#56B6C2">+</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">)</span><span style="color:#C678DD">:</span><span style="color:#ABB2BF">(m</span><span style="color:#56B6C2">*</span><span style="color:#D19A66">28</span><span style="color:#ABB2BF">)] </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#56B6C2"> matrix</span><span style="color:#ABB2BF">(layerMat[,w],</span><span style="color:#D19A66">28</span><span style="color:#ABB2BF">,</span><span style="color:#D19A66">28</span><span style="color:#ABB2BF">)[,</span><span style="color:#56B6C2">c</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">28</span><span style="color:#C678DD">:</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">),</span><span style="color:#E06C75;font-style:italic">drop</span><span style="color:#56B6C2">=</span><span style="color:#D19A66">FALSE</span><span style="color:#ABB2BF">]</span></span>
+<span class="line"><span style="color:#ABB2BF">            w </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#ABB2BF"> w </span><span style="color:#56B6C2">+</span><span style="color:#D19A66"> 1</span></span>
+<span class="line"><span style="color:#ABB2BF">          }</span></span>
+<span class="line"><span style="color:#ABB2BF">        }</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">        # Save for every fourth minibatch</span></span>
+<span class="line"><span style="color:#C678DD">        if</span><span style="color:#ABB2BF">(j</span><span style="color:#56B6C2">%%</span><span style="color:#D19A66">4</span><span style="color:#56B6C2"> ==</span><span style="color:#D19A66"> 1</span><span style="color:#ABB2BF">){</span></span>
+<span class="line"><span style="color:#ABB2BF">          data </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#56B6C2"> c</span><span style="color:#ABB2BF">(weightsIm)</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">          # Standardize to remove flickering</span></span>
+<span class="line"><span style="color:#ABB2BF">          nData </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#56B6C2"> qnorm</span><span style="color:#ABB2BF">(</span><span style="color:#56B6C2">seq</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">0</span><span style="color:#ABB2BF">,</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">,</span><span style="color:#E06C75;font-style:italic">len</span><span style="color:#56B6C2">=</span><span style="color:#D19A66">28</span><span style="color:#56B6C2">*</span><span style="color:#D19A66">28</span><span style="color:#56B6C2">*</span><span style="color:#ABB2BF">nr</span><span style="color:#56B6C2">*</span><span style="color:#ABB2BF">nc))[</span><span style="color:#56B6C2">rank</span><span style="color:#ABB2BF">(data)]</span></span>
+<span class="line"><span style="color:#ABB2BF">          nIm </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#56B6C2"> matrix</span><span style="color:#ABB2BF">(nData,</span><span style="color:#D19A66">28</span><span style="color:#56B6C2">*</span><span style="color:#ABB2BF">nr,</span><span style="color:#D19A66">28</span><span style="color:#56B6C2">*</span><span style="color:#ABB2BF">nc)</span></span>
+<span class="line"><span style="color:#56B6C2">          png</span><span style="color:#ABB2BF">(</span><span style="color:#56B6C2">paste0</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">'./plots/'</span><span style="color:#ABB2BF">,</span><span style="color:#98C379">'reLU'</span><span style="color:#ABB2BF">,</span><span style="color:#56B6C2">sprintf</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">"%08d"</span><span style="color:#ABB2BF">, k),</span><span style="color:#98C379">'.png'</span><span style="color:#ABB2BF">),</span><span style="color:#E06C75;font-style:italic">width</span><span style="color:#56B6C2">=</span><span style="color:#D19A66">28</span><span style="color:#56B6C2">*</span><span style="color:#ABB2BF">nc</span><span style="color:#56B6C2">*</span><span style="color:#D19A66">2</span><span style="color:#ABB2BF">,</span><span style="color:#E06C75;font-style:italic">height</span><span style="color:#56B6C2">=</span><span style="color:#D19A66">28</span><span style="color:#56B6C2">*</span><span style="color:#ABB2BF">nr</span><span style="color:#56B6C2">*</span><span style="color:#D19A66">2</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">          # Remove margins so it looks nicer</span></span>
+<span class="line"><span style="color:#56B6C2">          par</span><span style="color:#ABB2BF">(</span><span style="color:#E06C75;font-style:italic">mar</span><span style="color:#56B6C2"> =</span><span style="color:#56B6C2"> rep</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">0</span><span style="color:#ABB2BF">, </span><span style="color:#D19A66">4</span><span style="color:#ABB2BF">))</span></span>
+<span class="line"><span style="color:#56B6C2">          image</span><span style="color:#ABB2BF">(nIm,</span><span style="color:#E06C75;font-style:italic">asp</span><span style="color:#56B6C2">=</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">,</span><span style="color:#E06C75;font-style:italic">col</span><span style="color:#56B6C2">=gray</span><span style="color:#ABB2BF">(</span><span style="color:#56B6C2">seq</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">0</span><span style="color:#ABB2BF">,</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">,</span><span style="color:#E06C75;font-style:italic">by</span><span style="color:#56B6C2">=</span><span style="color:#D19A66">0.005</span><span style="color:#ABB2BF">),</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">),</span><span style="color:#E06C75;font-style:italic">axes</span><span style="color:#56B6C2">=</span><span style="color:#D19A66">FALSE</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"><span style="color:#56B6C2">          dev.off</span><span style="color:#ABB2BF">()</span></span>
+<span class="line"><span style="color:#ABB2BF">          k </span><span style="color:#56B6C2">&#x3C;-</span><span style="color:#ABB2BF"> k</span><span style="color:#56B6C2">+</span><span style="color:#D19A66">1</span></span>
+<span class="line"><span style="color:#ABB2BF">        }</span></span>
+<span class="line"></span></code></pre>
 <h1 id="next-post">Next post</h1>
-<p>For the next post I plan to compare different activation functions and implement dropout for the network. It will probably be the final post until I get new ideas for stuff to implement.</p>
-<p><a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-size="large" data-text="Learning Deep Learning in R" data-url="https://gumeo.github.io/post/part-2-deep-learning-with-closures-in-r/" data-via="gumgumeo" data-hashtags="#rstats #machinelearning #deeplearning" data-lang="en" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>
-
-    </div>
-
-    
-
-
-
-
-
-
-<div class="article-tags">
-  
-  <a class="badge badge-light" href="/tag/r/">R</a>
-  
-</div>
-
-
-
-<div class="share-box" aria-hidden="true">
-  <ul class="share">
-    
-      
-      
-      
-        
-      
-      
-      
-      <li>
-        <a href="https://twitter.com/intent/tweet?url=https://gumeo.github.io/post/part-2-deep-learning/&amp;text=Part%202:%20Deep%20Learning%20with%20Closures%20in%20R" target="_blank" rel="noopener" class="share-btn-twitter">
-          <i class="fab fa-twitter"></i>
-        </a>
-      </li>
-    
-      
-      
-      
-        
-      
-      
-      
-      <li>
-        <a href="https://www.facebook.com/sharer.php?u=https://gumeo.github.io/post/part-2-deep-learning/&amp;t=Part%202:%20Deep%20Learning%20with%20Closures%20in%20R" target="_blank" rel="noopener" class="share-btn-facebook">
-          <i class="fab fa-facebook"></i>
-        </a>
-      </li>
-    
-      
-      
-      
-        
-      
-      
-      
-      <li>
-        <a href="mailto:?subject=Part%202:%20Deep%20Learning%20with%20Closures%20in%20R&amp;body=https://gumeo.github.io/post/part-2-deep-learning/" target="_blank" rel="noopener" class="share-btn-email">
-          <i class="fas fa-envelope"></i>
-        </a>
-      </li>
-    
-      
-      
-      
-        
-      
-      
-      
-      <li>
-        <a href="https://www.linkedin.com/shareArticle?url=https://gumeo.github.io/post/part-2-deep-learning/&amp;title=Part%202:%20Deep%20Learning%20with%20Closures%20in%20R" target="_blank" rel="noopener" class="share-btn-linkedin">
-          <i class="fab fa-linkedin-in"></i>
-        </a>
-      </li>
-    
-      
-      
-      
-        
-      
-      
-      
-      <li>
-        <a href="whatsapp://send?text=Part%202:%20Deep%20Learning%20with%20Closures%20in%20R%20https://gumeo.github.io/post/part-2-deep-learning/" target="_blank" rel="noopener" class="share-btn-whatsapp">
-          <i class="fab fa-whatsapp"></i>
-        </a>
-      </li>
-    
-      
-      
-      
-        
-      
-      
-      
-      <li>
-        <a href="https://service.weibo.com/share/share.php?url=https://gumeo.github.io/post/part-2-deep-learning/&amp;title=Part%202:%20Deep%20Learning%20with%20Closures%20in%20R" target="_blank" rel="noopener" class="share-btn-weibo">
-          <i class="fab fa-weibo"></i>
-        </a>
-      </li>
-    
-  </ul>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-  
-    
-    
-
-
-
-
-
-  
-    
-    
-    
-      
-    
-    
-    
-    <div class="media author-card content-widget-hr">
-      
-        
-        <img class="avatar mr-3 avatar-circle" src="/author/gu%C3%B0mundur-einarsson/avatar_hu2e8155c65b026b8f773011166b8edcd9_836272_270x270_fill_lanczos_center_2.png" alt="Guðmundur Einarsson">
-      
-
-      <div class="media-body">
-        <h5 class="card-title"><a href="https://gumeo.github.io/">Guðmundur Einarsson</a></h5>
-        <h6 class="card-subtitle">Research Scientist</h6>
-        <p class="card-text">I am interested in statistics, genetics and machine learning.</p>
-        <ul class="network-icon" aria-hidden="true">
-  
-    
-    
-    
-      
-    
-    
-    
-    
-    
-    <li>
-      <a href="mailto:gudmundur.einarsson.phd@gmail.com" >
-        <i class="fas fa-envelope"></i>
-      </a>
-    </li>
-  
-    
-    
-    
-      
-    
-    
-    
-    
-    
-      
-    
-    <li>
-      <a href="https://twitter.com/gumgumeo" target="_blank" rel="noopener">
-        <i class="fab fa-twitter"></i>
-      </a>
-    </li>
-  
-    
-    
-    
-      
-    
-    
-    
-    
-    
-      
-    
-    <li>
-      <a href="https://github.com/gumeo" target="_blank" rel="noopener">
-        <i class="fab fa-github"></i>
-      </a>
-    </li>
-  
-    
-    
-    
-      
-    
-    
-    
-    
-    
-      
-    
-    <li>
-      <a href="https://www.linkedin.com/in/gudmundureinarsson/" target="_blank" rel="noopener">
-        <i class="fab fa-linkedin"></i>
-      </a>
-    </li>
-  
-</ul>
-
-      </div>
-    </div>
-  
-
-
-  
-
-
-
-
-
-
-
-
-<div class="article-widget">
-  
-<div class="post-nav">
-  
-  
-  
-  <div class="post-nav-item">
-    <div class="meta-nav">Next</div>
-    <a href="/post/leaving-academia/" rel="next">Leaving Academia</a>
-  </div>
-  
-  
-  
-  <div class="post-nav-item">
-    <div class="meta-nav">Previous</div>
-    <a href="/post/part-1-1deep-learning/" rel="prev">Part 1: Deep Learning with Closures in R</a>
-  </div>
-  
-</div>
-
-</div>
-
-
-
-
-
-  
-  
-  <div class="article-widget content-widget-hr">
-    <h3>Related</h3>
-    <ul>
-      
-      <li><a href="/post/part-1-1deep-learning/">Part 1: Deep Learning with Closures in R</a></li>
-      
-      <li><a href="/post/emplace-back/">emplace_back vs push_back</a></li>
-      
-      <li><a href="/post/visualizing-strange-attractors/">Visualizing Strange Attractors</a></li>
-      
-      <li><a href="/post/got-some-new-books/">Got some new books!</a></li>
-      
-    </ul>
-  </div>
-  
-
-
-
-
-
-  </div>
-</article>
-
-      
-
-    
-    
-    
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.1.0/instantpage.min.js" integrity="sha512-1+qUtKoh9XZW7j+6LhRMAyOrgSQKenQ4mluTR+cvxXjP1Z54RxZuzstR/H9kgPXQsVB8IW7DMDFUJpzLjvhGSQ==" crossorigin="anonymous"></script>
-
-      
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/8.4.8/mermaid.min.js" integrity="sha256-lyWCDMnMeZiXRi7Zl54sZGKYmgQs4izcT7+tKc+KUBk=" crossorigin="anonymous" title="mermaid"></script>
-      
-
-      
-        
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/highlight.min.js" integrity="sha512-7t8APmYpzEsZP7CYoA7RfMPV9Bb+PJHa9x2WiUnDXZx3XHveuyWUtvNOexhkierl5flZ3tr92dP1mMS+SGlD+A==" crossorigin="anonymous"></script>
-        
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/languages/r.min.js"></script>
-        
-      
-
-    
-
-    
-    
-
-    
-    
-    <script>const code_highlighting = true;</script>
-    
-
-    
-    
-    
-    
-    
-    
-    <script>
-      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
-      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
-      const content_type = {
-        'post': "Posts",
-        'project': "Projects",
-        'publication' : "Publications",
-        'talk' : "Talks",
-        'slides' : "Slides"
-        };
-    </script>
-    
-
-    
-    
-
-    
-    
-    <script id="search-hit-fuse-template" type="text/x-template">
-      <div class="search-hit" id="summary-{{key}}">
-      <div class="search-hit-content">
-        <div class="search-hit-name">
-          <a href="{{relpermalink}}">{{title}}</a>
-          <div class="article-metadata search-hit-type">{{type}}</div>
-          <p class="search-hit-description">{{snippet}}</p>
-        </div>
-      </div>
-      </div>
-    </script>
-    
-
-    
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
-    
-
-    
-    
-
-    
-    
-
-    
-    
-
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-      
-    
-    
-    
-    
-    <script src="/js/academic.min.3b2b658c61ebd725bd5fc606c89fe44c.js"></script>
-
-    
-
-
-
-
-
-
-  
-  
-  <div class="container">
-    <footer class="site-footer">
-  
-
-  <p class="powered-by">
-    © 2020
-  </p>
-
-  
-  
-
-
-
-
-
-
-  <p class="powered-by">
-    
-    Published with
-    <a href="https://wowchemy.com" target="_blank" rel="noopener">Wowchemy Website Builder</a>
-    
-
-    
-    <span class="float-right" aria-hidden="true">
-      <a href="#" class="back-to-top">
-        <span class="button_icon">
-          <i class="fas fa-chevron-up fa-2x"></i>
-        </span>
-      </a>
-    </span>
-    
-  </p>
-</footer>
-
-  </div>
-  
-
-  
-<div id="modal" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Cite</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <pre><code class="tex hljs"></code></pre>
-      </div>
-      <div class="modal-footer">
-        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
-          <i class="fas fa-copy"></i> Copy
-        </a>
-        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
-          <i class="fas fa-download"></i> Download
-        </a>
-        <div id="modal-error"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-</body>
-</html>
+<p>For the next post I plan to compare different activation functions and implement dropout for the network. It will probably be the final post until I get new ideas for stuff to implement.</p>  </div> <aside class="author-bio" data-astro-cid-ynhdph36> <img src="/avatar.png" alt="Guðmundur Einarsson" class="avatar" data-astro-cid-ynhdph36> <div class="author-info" data-astro-cid-ynhdph36> <strong class="author-name" data-astro-cid-ynhdph36>Guðmundur Einarsson</strong> <p class="author-role" data-astro-cid-ynhdph36>Research Scientist at <a href="https://www.decode.com/" target="_blank" rel="noopener" data-astro-cid-ynhdph36>deCODE Genetics</a></p> <p class="author-blurb" data-astro-cid-ynhdph36>Interested in statistics, genetics and machine learning. PhD in Applied Mathematics from DTU.</p> <div class="author-links" data-astro-cid-ynhdph36> <a href="https://twitter.com/gumgumeo" target="_blank" rel="noopener" data-astro-cid-ynhdph36>X</a> <a href="https://github.com/gumeo" target="_blank" rel="noopener" data-astro-cid-ynhdph36>GitHub</a> <a href="https://www.linkedin.com/in/gudmundureinarsson/" target="_blank" rel="noopener" data-astro-cid-ynhdph36>LinkedIn</a> </div> </div> </aside>  <nav class="post-nav" data-astro-cid-gjtny2mx> <a href="/post/part-1-1deep-learning/" class="post-nav-prev" data-astro-cid-gjtny2mx> <span class="nav-label" data-astro-cid-gjtny2mx>← Previous</span> <span class="nav-title" data-astro-cid-gjtny2mx>Part 1: Deep Learning with Closures in R</span> </a> <a href="/post/leaving-academia/" class="post-nav-next" data-astro-cid-gjtny2mx> <span class="nav-label" data-astro-cid-gjtny2mx>Next →</span> <span class="nav-title" data-astro-cid-gjtny2mx>Leaving Academia</span> </a> </nav> </article>  </main> <footer data-astro-cid-sz7xmlte> <div class="footer-inner" data-astro-cid-sz7xmlte> <div class="social-links" data-astro-cid-sz7xmlte> <a href="https://twitter.com/gumgumeo" target="_blank" rel="noopener" data-astro-cid-sz7xmlte>X</a> <a href="https://github.com/gumeo" target="_blank" rel="noopener" data-astro-cid-sz7xmlte>GitHub</a> <a href="https://www.linkedin.com/in/gudmundureinarsson/" target="_blank" rel="noopener" data-astro-cid-sz7xmlte>LinkedIn</a> <a href="mailto:gudmundur.einarsson.phd@gmail.com" data-astro-cid-sz7xmlte>Email</a> <a href="/subscribe/" data-astro-cid-sz7xmlte>Subscribe</a> </div> <p class="copyright" data-astro-cid-sz7xmlte>© 2026 Guðmundur Einarsson</p> </div> </footer>  </body></html> 
