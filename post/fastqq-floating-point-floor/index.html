@@ -15,7 +15,7 @@
 <p>And yet, here we are.</p>
 <hr>
 <h2 id="the-qq-plot-a-diagnostic-workhorse">The QQ plot: a diagnostic workhorse</h2>
-<p>The quantile-quantile (QQ) plot is one of the most important diagnostic tools in statistical genetics. If your test statistics follow their null distribution, plotting observed quantiles against expected quantiles should give a straight diagonal line. Deviations from that line, particularly the upward sweep at the right tail that geneticists call “inflation”, tell you something real is happening: true signal, population stratification, or model misspecification.</p>
+<p>The quantile-quantile (QQ) plot is one of the most important diagnostic tools in statistical genetics. If your test statistics follow their null distribution, plotting observed quantiles against expected quantiles should give a straight diagonal line. Deviations from that line, the upward sweep at the right tail that geneticists call “inflation”, tell you something real is happening: true signal, population stratification, or model misspecification.</p>
 <p>For GWAS, the QQ plot is as routine as checking residuals in a regression. You run your association tests across millions of genetic variants, collect the <em>p</em>-values, and plot them. A well-behaved null looks like a line. An inflated study looks like a ski jump.</p>
 <p>The problem is that modern GWAS has grown rather large.</p>
 <hr>
@@ -27,8 +27,8 @@
 <hr>
 <h2 id="a-new-problem-the-extreme-tail">A new problem: the extreme tail</h2>
 <p>That fixed the speed issue. But when we started running meta-analyses, combining results across multiple large biobank cohorts, I ran into something I hadn’t anticipated.</p>
-<p>Consider what happens when you combine GWAS results across, say, ten cohorts totaling 2 million participants for a highly heritable trait with a common variant of large effect. The resulting <em>p</em>-values at the top hits aren’t just small in the usual GWAS sense (10⁻⁸, the genome-wide significance threshold). They can be genuinely, almost incomprehensibly small. Values of 10⁻¹⁰⁰, 10⁻²⁰⁰, even 10⁻⁵⁰⁰ are not hypothetical; they’re the mathematically correct <em>p</em>-values that fall out of combining enough evidence.</p>
-<p>R’s double-precision floating point can’t represent these. Anything below approximately 2.2×10⁻³⁰⁸ underflows silently to zero. Not flagged as missing or infinite. Just <code>0</code>. And <code>fastqq</code>, like any software working on the raw <em>p</em>-value scale, had no idea what to do with a zero. The plotting would either error out or silently drop the point.</p>
+<p>Consider what happens when you combine GWAS results across, say, ten cohorts totaling 2 million participants for a highly heritable trait with a common variant of large effect. The resulting <em>p</em>-values at the top hits aren’t small in the usual GWAS sense (10⁻⁸, the genome-wide significance threshold). They can be astronomically small. Values of 10⁻¹⁰⁰, 10⁻²⁰⁰, even 10⁻⁵⁰⁰ are not hypothetical; they’re the mathematically correct <em>p</em>-values that fall out of combining enough evidence.</p>
+<p>R’s double-precision floating point can’t represent these. Anything below about 2.2×10⁻³⁰⁸ underflows to zero. Not flagged as missing or infinite. <code>0</code>. And <code>fastqq</code>, like any software working on the raw <em>p</em>-value scale, had no idea what to do with a zero. The plotting would either error out or drop the point.</p>
 <p>The most extreme signals in a meta-analysis, exactly the ones you most want to see, were disappearing from the diagnostic plot.</p>
 <hr>
 <h2 id="what-i-added">What I added</h2>
@@ -58,8 +58,8 @@
 <hr>
 <h2 id="why-this-matters-more-now">Why this matters more now</h2>
 <p>Mega-cohort meta-analysis in complex trait genetics isn’t slowing down. Efforts like the Global Biobank Meta-analysis Initiative are combining data across dozens of biobanks spanning millions of participants. For common, highly heritable phenotypes (height, BMI, educational attainment, blood pressure) the top signals will routinely produce test statistics that break double-precision arithmetic.</p>
-<p>It’s not a fundamental problem, more a calibration issue. But tooling built for the GWAS scale of ten years ago is increasingly inadequate for today. A QQ plot that silently drops the most extreme points hides exactly the part of the distribution you care most about.</p>
-<p>The fix turns out to be simple: work in log-space, never materialize the raw <em>p</em>-value, and let the analyst supply pre-transformed values when their pipeline already handles the arithmetic. The interesting part was the failure mode itself: silent zero underflow is easy to miss, easy to confuse with real zeros, and it matters because the QQ plot is the first thing everyone checks.</p>
+<p>It’s a calibration issue, not a fundamental one. But tooling built for the GWAS scale of ten years ago is inadequate for today’s meta-analyses. A QQ plot that drops the most extreme points hides the part of the distribution you care most about.</p>
+<p>The fix is simple: work in log-space, never materialize the raw <em>p</em>-value, and let the analyst supply pre-transformed values when their pipeline handles the arithmetic. The failure mode was the interesting part: zero underflow is easy to miss, easy to confuse with real zeros, and it matters because the QQ plot is the first thing people check.</p>
 <hr>
 <h2 id="getting-started">Getting started</h2>
 <p><code>fastqq</code> is available on CRAN and GitHub:</p>
