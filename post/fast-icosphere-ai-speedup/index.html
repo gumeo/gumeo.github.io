@@ -1,0 +1,77 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="I built a fast icosphere generator that avoids the usual recursive halving. Then Claude helped me squeeze out a 6-16x speedup without changing the algorithm."><title>16x Faster Icospheres with AI-Assisted Optimization | Guðmundur Einarsson</title><link rel="icon" type="image/png" href="/avatar.png"><!-- KaTeX CSS (build-time math rendering still uses this for styling) --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous"><!-- Prevent FOUC: apply stored or system theme before first paint --><script>
+    (function() {
+      var stored = localStorage.getItem('theme');
+      var sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', stored || sys);
+    })();
+  </script><style>.tag-list[data-astro-cid-lga65v7i]{display:flex;flex-wrap:wrap;gap:.4rem;list-style:none;padding:0;margin:0}.tag[data-astro-cid-lga65v7i]{background:var(--tag-bg);color:var(--tag-text);font-size:.75rem;font-weight:500;padding:.2rem .55rem;border-radius:9999px}
+</style>
+<link rel="stylesheet" href="/_astro/_slug_.B6VsEEmn.css">
+<style>.author-bio[data-astro-cid-ynhdph36]{display:flex;gap:1.25rem;align-items:flex-start;padding:1.5rem 0;border-top:1px solid var(--border);margin-top:3rem}.avatar[data-astro-cid-ynhdph36]{width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0;margin-top:.1rem}.author-info[data-astro-cid-ynhdph36]{display:flex;flex-direction:column;gap:.2rem}.author-name[data-astro-cid-ynhdph36]{font-size:.95rem;font-weight:600;letter-spacing:-.01em}.author-role[data-astro-cid-ynhdph36]{font-size:.82rem;color:var(--text-muted);margin:0}.author-role[data-astro-cid-ynhdph36] a[data-astro-cid-ynhdph36]{color:var(--text-muted);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}.author-role[data-astro-cid-ynhdph36] a[data-astro-cid-ynhdph36]:hover{color:var(--accent)}.author-blurb[data-astro-cid-ynhdph36]{font-size:.82rem;color:var(--text-muted);margin:.2rem 0;line-height:1.55}.author-links[data-astro-cid-ynhdph36]{display:flex;gap:.85rem;flex-wrap:wrap;margin-top:.1rem}.author-links[data-astro-cid-ynhdph36] a[data-astro-cid-ynhdph36]{font-size:.78rem;color:var(--text-muted);text-decoration:none;transition:color .15s}.author-links[data-astro-cid-ynhdph36] a[data-astro-cid-ynhdph36]:hover{color:var(--accent)}.post-header[data-astro-cid-gjtny2mx]{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--border)}.post-meta[data-astro-cid-gjtny2mx]{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem}time[data-astro-cid-gjtny2mx]{font-size:.8rem;color:var(--text-muted);letter-spacing:.01em}h1[data-astro-cid-gjtny2mx]{font-family:Fraunces,Georgia,serif;font-size:2.25rem;line-height:1.15;margin:0;letter-spacing:-.02em}.post-nav[data-astro-cid-gjtny2mx]{display:flex;justify-content:space-between;gap:1rem;margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border)}.post-nav[data-astro-cid-gjtny2mx] a[data-astro-cid-gjtny2mx]{display:flex;flex-direction:column;gap:.25rem;max-width:48%;text-decoration:none;color:var(--text)}.post-nav-next[data-astro-cid-gjtny2mx]{text-align:right;margin-left:auto}.nav-label[data-astro-cid-gjtny2mx]{font-size:.72rem;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:.07em}.nav-title[data-astro-cid-gjtny2mx]{font-size:.9rem;font-weight:500;color:var(--accent);font-family:Fraunces,Georgia,serif}.post-nav[data-astro-cid-gjtny2mx] a[data-astro-cid-gjtny2mx]:hover .nav-title[data-astro-cid-gjtny2mx]{color:var(--accent-hover)}
+</style></head> <body> <nav data-astro-cid-dmqpwcec> <div class="nav-inner" data-astro-cid-dmqpwcec> <a href="/" class="nav-brand" data-astro-cid-dmqpwcec>Guðmundur Einarsson</a> <div class="nav-links" data-astro-cid-dmqpwcec> <a href="/blog/" data-astro-cid-dmqpwcec>Blog</a> <a href="/about/" data-astro-cid-dmqpwcec>About</a> <a href="/subscribe/" data-astro-cid-dmqpwcec>Subscribe</a> </div> <div class="nav-toggle" data-astro-cid-dmqpwcec> <button id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode" data-astro-cid-x3pjskd3> <!-- Sun icon (shown in dark mode, click to go light) --> <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-astro-cid-x3pjskd3> <circle cx="12" cy="12" r="5" data-astro-cid-x3pjskd3></circle> <line x1="12" y1="1" x2="12" y2="3" data-astro-cid-x3pjskd3></line> <line x1="12" y1="21" x2="12" y2="23" data-astro-cid-x3pjskd3></line> <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" data-astro-cid-x3pjskd3></line> <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" data-astro-cid-x3pjskd3></line> <line x1="1" y1="12" x2="3" y2="12" data-astro-cid-x3pjskd3></line> <line x1="21" y1="12" x2="23" y2="12" data-astro-cid-x3pjskd3></line> <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" data-astro-cid-x3pjskd3></line> <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" data-astro-cid-x3pjskd3></line> </svg> <!-- Moon icon (shown in light mode, click to go dark) --> <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-astro-cid-x3pjskd3> <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" data-astro-cid-x3pjskd3></path> </svg> </button>  <script type="module">const e=document.getElementById("theme-toggle");e?.addEventListener("click",()=>{const t=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",t),localStorage.setItem("theme",t)});</script> </div> </div> </nav>  <main>  <article data-astro-cid-gjtny2mx> <header class="post-header" data-astro-cid-gjtny2mx> <div class="post-meta" data-astro-cid-gjtny2mx> <time datetime="2026-04-08T18:00:00.000Z" data-astro-cid-gjtny2mx>April 8, 2026</time> <ul class="tag-list" data-astro-cid-lga65v7i><li data-astro-cid-lga65v7i><span class="tag" data-astro-cid-lga65v7i>cpp</span></li><li data-astro-cid-lga65v7i><span class="tag" data-astro-cid-lga65v7i>AI</span></li><li data-astro-cid-lga65v7i><span class="tag" data-astro-cid-lga65v7i>geometry</span></li></ul> </div> <h1 data-astro-cid-gjtny2mx>16x Faster Icospheres with AI-Assisted Optimization</h1> </header> <div class="prose" data-astro-cid-gjtny2mx>  <p>A while back I wrote <a href="https://github.com/gumeo/fast_icosphere">fast_icosphere</a>, a C++ library for generating icospheres with fine-grained control over the number of faces. Most icosphere implementations work by recursive subdivision: start with an icosahedron and repeatedly split each triangle into four. That gives you 20, 80, 320, 1280 faces and so on, always powers of four times 20. If you want something in between, you’re out of luck.</p>
+<p>My approach is different. Instead of halving edges recursively, I place <code>n</code> additional vertices along each edge of the base icosahedron, then fill each original triangle face with a grid of smaller triangles. This gives you <code>20 * (n+1)^2</code> faces for any value of <code>n</code>, which means you can dial in exactly the resolution you need rather than jumping between powers of four.</p>
+<p>The algorithm was correct but not particularly fast. I recently sat down with Claude and asked it to optimize the implementation while keeping the same algorithmic structure. The results were better than I expected.</p>
+<h2 id="what-changed">What changed</h2>
+<p>Six targeted optimizations, none of them algorithmic:</p>
+<p><strong>1. <code>std::map</code> to <code>std::unordered_map</code> with a custom hash.</strong> The original code used <code>std::map</code> for edge key lookups, which gives O(log n) per lookup. Switching to <code>std::unordered_map</code> with a Szudzik pairing function as the hash drops this to O(1). Edge lookups happen constantly during subdivision, so this alone made a big difference.</p>
+<p><strong>2. Fixed-size arrays for faces.</strong> Every triangle face is exactly three indices. The original code stored these as <code>std::vector&#x3C;size_t></code>, which means a heap allocation per face. Replacing with <code>std::array&#x3C;size_t, 3></code> eliminates millions of small allocations at higher subdivision levels.</p>
+<p><strong>3. Removed redundant position data from edges.</strong> The edge map used to store full vertex positions alongside indices. Now it stores only vertex indices, and positions are looked up from the vertex array when needed. Less memory, fewer copies.</p>
+<p><strong>4. Eliminated copies in the hot loop.</strong> <code>FillIcoFace</code> was the most expensive function, and it was copying vectors on every call. The refactored version uses <code>const auto&#x26;</code> references for edge data and <code>std::swap</code> on row buffers instead of reallocating.</p>
+<p><strong>5. Inlined normalization.</strong> The original code had separate <code>Norm()</code> and <code>Normalize()</code> helper functions that each did three divisions. Now it’s a single <code>1.0 / std::sqrt(...)</code> multiply, inlined at the call site. Three multiplications instead of three divisions, and no function call overhead.</p>
+<p><strong>6. Added missing <code>#include &#x3C;array></code>.</strong> Not a performance fix, but the code wouldn’t compile on modern GCC without it. Good to have.</p>
+<h2 id="benchmarks">Benchmarks</h2>
+<p>Compiled with <code>g++ -O2 -std=c++17</code>, times averaged over multiple runs:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>n</th><th>Vertices</th><th>Before (ms)</th><th>After (ms)</th><th>Speedup</th></tr></thead><tbody><tr><td>10</td><td>1,212</td><td>0.22</td><td>0.02</td><td><strong>11x</strong></td></tr><tr><td>50</td><td>26,012</td><td>5.07</td><td>0.34</td><td><strong>15x</strong></td></tr><tr><td>100</td><td>102,012</td><td>19.87</td><td>1.28</td><td><strong>16x</strong></td></tr><tr><td>200</td><td>404,012</td><td>82.04</td><td>9.28</td><td><strong>9x</strong></td></tr><tr><td>500</td><td>2,510,012</td><td>511.10</td><td>80.01</td><td><strong>6x</strong></td></tr></tbody></table>
+<p>The sweet spot is around n=100, where the speedup peaks at 16x. At larger sizes the gains taper off, likely because memory bandwidth starts to dominate over the per-element overhead that the optimizations targeted.</p>
+<h2 id="what-this-tells-me-about-ai-assisted-optimization">What this tells me about AI-assisted optimization</h2>
+<p>None of these changes are conceptually difficult. Replacing <code>std::map</code> with <code>std::unordered_map</code> is textbook advice. Using <code>std::array</code> for fixed-size data is obvious in hindsight. Removing unnecessary copies is basic performance hygiene.</p>
+<p>But I hadn’t done any of it. The code worked, it was correct, and I moved on. That’s the gap AI fills well: the difference between what you know you should do and what you actually get around to doing. Claude looked at the code, identified six concrete improvements, and applied them in a way that preserved the algorithm exactly. No clever tricks, just disciplined application of things any C++ programmer knows but doesn’t always prioritize.</p>
+<p>The speedup is real and useful. If you’re generating icospheres at runtime, going from 20ms to 1.3ms at n=100 matters. And the code is arguably cleaner now too, with less redundant data and fewer allocations to reason about.</p>
+<p>If you want to play with the icosphere interactively, check out the <a href="https://github.com/gumeo/polyscope">polyscope fork</a> which has visualization set up. The library itself is a single header and source file, easy to drop into any project.</p>  </div> <aside class="author-bio" data-astro-cid-ynhdph36> <img src="/avatar.png" alt="Guðmundur Einarsson" class="avatar" data-astro-cid-ynhdph36> <div class="author-info" data-astro-cid-ynhdph36> <strong class="author-name" data-astro-cid-ynhdph36>Guðmundur Einarsson</strong> <p class="author-role" data-astro-cid-ynhdph36>Statistician at <a href="https://www.tm.is" target="_blank" rel="noopener" data-astro-cid-ynhdph36>TM Insurance</a></p> <p class="author-blurb" data-astro-cid-ynhdph36>Interested in statistics, genetics and machine learning. PhD in Applied Mathematics from DTU.</p> <div class="author-links" data-astro-cid-ynhdph36> <a href="https://twitter.com/gumgumeo" target="_blank" rel="noopener" data-astro-cid-ynhdph36>X</a> <a href="https://github.com/gumeo" target="_blank" rel="noopener" data-astro-cid-ynhdph36>GitHub</a> <a href="https://www.linkedin.com/in/gudmundureinarsson/" target="_blank" rel="noopener" data-astro-cid-ynhdph36>LinkedIn</a> </div> </div> </aside>  <nav class="post-nav" data-astro-cid-gjtny2mx> <a href="/post/trust-will-define-the-ai-era/" class="post-nav-prev" data-astro-cid-gjtny2mx> <span class="nav-label" data-astro-cid-gjtny2mx>← Previous</span> <span class="nav-title" data-astro-cid-gjtny2mx>Trust Will Define the AI Era</span> </a>  </nav> </article>  </main> <footer data-astro-cid-sz7xmlte> <div class="footer-inner" data-astro-cid-sz7xmlte> <div class="social-links" data-astro-cid-sz7xmlte> <a href="https://twitter.com/gumgumeo" target="_blank" rel="noopener" data-astro-cid-sz7xmlte>X</a> <a href="https://github.com/gumeo" target="_blank" rel="noopener" data-astro-cid-sz7xmlte>GitHub</a> <a href="https://www.linkedin.com/in/gudmundureinarsson/" target="_blank" rel="noopener" data-astro-cid-sz7xmlte>LinkedIn</a> <a href="mailto:gudmundur.einarsson.phd@gmail.com" data-astro-cid-sz7xmlte>Email</a> <a href="/subscribe/" data-astro-cid-sz7xmlte>Subscribe</a> </div> <p class="copyright" data-astro-cid-sz7xmlte>© 2026 Guðmundur Einarsson</p> </div> </footer>  <script data-goatcounter="https://gumeo.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script> </body> </html> 
