@@ -1,0 +1,767 @@
+/* Dark Mode Styles for Deep Learning Course Presentations */
+/* University of Iceland Branding - Dark Mode Variant */
+
+/*********************************************
+ * DARK MODE COLOR VARIABLES
+ *********************************************/
+
+:root {
+  /* Dark mode backgrounds */
+  --dm-background: #1a1d2e;
+  --dm-background-secondary: #242838;
+  --dm-background-tertiary: #2d3142;
+
+  /* Dark mode text */
+  --dm-text: #e5e7eb;
+  --dm-text-secondary: #9ca3af;
+  --dm-text-muted: #6b7280;
+
+  /* Dark mode UI colors - adjusted for dark backgrounds */
+  --dm-primary: #5B54F5;          /* Lighter UI Blue */
+  --dm-teal: #3FE5CF;            /* Lighter Teal */
+  --dm-mint: #33FFCC;            /* Brighter Mint */
+  --dm-yellow: #FDD074;          /* Lighter Yellow */
+  --dm-coral: #FF9B9B;           /* Lighter Coral */
+  --dm-orange: #FFB380;          /* Lighter Orange */
+
+  /* Dark mode borders and dividers */
+  --dm-border: #3d4255;
+  --dm-border-light: #2d3142;
+
+  /* Dark mode code blocks */
+  --dm-code-bg: #1e2130;
+  --dm-code-border: #2d3142;
+}
+
+/*********************************************
+ * DARK MODE TOGGLE BUTTON
+ *********************************************/
+
+#dark-mode-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--ui-primary);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  user-select: none;
+}
+
+#dark-mode-toggle:hover {
+  background: var(--ui-teal);
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+#dark-mode-toggle:active {
+  transform: scale(0.95);
+}
+
+[data-theme="dark"] #dark-mode-toggle {
+  background: var(--dm-primary);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] #dark-mode-toggle:hover {
+  background: var(--dm-teal);
+}
+
+/*********************************************
+ * DARK MODE BASE STYLES
+ *********************************************/
+
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+[data-theme="dark"] .reveal-viewport {
+  background: var(--dm-background);
+  transition: background-color 0.3s ease;
+}
+
+[data-theme="dark"] .reveal {
+  color: var(--dm-text);
+}
+
+/* Ensure all text elements are light colored in dark mode */
+[data-theme="dark"] .reveal p,
+[data-theme="dark"] .reveal li,
+[data-theme="dark"] .reveal td,
+[data-theme="dark"] .reveal th,
+[data-theme="dark"] .reveal div,
+[data-theme="dark"] .reveal span:not(.tooltiptext),
+[data-theme="dark"] .reveal label,
+[data-theme="dark"] .reveal small,
+[data-theme="dark"] .reveal em,
+[data-theme="dark"] .reveal strong,
+[data-theme="dark"] .reveal b,
+[data-theme="dark"] .reveal i {
+  color: var(--dm-text);
+}
+
+[data-theme="dark"] .reveal ::selection {
+  background: var(--dm-primary);
+  color: var(--dm-text);
+}
+
+[data-theme="dark"] .reveal ::-moz-selection {
+  background: var(--dm-primary);
+  color: var(--dm-text);
+}
+
+/*********************************************
+ * DARK MODE HEADINGS
+ *********************************************/
+
+[data-theme="dark"] .reveal h1,
+[data-theme="dark"] .reveal h2,
+[data-theme="dark"] .reveal h3,
+[data-theme="dark"] .reveal h4,
+[data-theme="dark"] .reveal h5,
+[data-theme="dark"] .reveal h6 {
+  color: var(--dm-primary) !important;
+}
+
+/* Title slide specific styling */
+[data-theme="dark"] .reveal .title-slide h1 {
+  color: var(--dm-primary) !important;
+}
+
+[data-theme="dark"] .reveal .title-slide h2,
+[data-theme="dark"] .reveal .title-slide p,
+[data-theme="dark"] .reveal .title-slide small {
+  color: var(--dm-text) !important;
+}
+
+/*********************************************
+ * DARK MODE LINKS
+ *********************************************/
+
+[data-theme="dark"] .reveal a {
+  color: var(--dm-primary);
+}
+
+[data-theme="dark"] .reveal a:hover {
+  color: var(--dm-teal);
+}
+
+/*********************************************
+ * DARK MODE CODE BLOCKS
+ *********************************************/
+
+[data-theme="dark"] .reveal pre {
+  background: var(--dm-code-bg);
+  border: 1px solid var(--dm-code-border);
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .reveal code {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--dm-text);
+}
+
+[data-theme="dark"] .reveal .hljs {
+  background: var(--dm-code-bg);
+  color: var(--dm-text);
+  border: 1px solid var(--dm-code-border);
+}
+
+/*********************************************
+ * DARK MODE TABLES
+ *********************************************/
+
+[data-theme="dark"] .reveal table th,
+[data-theme="dark"] .reveal table td {
+  border-bottom: 1px solid var(--dm-border);
+}
+
+[data-theme="dark"] .reveal table th {
+  background: var(--dm-background-secondary);
+  color: var(--dm-text);
+}
+
+/*********************************************
+ * DARK MODE BLOCKQUOTES
+ *********************************************/
+
+[data-theme="dark"] .reveal blockquote {
+  background: var(--dm-background-secondary);
+  border-left: 4px solid var(--dm-primary);
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+}
+
+/*********************************************
+ * DARK MODE INTERACTIVE ELEMENTS
+ *********************************************/
+
+[data-theme="dark"] .interactive-demo {
+  background: var(--dm-background-secondary);
+  border: 1px solid var(--dm-border);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .control-panel {
+  background: var(--dm-background-tertiary);
+  border: 1px solid var(--dm-border);
+}
+
+[data-theme="dark"] .control-label {
+  color: var(--dm-text-secondary);
+}
+
+/*********************************************
+ * DARK MODE BUTTONS
+ *********************************************/
+
+[data-theme="dark"] .button {
+  background: var(--dm-yellow);
+  color: var(--dm-background);
+}
+
+[data-theme="dark"] .button:hover {
+  background: var(--dm-orange);
+}
+
+[data-theme="dark"] .button.secondary {
+  background: var(--dm-teal);
+}
+
+[data-theme="dark"] .button.secondary:hover {
+  background: var(--dm-mint);
+}
+
+/*********************************************
+ * DARK MODE NEURAL NETWORK VISUALIZATIONS
+ *********************************************/
+
+[data-theme="dark"] .neuron {
+  fill: var(--dm-primary);
+  stroke: var(--dm-background);
+  stroke-width: 2;
+}
+
+[data-theme="dark"] .neuron.hidden {
+  fill: var(--dm-teal);
+}
+
+[data-theme="dark"] .neuron.output {
+  fill: var(--dm-coral);
+}
+
+[data-theme="dark"] .connection {
+  stroke: var(--dm-border);
+}
+
+[data-theme="dark"] .connection.active {
+  stroke: var(--dm-orange);
+}
+
+/*********************************************
+ * DARK MODE MATH EQUATIONS
+ *********************************************/
+
+[data-theme="dark"] .math-colored {
+  background: var(--dm-background-secondary);
+  border: 1px solid var(--dm-border);
+}
+
+[data-theme="dark"] .math-input { color: var(--dm-primary); }
+[data-theme="dark"] .math-hidden { color: var(--dm-teal); }
+[data-theme="dark"] .math-output { color: var(--dm-coral); }
+[data-theme="dark"] .math-gradient { color: var(--dm-orange); }
+
+/*********************************************
+ * DARK MODE CUSTOM CLASSES
+ *********************************************/
+
+[data-theme="dark"] .reveal .emphasis-box {
+  background: rgba(91, 84, 245, 0.15);
+  border-left: 4px solid var(--dm-primary);
+}
+
+[data-theme="dark"] .reveal .emphasis-box p,
+[data-theme="dark"] .reveal .emphasis-box li,
+[data-theme="dark"] .reveal .emphasis-box span,
+[data-theme="dark"] .reveal .emphasis-box div {
+  color: var(--dm-text) !important;
+}
+
+[data-theme="dark"] .reveal .learning-objectives {
+  background: rgba(63, 229, 207, 0.15);
+  border: 2px solid var(--dm-teal);
+}
+
+[data-theme="dark"] .reveal .learning-objectives h3 {
+  color: var(--dm-teal);
+}
+
+[data-theme="dark"] .reveal .learning-objectives p,
+[data-theme="dark"] .reveal .learning-objectives li,
+[data-theme="dark"] .reveal .learning-objectives span {
+  color: var(--dm-text) !important;
+}
+
+/* Grid layouts and columns */
+[data-theme="dark"] .reveal .grid-2x2 p,
+[data-theme="dark"] .reveal .grid-2x2 div,
+[data-theme="dark"] .reveal .grid-2x2 span,
+[data-theme="dark"] .reveal .two-column p,
+[data-theme="dark"] .reveal .two-column li,
+[data-theme="dark"] .reveal .two-column div,
+[data-theme="dark"] .reveal .three-column p,
+[data-theme="dark"] .reveal .three-column li,
+[data-theme="dark"] .reveal .three-column div,
+[data-theme="dark"] .reveal .column p,
+[data-theme="dark"] .reveal .column li,
+[data-theme="dark"] .reveal .column div,
+[data-theme="dark"] .reveal .columns p,
+[data-theme="dark"] .reveal .columns li,
+[data-theme="dark"] .reveal .columns div {
+  color: var(--dm-text) !important;
+}
+
+/* Fragment elements */
+[data-theme="dark"] .reveal .fragment p,
+[data-theme="dark"] .reveal .fragment li,
+[data-theme="dark"] .reveal .fragment span:not(.tooltiptext),
+[data-theme="dark"] .reveal .fragment div {
+  color: var(--dm-text) !important;
+}
+
+/* Override inline styles for light backgrounds */
+[data-theme="dark"] .reveal div[style*="background: #f"],
+[data-theme="dark"] .reveal div[style*="background:#f"],
+[data-theme="dark"] .reveal div[style*="background: rgb(2"],
+[data-theme="dark"] .reveal div[style*="background:rgb(2"],
+[data-theme="dark"] .reveal div[style*="background: white"],
+[data-theme="dark"] .reveal div[style*="background:white"],
+[data-theme="dark"] .reveal div[style*="background-color: #f"],
+[data-theme="dark"] .reveal div[style*="background-color:#f"],
+[data-theme="dark"] .reveal div[style*="background-color: rgb(2"],
+[data-theme="dark"] .reveal div[style*="background-color:rgb(2"],
+[data-theme="dark"] .reveal div[style*="background-color: white"],
+[data-theme="dark"] .reveal div[style*="background-color:white"] {
+  background: var(--dm-background-secondary) !important;
+  background-color: var(--dm-background-secondary) !important;
+}
+
+/* Ensure ALL text in styled containers is visible - more aggressive */
+[data-theme="dark"] .reveal div[style*="background"] *,
+[data-theme="dark"] .reveal div[style*="padding"] *,
+[data-theme="dark"] .reveal div[style*="border"] * {
+  color: var(--dm-text) !important;
+}
+
+/* Extremely aggressive: any element with color styling gets overridden in dark mode */
+[data-theme="dark"] .reveal [style*="color: #"],
+[data-theme="dark"] .reveal [style*="color:#"],
+[data-theme="dark"] .reveal [style*="color: rgb"] {
+  color: var(--dm-text) !important;
+}
+
+/* NUCLEAR OPTION: Override ALL text colors in .reveal slides */
+[data-theme="dark"] .reveal .slides section p,
+[data-theme="dark"] .reveal .slides section div:not(.emphasis-box):not(.learning-objectives),
+[data-theme="dark"] .reveal .slides section span,
+[data-theme="dark"] .reveal .slides section li,
+[data-theme="dark"] .reveal .slides section td,
+[data-theme="dark"] .reveal .slides section small {
+  color: var(--dm-text) !important;
+}
+
+/* ULTRA NUCLEAR: Force ALL text elements to light color, regardless of inline styles */
+[data-theme="dark"] .reveal .slides p,
+[data-theme="dark"] .reveal .slides div,
+[data-theme="dark"] .reveal .slides span,
+[data-theme="dark"] .reveal .slides li,
+[data-theme="dark"] .reveal .slides td,
+[data-theme="dark"] .reveal .slides small,
+[data-theme="dark"] .reveal .slides em,
+[data-theme="dark"] .reveal .slides strong,
+[data-theme="dark"] .reveal .slides b,
+[data-theme="dark"] .reveal .slides i,
+[data-theme="dark"] .reveal .slides label,
+[data-theme="dark"] .reveal .slides .fragment,
+[data-theme="dark"] .reveal section p,
+[data-theme="dark"] .reveal section div,
+[data-theme="dark"] .reveal section span,
+[data-theme="dark"] .reveal section li {
+  color: var(--dm-text) !important;
+}
+
+/* Preserve heading colors even with nuclear option */
+[data-theme="dark"] .reveal .slides h1,
+[data-theme="dark"] .reveal .slides h2,
+[data-theme="dark"] .reveal .slides h3,
+[data-theme="dark"] .reveal .slides h4,
+[data-theme="dark"] .reveal h1,
+[data-theme="dark"] .reveal h2,
+[data-theme="dark"] .reveal h3,
+[data-theme="dark"] .reveal h4,
+[data-theme="dark"] .reveal h5,
+[data-theme="dark"] .reveal h6 {
+  color: var(--dm-primary) !important;
+}
+
+/* Preserve link colors */
+[data-theme="dark"] .reveal .slides a,
+[data-theme="dark"] .reveal a {
+  color: var(--dm-primary) !important;
+}
+
+/* Override ALL inline color styles - maximum specificity */
+[data-theme="dark"][data-theme="dark"] .reveal [style],
+[data-theme="dark"][data-theme="dark"] .reveal .slides [style] {
+  color: var(--dm-text) !important;
+}
+
+/* But headings and links still keep their colors even with inline styles */
+[data-theme="dark"][data-theme="dark"] .reveal h1[style],
+[data-theme="dark"][data-theme="dark"] .reveal h2[style],
+[data-theme="dark"][data-theme="dark"] .reveal h3[style],
+[data-theme="dark"][data-theme="dark"] .reveal h4[style],
+[data-theme="dark"][data-theme="dark"] .reveal a[style] {
+  color: var(--dm-primary) !important;
+}
+
+/*********************************************
+ * DARK MODE SOURCE MODAL
+ *********************************************/
+
+[data-theme="dark"] .source-modal {
+  background-color: rgba(0, 0, 0, 0.85);
+}
+
+[data-theme="dark"] .source-modal-content {
+  background: var(--dm-background-secondary);
+}
+
+[data-theme="dark"] .source-modal-header {
+  background: linear-gradient(135deg, var(--dm-primary), var(--dm-teal));
+}
+
+[data-theme="dark"] .source-modal-body {
+  color: var(--dm-text);
+}
+
+[data-theme="dark"] .source-modal-body h4 {
+  color: var(--dm-primary);
+}
+
+[data-theme="dark"] .source-list a {
+  color: var(--dm-primary);
+}
+
+[data-theme="dark"] .source-list a:hover {
+  color: var(--dm-teal);
+}
+
+[data-theme="dark"] .source-modal-body::-webkit-scrollbar-track {
+  background: var(--dm-background-tertiary);
+}
+
+[data-theme="dark"] .source-modal-body::-webkit-scrollbar-thumb {
+  background: var(--dm-border);
+}
+
+[data-theme="dark"] .source-modal-body::-webkit-scrollbar-thumb:hover {
+  background: var(--dm-border-light);
+}
+
+/*********************************************
+ * DARK MODE TOOLTIP MODAL
+ *********************************************/
+
+[data-theme="dark"] .tooltip-modal {
+  background-color: rgba(0, 0, 0, 0.85);
+}
+
+[data-theme="dark"] .tooltip-modal-content {
+  background: var(--dm-background-secondary);
+  color: var(--dm-text);
+  border: 1px solid var(--dm-border);
+}
+
+[data-theme="dark"] .tooltip-modal-close {
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .tooltip-modal-close:hover {
+  color: var(--dm-text);
+}
+
+/*********************************************
+ * DARK MODE MULTIPLE CHOICE QUESTIONS
+ *********************************************/
+
+[data-theme="dark"] .mcq-container {
+  background: var(--dm-background-secondary);
+  border: 2px solid var(--dm-border);
+}
+
+[data-theme="dark"] .mcq-question {
+  color: var(--dm-text);
+  border-bottom: 2px solid var(--dm-border);
+}
+
+[data-theme="dark"] .mcq-option {
+  background: var(--dm-background-tertiary);
+  border: 1px solid var(--dm-border);
+  color: var(--dm-text);
+}
+
+[data-theme="dark"] .mcq-option:hover {
+  background: var(--dm-background);
+  border-color: var(--dm-primary);
+}
+
+[data-theme="dark"] .mcq-option.selected {
+  background: var(--dm-background);
+  border-color: var(--dm-primary);
+}
+
+[data-theme="dark"] .mcq-option.correct {
+  background: rgba(63, 229, 207, 0.2);
+  border-color: var(--dm-teal);
+}
+
+[data-theme="dark"] .mcq-option.incorrect {
+  background: rgba(255, 155, 155, 0.2);
+  border-color: var(--dm-coral);
+}
+
+[data-theme="dark"] .mcq-explanation {
+  background: var(--dm-background-tertiary);
+  border-left: 4px solid var(--dm-primary);
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .mcq-submit-btn,
+[data-theme="dark"] .mcq-retry-btn {
+  background: var(--dm-primary);
+  color: white;
+}
+
+[data-theme="dark"] .mcq-submit-btn:hover,
+[data-theme="dark"] .mcq-retry-btn:hover {
+  background: var(--dm-teal);
+}
+
+/* ULTRA AGGRESSIVE MCQ DARK MODE - Override all inline styles AND quiz.css */
+
+/* MCQ Container backgrounds */
+[data-theme="dark"][data-theme="dark"] .mcq-container,
+[data-theme="dark"][data-theme="dark"] .mcq-container[style],
+[data-theme="dark"][data-theme="dark"] .mcq-wrapper .mcq-container {
+  background: var(--dm-background-secondary) !important;
+  background-color: var(--dm-background-secondary) !important;
+  border-color: var(--dm-border) !important;
+}
+
+/* MCQ Option labels - the white boxes */
+[data-theme="dark"][data-theme="dark"] .mcq-option-label,
+[data-theme="dark"][data-theme="dark"] .mcq-option .mcq-option-label,
+[data-theme="dark"][data-theme="dark"] .mcq-option-input + .mcq-option-label,
+[data-theme="dark"][data-theme="dark"] .mcq-option-input:checked + .mcq-option-label,
+[data-theme="dark"][data-theme="dark"] .mcq-option-input:disabled + .mcq-option-label {
+  background: var(--dm-background-tertiary) !important;
+  background-color: var(--dm-background-tertiary) !important;
+  border-color: var(--dm-border) !important;
+}
+
+/* Hover state for options */
+[data-theme="dark"][data-theme="dark"] .mcq-option-label:hover,
+[data-theme="dark"][data-theme="dark"] .mcq-option-input:disabled + .mcq-option-label:hover {
+  background: var(--dm-background) !important;
+  border-color: var(--dm-primary) !important;
+}
+
+/* Checked state */
+[data-theme="dark"][data-theme="dark"] .mcq-option-input:checked + .mcq-option-label {
+  background: var(--dm-background) !important;
+  border-color: var(--dm-primary) !important;
+}
+
+/* Correct answer styling */
+[data-theme="dark"][data-theme="dark"] .mcq-option.mcq-correct .mcq-option-label {
+  background: rgba(63, 229, 207, 0.15) !important;
+  border-color: var(--dm-teal) !important;
+}
+
+/* Incorrect answer styling */
+[data-theme="dark"][data-theme="dark"] .mcq-option.mcq-incorrect .mcq-option-label {
+  background: rgba(255, 155, 155, 0.15) !important;
+  border-color: var(--dm-coral) !important;
+}
+
+/* Explanation boxes */
+[data-theme="dark"][data-theme="dark"] .mcq-option-explanation,
+[data-theme="dark"][data-theme="dark"] .mcq-option.mcq-correct .mcq-option-explanation,
+[data-theme="dark"][data-theme="dark"] .mcq-option.mcq-incorrect .mcq-option-explanation {
+  background: var(--dm-background-tertiary) !important;
+  background-color: var(--dm-background-tertiary) !important;
+}
+
+/* Footer */
+[data-theme="dark"][data-theme="dark"] .mcq-footer {
+  background: var(--dm-background-secondary) !important;
+  border-top-color: var(--dm-border) !important;
+}
+
+/* Force ALL text in MCQ elements to be light colored */
+[data-theme="dark"][data-theme="dark"] .mcq-container,
+[data-theme="dark"][data-theme="dark"] .mcq-container *,
+[data-theme="dark"][data-theme="dark"] .mcq-option *,
+[data-theme="dark"][data-theme="dark"] .mcq-option-text,
+[data-theme="dark"][data-theme="dark"] .mcq-question,
+[data-theme="dark"][data-theme="dark"] .mcq-explanation-text,
+[data-theme="dark"][data-theme="dark"] .mcq-title {
+  color: var(--dm-text) !important;
+}
+
+/* Scrollbar for MCQ */
+[data-theme="dark"] .mcq-container::-webkit-scrollbar-track,
+[data-theme="dark"] .mcq-scroll-content::-webkit-scrollbar-track {
+  background: var(--dm-background-tertiary) !important;
+}
+
+[data-theme="dark"] .mcq-container::-webkit-scrollbar-thumb,
+[data-theme="dark"] .mcq-scroll-content::-webkit-scrollbar-thumb {
+  background: var(--dm-primary) !important;
+}
+
+/* Option indicator (radio/checkbox) */
+[data-theme="dark"] .mcq-option-indicator {
+  border-color: var(--dm-border) !important;
+}
+
+[data-theme="dark"] .mcq-option-input:checked + .mcq-option-label .mcq-option-indicator {
+  border-color: var(--dm-primary) !important;
+  background: var(--dm-primary) !important;
+}
+
+/*********************************************
+ * DARK MODE PROGRESS BAR
+ *********************************************/
+
+[data-theme="dark"] .progress-bar {
+  background: var(--dm-border);
+}
+
+[data-theme="dark"] .progress-fill {
+  background: var(--dm-yellow);
+}
+
+[data-theme="dark"] .reveal .progress {
+  background: var(--dm-border);
+  color: var(--dm-primary);
+}
+
+/*********************************************
+ * DARK MODE NAVIGATION CONTROLS
+ *********************************************/
+
+[data-theme="dark"] .reveal .controls {
+  color: var(--dm-primary);
+}
+
+/*********************************************
+ * DARK MODE FRAME HELPER
+ *********************************************/
+
+[data-theme="dark"] .reveal .r-frame {
+  border: 4px solid var(--dm-primary);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .reveal a:hover .r-frame {
+  border-color: var(--dm-teal);
+  box-shadow: 0 0 20px rgba(91, 84, 245, 0.5);
+}
+
+/*********************************************
+ * DARK MODE IMAGES & SVG
+ *********************************************/
+
+/* Slightly reduce brightness of images in dark mode for better integration */
+[data-theme="dark"] .reveal img:not(.ui-logo) {
+  opacity: 0.9;
+  filter: brightness(0.95);
+}
+
+/* Keep logo at full brightness */
+[data-theme="dark"] .reveal img.ui-logo {
+  opacity: 1;
+  filter: none;
+}
+
+/*********************************************
+ * DARK MODE SMOOTH TRANSITIONS
+ *********************************************/
+
+.reveal,
+.reveal-viewport,
+.reveal h1,
+.reveal h2,
+.reveal h3,
+.reveal h4,
+.reveal h5,
+.reveal h6,
+.reveal p,
+.reveal a,
+.reveal code,
+.reveal pre,
+.interactive-demo,
+.control-panel,
+.button,
+.emphasis-box,
+.learning-objectives,
+.source-modal-content,
+.tooltip-modal-content,
+.mcq-container,
+.mcq-option {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/*********************************************
+ * MOBILE ADJUSTMENTS
+ *********************************************/
+
+@media (max-width: 768px) {
+  #dark-mode-toggle {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    top: 15px;
+    right: 15px;
+  }
+}
+
+/*********************************************
+ * PRINT STYLES
+ *********************************************/
+
+@media print {
+  #dark-mode-toggle {
+    display: none;
+  }
+
+  /* Force light mode for printing */
+  [data-theme="dark"] .reveal-viewport {
+    background: white !important;
+  }
+
+  [data-theme="dark"] .reveal {
+    color: black !important;
+  }
+}

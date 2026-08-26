@@ -1,0 +1,301 @@
+/* Custom styles for Machine Learning Basics presentation */
+
+/* Math display styles */
+.math-display {
+    font-size: 1.2em;
+    margin: 1em 0;
+    text-align: center;
+}
+
+/* Visualization containers */
+#simple-network-viz,
+#overfitting-viz,
+#regression-demo,
+#clustering-viz-raw,
+#clustering-viz-labeled,
+#clustering-viz-kmeans,
+#rl-diagram {
+    width: 100%;
+    height: 400px;
+    margin: 1em auto;
+    background: var(--color-bg-secondary);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Larger container for loss landscape */
+#loss-landscape-viz {
+    width: 100%;
+    height: 500px;
+    margin: 1em auto;
+    background: var(--color-bg-secondary);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Interactive demo controls */
+.demo-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1em;
+    margin-top: 1em;
+}
+
+.demo-controls button {
+    padding: 0.5em 1em;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.demo-controls button:hover {
+    background: var(--color-primary-dark);
+}
+
+.demo-controls input[type="range"] {
+    width: 200px;
+}
+
+/* Network visualization styles */
+.neuron {
+    stroke: var(--color-primary);
+    stroke-width: 2;
+    transition: all 0.3s;
+}
+
+.neuron.input {
+    fill: var(--color-primary);
+}
+
+.neuron.hidden {
+    fill: var(--color-accent);
+}
+
+.neuron.output {
+    fill: var(--color-error);
+}
+
+.connection {
+    stroke-width: 1;
+    fill: none;
+    opacity: 0.6;
+    transition: all 0.3s;
+}
+
+.connection.active {
+    stroke: var(--color-warning);
+    stroke-width: 2;
+    opacity: 1;
+}
+
+/* Loss landscape visualization */
+.contour-line {
+    fill: none;
+    stroke: var(--color-primary);
+    stroke-width: 1;
+    opacity: 0.3;
+}
+
+.gradient-arrow {
+    fill: var(--color-error);
+    stroke: none;
+}
+
+.current-position {
+    fill: var(--color-warning);
+    stroke: var(--color-primary);
+    stroke-width: 2;
+}
+
+/* Regression demo styles */
+.data-point {
+    fill: var(--color-primary);
+    stroke: white;
+    stroke-width: 1;
+    opacity: 0.8;
+    transition: all 0.3s;
+}
+
+.data-point:hover {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.regression-line {
+    stroke: var(--color-error);
+    stroke-width: 3;
+    fill: none;
+}
+
+.prediction-band {
+    fill: var(--color-error);
+    opacity: 0.1;
+}
+
+/* Classification demo styles */
+.class-region {
+    opacity: 0.3;
+    transition: opacity 0.3s;
+}
+
+.class-boundary {
+    stroke: var(--color-primary);
+    stroke-width: 2;
+    fill: none;
+    stroke-dasharray: 5,5;
+}
+
+.class-point {
+    stroke: white;
+    stroke-width: 2;
+    transition: all 0.3s;
+}
+
+.class-0 {
+    fill: var(--color-primary);
+}
+
+.class-1 {
+    fill: var(--color-error);
+}
+
+.class-2 {
+    fill: var(--color-success);
+}
+
+/* Clustering visualization */
+.cluster-point {
+    opacity: 0.8;
+    transition: all 0.5s;
+}
+
+.cluster-center {
+    stroke: black;
+    stroke-width: 2;
+    fill: white;
+}
+
+/* RL diagram styles */
+.rl-component {
+    stroke-width: 2;
+    rx: 8;
+}
+
+.rl-arrow {
+    marker-end: url(#arrowhead);
+    stroke-width: 2;
+    fill: none;
+}
+
+.rl-label {
+    text-anchor: middle;
+    font-size: 0.9em;
+    fill: var(--color-text);
+}
+
+/* Animation keyframes */
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+@keyframes flow {
+    0% {
+        offset-distance: 0%;
+    }
+    100% {
+        offset-distance: 100%;
+    }
+}
+
+/* Code example styling */
+.reveal pre {
+    box-shadow: none;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-secondary);
+}
+
+.reveal pre code {
+    padding: 1em;
+    line-height: 1.4;
+}
+
+/* Table styling */
+.reveal table {
+    margin: 0 auto;
+    border-collapse: collapse;
+}
+
+.reveal table th,
+.reveal table td {
+    border: 1px solid var(--color-border);
+    padding: 0.5em 1em;
+}
+
+.reveal table th {
+    background: var(--color-primary);
+    color: white;
+    font-weight: bold;
+    text-align: center;
+}
+
+.reveal table td {
+    text-align: center;
+}
+
+/* Two-column layout */
+.columns {
+    display: flex;
+    gap: 2em;
+    align-items: flex-start;
+}
+
+.column {
+    flex: 1;
+}
+
+/* Remove emphasis box override - use default from reveal-theme.css */
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .columns {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .column {
+        width: 100%;
+        text-align: center;
+    }
+    
+    #simple-network-viz,
+    #overfitting-viz,
+    #loss-landscape-viz,
+    #regression-demo,
+    #clustering-viz-raw,
+    #clustering-viz-labeled,
+    #clustering-viz-kmeans,
+    #rl-diagram {
+        height: 300px;
+    }
+    
+    .demo-controls {
+        flex-direction: column;
+        align-items: center;
+    }
+}

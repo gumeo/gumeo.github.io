@@ -1,0 +1,454 @@
+/**
+ * Multiple Choice Question Styles
+ * University of Iceland - Introduction to Deep Learning
+ * 
+ * Color Palette:
+ * Primary: #10099F (UI Blue)
+ * Teal: #2DD2C0
+ * Mint: #00FFBA
+ * Yellow: #FAC55B
+ * Coral: #FC8484
+ * Orange: #FFA05F
+ * Light Gray: #EEEEEE
+ * Lighter Gray: #F5F5F5
+ * Dark: #262626
+ */
+
+/* Ensure vertical slides with MCQs are properly centered */
+.reveal .slides section[data-mcq] {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Keep existing title at top while centering MCQ container */
+.reveal .slides section[data-mcq] > h2 {
+    margin-bottom: auto;
+    padding-top: 50px;
+}
+
+/* Center the MCQ container within the available space */
+.reveal .slides section[data-mcq] > [data-mcq] {
+    margin: auto;
+    max-width: 90%;
+}
+
+/* Wrapper for fixed height container */
+.mcq-wrapper {
+    max-width: 800px;
+    height: 500px;  /* Fixed height for consistent sizing */
+    margin: 0 auto;
+    position: relative;
+}
+
+.mcq-container {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    background: #FFFFFF;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(16, 9, 159, 0.1);
+    border: 1px solid #EEEEEE;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;  /* Prevent container overflow */
+}
+
+/* Custom scrollbar styling */
+.mcq-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.mcq-container::-webkit-scrollbar-track {
+    background: #F5F5F5;
+    border-radius: 4px;
+}
+
+.mcq-container::-webkit-scrollbar-thumb {
+    background: #10099F;
+    border-radius: 4px;
+    opacity: 0.6;
+}
+
+.mcq-container::-webkit-scrollbar-thumb:hover {
+    background: #0D077F;
+}
+
+.mcq-header {
+    margin-bottom: 10px;
+    text-align: center;
+    flex-shrink: 0;  /* Prevent header from shrinking */
+}
+
+/* Scrollable content area */
+.mcq-scroll-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin: 10px 0;
+    padding-right: 8px;  /* Space for scrollbar */
+    min-height: 0;  /* Important for Firefox */
+}
+
+.mcq-title {
+    color: #10099F;
+    font-size: 0.9em;
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-family: 'Atkinson Hyperlegible', 'Source Sans Pro', Helvetica, sans-serif;
+}
+
+.mcq-question {
+    color: #262626;
+    font-size: 0.75em;
+    line-height: 1.3;
+    margin-bottom: 6px;
+}
+
+.mcq-instruction {
+    color: #666;
+    font-size: 0.65em;
+    font-style: italic;
+    margin-top: 4px;
+}
+
+.mcq-options {
+    /* Remove scrolling from options, now handled by scroll-content */
+    margin: 0;
+    padding: 0;
+}
+
+/* Custom scrollbar for scroll content */
+.mcq-scroll-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.mcq-scroll-content::-webkit-scrollbar-track {
+    background: #F5F5F5;
+    border-radius: 4px;
+}
+
+.mcq-scroll-content::-webkit-scrollbar-thumb {
+    background: #10099F;
+    border-radius: 4px;
+    opacity: 0.6;
+}
+
+.mcq-scroll-content::-webkit-scrollbar-thumb:hover {
+    background: #0D077F;
+}
+
+.mcq-option {
+    position: relative;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.mcq-option-input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.mcq-option-label {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    background: #F5F5F5;
+    border: 2px solid #EEEEEE;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.mcq-option-label:hover {
+    background: #00FFBA;
+    background: linear-gradient(135deg, #F5F5F5 0%, rgba(0, 255, 186, 0.1) 100%);
+    border-color: #2DD2C0;
+    transform: translateX(5px);
+}
+
+.mcq-option-input:checked + .mcq-option-label {
+    background: linear-gradient(135deg, #FFFFFF 0%, rgba(16, 9, 159, 0.05) 100%);
+    border-color: #10099F;
+    box-shadow: 0 2px 8px rgba(16, 9, 159, 0.15);
+}
+
+.mcq-option-input:disabled + .mcq-option-label {
+    cursor: default;
+    opacity: 0.9;
+}
+
+.mcq-option-input:disabled + .mcq-option-label:hover {
+    transform: none;
+}
+
+.mcq-option-indicator {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #EEEEEE;
+    border-radius: 50%;
+    margin-right: 12px;
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+input[type="checkbox"] + .mcq-option-label .mcq-option-indicator {
+    border-radius: 4px;
+}
+
+.mcq-option-input:checked + .mcq-option-label .mcq-option-indicator {
+    border-color: #10099F;
+    background: #10099F;
+}
+
+.mcq-option-input:checked + .mcq-option-label .mcq-option-indicator::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.mcq-option-text {
+    color: #262626;
+    font-size: 0.7em;
+    line-height: 1.25;
+    flex: 1;
+}
+
+.mcq-option-explanation {
+    margin-top: 6px;
+    margin-left: 32px;
+    padding: 8px;
+    background: #F5F5F5;
+    border-left: 3px solid #EEEEEE;
+    border-radius: 4px;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+}
+
+.mcq-option-explanation.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.mcq-explanation-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 6px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 20px;
+    font-weight: bold;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.mcq-icon-correct {
+    background: #2DD2C0;
+    color: white;
+}
+
+.mcq-icon-incorrect {
+    background: #FC8484;
+    color: white;
+}
+
+.mcq-explanation-text {
+    display: inline;
+    color: #262626;
+    font-size: 0.65em;
+    line-height: 1.3;
+}
+
+.mcq-option.mcq-correct .mcq-option-label {
+    background: linear-gradient(135deg, #FFFFFF 0%, rgba(45, 210, 192, 0.1) 100%);
+    border-color: #2DD2C0;
+}
+
+.mcq-option.mcq-correct .mcq-option-explanation {
+    border-left-color: #2DD2C0;
+    background: linear-gradient(135deg, #F5F5F5 0%, rgba(45, 210, 192, 0.05) 100%);
+}
+
+.mcq-option.mcq-incorrect .mcq-option-label {
+    background: linear-gradient(135deg, #FFFFFF 0%, rgba(252, 132, 132, 0.1) 100%);
+    border-color: #FC8484;
+}
+
+.mcq-option.mcq-incorrect .mcq-option-explanation {
+    border-left-color: #FC8484;
+    background: linear-gradient(135deg, #F5F5F5 0%, rgba(252, 132, 132, 0.05) 100%);
+}
+
+.mcq-footer {
+    text-align: center;
+    margin-top: auto;  /* Push to bottom */
+    /* Keep footer always visible */
+    flex-shrink: 0;
+    padding-top: 10px;
+    border-top: 1px solid #EEEEEE;
+    background: white;
+}
+
+.mcq-submit-btn,
+.mcq-reset-btn {
+    padding: 8px 20px;
+    font-size: 0.75em;
+    font-weight: 600;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Atkinson Hyperlegible', 'Source Sans Pro', Helvetica, sans-serif;
+}
+
+.mcq-submit-btn {
+    background: #10099F;
+    color: white;
+}
+
+.mcq-submit-btn:hover:not(:disabled) {
+    background: #0D077F;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 9, 159, 0.3);
+}
+
+.mcq-submit-btn:disabled {
+    background: #EEEEEE;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.mcq-reset-btn {
+    background: #FFA05F;
+    color: white;
+}
+
+.mcq-reset-btn:hover {
+    background: #FF8940;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 160, 95, 0.3);
+}
+
+.mcq-feedback {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    /* Keep feedback visible */
+    flex-shrink: 0;
+}
+
+.mcq-feedback.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.mcq-success {
+    color: #2DD2C0;
+    font-size: 0.75em;
+    font-weight: 600;
+}
+
+.mcq-error {
+    color: #FC8484;
+    font-size: 0.75em;
+    font-weight: 600;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .mcq-wrapper {
+        height: 450px;  /* Slightly smaller on mobile */
+    }
+    
+    .mcq-container {
+        padding: 8px;
+        text-align: center;
+    }
+    
+    .mcq-title {
+        font-size: 0.8em;
+    }
+    
+    .mcq-question {
+        font-size: 0.7em;
+    }
+    
+    .mcq-option-label {
+        padding: 6px;
+    }
+    
+    .mcq-option-indicator {
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
+    }
+    
+    .mcq-option-explanation {
+        margin-left: 24px;
+        padding: 6px;
+    }
+    
+    .mcq-submit-btn,
+    .mcq-reset-btn {
+        padding: 6px 16px;
+        font-size: 0.7em;
+    }
+}
+
+/* Animation for slide-in effect */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mcq-wrapper {
+    animation: slideIn 0.5s ease-out;
+}
+
+/* Accessibility - Focus styles */
+.mcq-option-input:focus + .mcq-option-label {
+    outline: 3px solid #10099F;
+    outline-offset: 2px;
+}
+
+.mcq-submit-btn:focus,
+.mcq-reset-btn:focus {
+    outline: 3px solid #10099F;
+    outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+    .mcq-container {
+        box-shadow: none;
+        border: 1px solid #262626;
+    }
+    
+    .mcq-submit-btn,
+    .mcq-reset-btn {
+        display: none;
+    }
+}

@@ -1,0 +1,494 @@
+/* Common styles for all Deep Learning course presentations */
+
+:root {
+  /* University of Iceland Brand Colors */
+  --ui-primary: #10099F;          /* Main UI Blue */
+  --ui-teal: #2DD2C0;            /* Supporting color */
+  --ui-mint: #00FFBA;            /* Supporting color */
+  --ui-yellow: #FAC55B;          /* Supporting color */
+  --ui-coral: #FC8484;           /* Supporting color */
+  --ui-orange: #FFA05F;          /* Supporting color */
+  --ui-light-gray: #EEEEEE;      /* Supporting color */
+  --ui-lighter-gray: #F5F5F5;    /* Supporting color */
+  --ui-dark: #262626;            /* Supporting color */
+  
+  /* Color Palette for Neural Network Visualizations */
+  --color-input: var(--ui-primary);     /* Blue - Input layers */
+  --color-hidden: var(--ui-teal);       /* Teal - Hidden layers */
+  --color-output: var(--ui-coral);      /* Coral - Output layers */
+  --color-gradient: var(--ui-orange);   /* Orange - Gradients */
+  --color-weight-min: var(--ui-light-gray);  /* Light gray - Small weights */
+  --color-weight-max: var(--ui-dark);        /* Dark gray - Large weights */
+  
+  /* Additional colors */
+  --color-background: #FFFFFF;
+  --color-text: var(--ui-dark);
+  --color-text-secondary: #666666;
+  --color-accent: var(--ui-yellow);
+  --color-success: var(--ui-teal);
+  --color-error: var(--ui-coral);
+  
+  /* Typography */
+  --font-main: 'Atkinson Hyperlegible', 'Source Sans Pro', Helvetica, sans-serif;
+  --font-heading: 'Atkinson Hyperlegible', 'Source Sans Pro', Helvetica, sans-serif;
+  --font-code: 'Source Code Pro', monospace;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 4rem;
+  
+  /* Animations */
+  --transition-fast: 0.2s ease-in-out;
+  --transition-normal: 0.3s ease-in-out;
+  --transition-slow: 0.5s ease-in-out;
+}
+
+/* Base styles */
+.reveal {
+  font-family: var(--font-main);
+  font-size: 36px;
+  font-weight: normal;
+  color: var(--color-text);
+}
+
+.reveal h1,
+.reveal h2,
+.reveal h3,
+.reveal h4,
+.reveal h5,
+.reveal h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: normal;
+  text-transform: none;
+  text-shadow: none;
+  word-wrap: break-word;
+}
+
+.reveal h1 { font-size: 2.5em; }
+.reveal h2 { font-size: 1.8em; }
+.reveal h3 { font-size: 1.3em; }
+.reveal h4 { font-size: 1em; }
+
+/* Code blocks */
+.reveal pre {
+  display: block;
+  position: relative;
+  width: 90%;
+  margin: var(--spacing-md) auto;
+  text-align: left;
+  font-size: 0.55em;
+  font-family: var(--font-code);
+  line-height: 1.2em;
+  word-wrap: break-word;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.reveal code {
+  font-family: var(--font-code);
+  text-transform: none;
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 0 var(--spacing-xs);
+  border-radius: 3px;
+}
+
+/* Title slide logo positioning */
+.title-slide .ui-logo {
+  position: absolute;
+  top: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 330px;
+  z-index: 10;
+}
+
+/* Adjust title position to account for logo */
+.title-slide h1 {
+  margin-top: 240px;
+}
+
+/* Interactive elements */
+.interactive-demo {
+  margin: var(--spacing-lg) auto;
+  padding: var(--spacing-lg);
+  background: var(--ui-lighter-gray);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--ui-light-gray);
+}
+
+.control-panel {
+  background: var(--ui-lighter-gray);
+  padding: var(--spacing-md);
+  border-radius: 4px;
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--ui-light-gray);
+}
+
+.control-group {
+  margin-bottom: var(--spacing-sm);
+}
+
+.control-label {
+  display: inline-block;
+  min-width: 120px;
+  font-size: 0.8em;
+  color: var(--color-text-secondary);
+}
+
+/* Buttons */
+.button {
+  background: var(--color-accent);
+  color: white;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 4px;
+  font-size: 0.8em;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.button:hover {
+  background: var(--ui-orange);
+}
+
+.button.secondary {
+  background: var(--color-hidden);
+}
+
+.button.secondary:hover {
+  background: var(--ui-mint);
+}
+
+/* Neural Network Visualization Common Styles */
+.neural-network {
+  margin: var(--spacing-md) auto;
+}
+
+.neuron {
+  fill: var(--color-input);
+  stroke: white;
+  stroke-width: 2;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.neuron.hidden {
+  fill: var(--color-hidden);
+}
+
+.neuron.output {
+  fill: var(--color-output);
+}
+
+.neuron:hover {
+  transform: scale(1.1);
+}
+
+.connection {
+  stroke: #CCCCCC;
+  stroke-width: 2;
+  fill: none;
+  opacity: 0.6;
+  transition: all var(--transition-normal);
+}
+
+.connection.active {
+  stroke: var(--color-gradient);
+  stroke-width: 3;
+  opacity: 1;
+}
+
+/* Math equations with color coding */
+.math-colored {
+  padding: var(--spacing-sm);
+  border-radius: 4px;
+  background: var(--ui-lighter-gray);
+  border: 1px solid var(--ui-light-gray);
+}
+
+.math-input { color: var(--color-input); }
+.math-hidden { color: var(--color-hidden); }
+.math-output { color: var(--color-output); }
+.math-gradient { color: var(--color-gradient); }
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInFromLeft {
+  from { transform: translateX(-50px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInFromRight {
+  from { transform: translateX(50px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.fade-in {
+  animation: fadeIn var(--transition-normal);
+}
+
+.slide-in-left {
+  animation: slideInFromLeft var(--transition-normal);
+}
+
+.slide-in-right {
+  animation: slideInFromRight var(--transition-normal);
+}
+
+.pulse {
+  animation: pulse 1s infinite;
+}
+
+/* Utility classes */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+
+.mb-sm { margin-bottom: var(--spacing-sm); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }
+
+/* Progress indicators */
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--ui-light-gray);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: var(--spacing-md) 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--color-accent);
+  transition: width var(--transition-normal);
+}
+
+/* Three-column layout */
+.reveal .three-column {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5em;
+  align-items: flex-start;
+  margin: 1em 0;
+}
+
+.reveal .three-column .column {
+  padding: 0 0.5em;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .reveal {
+    font-size: 28px;
+  }
+  
+  .interactive-demo {
+    padding: var(--spacing-md);
+  }
+  
+  .control-label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  /* Three-column responsive */
+  .reveal .three-column {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Source Icon System */
+.source-icon {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  font-size: 1.5em;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.3s ease, transform 0.2s ease;
+  z-index: 100;
+  user-select: none;
+}
+
+.source-icon:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Source Modal Styles */
+.source-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.source-modal.show {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+}
+
+.source-modal-content {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 0;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+.source-modal.show .source-modal-content {
+  transform: scale(1);
+}
+
+.source-modal-header {
+  background: linear-gradient(135deg, var(--ui-primary), var(--ui-teal));
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 12px 12px 0 0;
+}
+
+.source-modal-header h3 {
+  margin: 0;
+  color: white;
+  font-size: 1.4em;
+}
+
+.source-modal-close {
+  color: white;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 20px;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.source-modal-close:hover {
+  opacity: 1;
+}
+
+.source-modal-body {
+  padding: 30px;
+  max-height: calc(80vh - 80px);
+  overflow-y: auto;
+}
+
+.source-modal-body h4 {
+  color: var(--ui-primary);
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-size: 1.1em;
+}
+
+.source-modal-body h4:first-child {
+  margin-top: 0;
+}
+
+.source-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.source-list li {
+  padding: 8px 0;
+  line-height: 1.6;
+}
+
+.source-list a {
+  color: var(--ui-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.source-list a:hover {
+  color: var(--ui-teal);
+  text-decoration: underline;
+}
+
+.source-section {
+  margin-bottom: 25px;
+}
+
+.source-section:last-child {
+  margin-bottom: 0;
+}
+
+/* Custom scrollbar for modal */
+.source-modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.source-modal-body::-webkit-scrollbar-track {
+  background: var(--ui-lighter-gray);
+  border-radius: 4px;
+}
+
+.source-modal-body::-webkit-scrollbar-thumb {
+  background: var(--ui-light-gray);
+  border-radius: 4px;
+}
+
+.source-modal-body::-webkit-scrollbar-thumb:hover {
+  background: #CCCCCC;
+}
+
+/* Truncated Title Styles - Auto font-size adjustment */
+.truncate-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  transition: font-size var(--transition-normal);
+  line-height: 1.2;
+}
+
+/* Visual indicator when font size has been reduced */
+.truncate-title[data-font-reduced="true"] {
+  opacity: 0.95; /* Slightly subtle to indicate size reduction */
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+  .truncate-title {
+    /* Allow more aggressive font size reduction on mobile */
+    min-font-size: 0.5em;
+  }
+}

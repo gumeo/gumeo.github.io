@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introduction to Deep Learning</title>
+    
+    <!-- Reveal.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+    <link rel="stylesheet" href="../shared/css/reveal-theme.css">
+    <link rel="stylesheet" href="../shared/css/common.css">
+    <link rel="stylesheet" href="css/intro-custom.css">
+    
+    <!-- Code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.css">
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            
+            <!-- Title Slide -->
+            <section class="title-slide">
+                <img src="../shared/images/uoi_logo_blue.png" alt="University of Iceland Logo" class="ui-logo">
+                <h1>Introduction to Deep Learning</h1>
+                <p>Based on "Dive into Deep Learning" by Zhang et al.</p>
+                <p class="mt-lg">
+                    <small>Instructors: Guðmundur Einarsson &amp; Hlynur Davíð Hlynsson</small><br>
+                    <small>University of Iceland</small>
+                </p>
+            </section>
+
+            <!-- Teacher Introduction Slide -->
+            <section>
+                <h2 class="truncate-title">Teacher Introduction</h2>
+                <div class="columns">
+                    <div class="column">
+                        <h4>Guðmundur Einarsson</h4>
+                        <ul style="font-size: 0.85em;">
+                            <li class="fragment">Teaches <strong>weeks 1–5</strong></li>
+                            <li class="fragment">Theoretical foundations of deep learning</li>
+                            <li class="fragment">gue20@hi.is</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h4>Hlynur Davíð Hlynsson</h4>
+                        <ul style="font-size: 0.85em;">
+                            <li class="fragment">Teaches the <strong>latter part</strong> of the course</li>
+                            <li class="fragment">Applied aspects of deep learning</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="fragment mt-lg emphasis-box" style="font-size: 0.85em;">
+                    Together, you'll get a solid theoretical foundation followed by hands-on, applied experience.
+                </p>
+            </section>
+
+            <!-- Course Overview Slide -->
+            <section>
+                <h2 class="truncate-title">Deep Neural Networks – Course Overview</h2>
+                <p style="font-size: 0.9em; text-align: left; margin: 0.5em 0;">
+                    This course introduces <strong>deep neural networks</strong> and the powerful methods associated with them.
+                </p>
+                <div style="font-size: 0.85em; text-align: left;">
+                    <p class="fragment">We will cover:</p>
+                    <ul>
+                        <li class="fragment">Design and function of networks for various tasks</li>
+                        <li class="fragment">Image, audio, and text analysis</li>
+                        <li class="fragment">Solid theoretical foundation</li>
+                        <li class="fragment">Practical implementation using <span class="tooltip">PyTorch<span class="tooltiptext">PyTorch is an open-source machine learning library developed by Facebook's AI Research lab. It provides a flexible and intuitive framework for building and training neural networks with dynamic computation graphs and automatic differentiation.</span></span></li>
+                    </ul>
+                    <p class="fragment" style="margin-top: 1em;">
+                        The course emphasizes <strong>active participation</strong> through assignments and quizzes, 
+                        concluding with a larger <strong>final project</strong> where you'll tackle a real-world problem.
+                    </p>
+                </div>
+            </section>
+            
+            <!-- Learning Outcomes Slide -->
+            <section>
+                <h2 class="truncate-title">Learning Outcomes</h2>
+                <p style="font-size: 0.9em;">Upon completion of the course, you will be able to:</p>
+                <ol style="font-size: 0.85em;">
+                    <li class="fragment">
+                        <strong>Explain</strong> the fundamental concepts and mechanics of deep neural networks
+                    </li>
+                    <li class="fragment">
+                        <strong>Train</strong> deep neural networks to solve practical problems
+                    </li>
+                    <li class="fragment">
+                        <strong>Utilize</strong> the PyTorch library for model implementation
+                    </li>
+                    <li class="fragment">
+                        <strong>Differentiate</strong> between and apply major types of neural networks:
+                        <ul style="font-size: 0.9em; margin-top: 0.3em;">
+                            <li>Convolutional Neural Networks (CNNs)</li>
+                            <li>Recurrent Neural Networks (RNNs)</li>
+                            <li>Generative Models</li>
+                        </ul>
+                    </li>
+                    <li class="fragment">
+                        <strong>Design and implement</strong> solutions for a variety of tasks using deep neural networks
+                    </li>
+                </ol>
+            </section>
+            
+            <!-- Course Schedule Part 1 -->
+            <section>
+                <h2 class="truncate-title">Course schedule (Weeks 1-6)</h2>
+                <table style="font-size: 0.75em; width: 100%;">
+                    <thead>
+                        <tr>
+                            <th style="width: 15%;">Week</th>
+                            <th style="width: 60%;">Topic</th>
+                            <th style="width: 25%;">Assessment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="fragment">
+                            <td>1</td>
+                            <td style="text-align: left;">Course introduction, supervised learning, multi-layer neural networks</td>
+                            <td>-</td>
+                        </tr>
+                        <tr class="fragment">
+                            <td>2</td>
+                            <td style="text-align: left;">Training neural networks: Optimization, regularization, backpropagation</td>
+                            <td style="color: var(--color-warning);">Quiz 1</td>
+                        </tr>
+                        <tr class="fragment">
+                            <td>3</td>
+                            <td style="text-align: left;">Convolutional Neural Networks (CNNs) for images and time series</td>
+                            <td style="color: var(--color-accent);">Assignment 1</td>
+                        </tr>
+                        <tr class="fragment">
+                            <td>4</td>
+                            <td style="text-align: left;">CNNs (continued) and Transfer Learning</td>
+                            <td style="color: var(--color-warning);">Quiz 2</td>
+                        </tr>
+                        <tr class="fragment">
+                            <td>5</td>
+                            <td style="text-align: left;">Recurrent Neural Networks (RNNs) and sequence models</td>
+                            <td style="color: var(--color-accent);">Assignment 2</td>
+                        </tr>
+                        <tr class="fragment">
+                            <td>6</td>
+                            <td style="text-align: left;"></td>
+                            <td style="color: var(--color-warning);">Quiz 3</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="font-size: 0.7em; font-style: italic; margin-top: 1em;">*Subject to change</p>
+            </section>
+            
+            <!-- Course Schedule Part 2: Handoff -->
+            <section>
+                <h2 class="truncate-title">Course Schedule (Remaining Weeks)</h2>
+                <div class="fragment mt-lg emphasis-box">
+                    <p>From this point on, <strong>Hlynur Davíð Hlynsson</strong> will take over the course and present the remaining material, focusing on applied aspects of deep learning.</p>
+                </div>
+                <p class="fragment" style="font-size: 0.85em; margin-top: 1em;">The detailed schedule for these weeks will be announced by Hlynur when he takes over.</p>
+            </section>
+            
+            <!-- Course Logistics -->
+            <section>
+                <h2 class="truncate-title">Course Logistics</h2>
+                <div style="font-size: 0.85em;">
+                    <div class="fragment">
+                        <h3 style="color: var(--color-primary); font-size: 1.2em; margin-bottom: 0.3em;">📚 Textbook</h3>
+                        <p><strong>Dive Into Deep Learning</strong> (Zhang et al., 2022)</p>
+                        <p style="font-size: 0.9em; color: var(--color-accent);">Available online free of charge at <a href="https://d2l.ai" target="_blank">d2l.ai</a></p>
+                    </div>
+                    
+                    <div class="fragment" style="margin-top: 1.2em;">
+                        <h3 style="color: var(--color-primary); font-size: 1.2em; margin-bottom: 0.3em;">📅 Schedule</h3>
+                        <ul style="list-style: none; padding-left: 0;">
+                            <li><strong>Lectures:</strong> Thursdays 10:00–12:20 in Gr-321</li>
+                            <li><strong>Problem Sessions & Quizzes:</strong> Tuesdays 8:20–9:50 in Gr-321</li>
+                        </ul>
+                        <p style="font-size: 0.9em; font-style: italic;">Problem sessions provide an opportunity to work on assignments with assistance</p>
+                    </div>
+                    
+                    <div class="fragment" style="margin-top: 1.2em;">
+                        <h3 style="color: var(--color-primary); font-size: 1.2em; margin-bottom: 0.3em;">🌐 Course Website</h3>
+                        <p><strong>Canvas</strong> is the main platform for the course</p>
+                        <p style="font-size: 0.9em;">All teaching materials, assignments, announcements, and discussions</p>
+                        <p style="font-size: 0.9em; color: var(--color-warning);">⚠️ Check Canvas regularly!</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Assessment & Grading -->
+            <section>
+                <h2 class="truncate-title">Assessment & Grading</h2>
+                <div style="font-size: 0.85em;">
+                    <div class="fragment">
+                        <h3 style="color: var(--color-primary); font-size: 1.2em; margin-bottom: 0.5em;">Grade Distribution</h3>
+                        <div style="display: flex; justify-content: space-around; align-items: center; margin: 1em 0;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 2em; color: var(--color-accent); font-weight: bold;">10%</div>
+                                <div>Assignments</div>
+                                <div style="font-size: 0.8em; color: var(--color-text-secondary);">(2% each)</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 2em; color: var(--color-accent); font-weight: bold;">25%</div>
+                                <div>Quizzes</div>
+                                <div style="font-size: 0.8em; color: var(--color-text-secondary);">(5% each)</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 2em; color: var(--color-warning); font-weight: bold;">15%</div>
+                                <div>Final Project</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 2em; color: var(--color-error); font-weight: bold;">50%</div>
+                                <div>Final Exam</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="fragment" style="margin-top: 1.5em;">
+                        <h3 style="color: var(--color-primary); font-size: 1.2em; margin-bottom: 0.5em;">Passing Requirements</h3>
+                        <ul>
+                            <li><strong>Undergraduate:</strong> Total grade ≥ 5.0, Final exam ≥ 5.0</li>
+                            <li><strong>Master's:</strong> Total grade ≥ 6.0, Final exam ≥ 6.0</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="fragment" style="margin-top: 1em;">
+                        <h3 style="color: var(--color-primary); font-size: 1.2em; margin-bottom: 0.5em;">Eligibility for Final Exam</h3>
+                        <p style="color: var(--color-warning);">⚠️ By end of week 7, must have:</p>
+                        <ul style="font-size: 0.9em;">
+                            <li>Submitted 2 of first 3 assignments</li>
+                            <li>Taken 2 of first 3 quizzes</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Prerequisites & Policies -->
+            <!-- Prerequisites -->
+            <section>
+                <h2 class="truncate-title">Prerequisites</h2>
+                <div style="font-size: 0.85em;">
+                    <div class="fragment">
+                        <h3 style="color: var(--color-primary); font-size: 1.2em; margin-bottom: 0.5em;">Mathematical Background</h3>
+                        <ul>
+                            <li>Basic knowledge of <strong>linear algebra</strong> and <strong>calculus</strong>
+                                <ul style="font-size: 0.9em; color: var(--color-text-secondary);">
+                                    <li>Derivatives and matrix/vector operations</li>
+                                </ul>
+                            </li>
+                            <li>Familiarity with <strong>data science concepts</strong>
+                                <ul style="font-size: 0.9em; color: var(--color-text-secondary);">
+                                    <li>Supervised learning, classification, regression</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="fragment" style="margin-top: 1.5em;">
+                        <h3 style="color: var(--color-primary); font-size: 1.2em; margin-bottom: 0.5em;">Programming Skills</h3>
+                        <ul>
+                            <li>Good <strong>programming skills</strong>
+                                <ul style="font-size: 0.9em; color: var(--color-text-secondary);">
+                                    <li>Python will be used (experience with Java, C, or Matlab is beneficial)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Collaboration Policy -->
+            <section>
+                <h2 class="truncate-title">Collaboration Policy</h2>
+                <div style="font-size: 0.85em;">
+                    <div class="fragment">
+                        <h3 style="color: var(--color-success); font-size: 1.2em; margin-bottom: 0.5em;">✅ Encouraged</h3>
+                        <ul>
+                            <li>Discuss course material and assignments</li>
+                            <li>Study together and share learning resources</li>
+                            <li>Help each other understand concepts</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="fragment" style="margin-top: 1.5em;">
+                        <h3 style="color: var(--color-warning); font-size: 1.2em; margin-bottom: 0.5em;">⚠️ Required</h3>
+                        <ul>
+                            <li>Write and submit your own implementation</li>
+                            <li>State if you collaborated with others</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="fragment" style="margin-top: 1.5em;">
+                        <h3 style="color: var(--color-error); font-size: 1.2em; margin-bottom: 0.5em;">❌ Forbidden</h3>
+                        <ul>
+                            <li>Copy solutions or share your own solutions</li>
+                            <li>Submit work that is not your own</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Contact Information -->
+            <section>
+                <h2 class="truncate-title">Contact Information</h2>
+                <div style="font-size: 0.9em; text-align: center;">
+                    <div class="fragment" style="margin-top: 1.5em;">
+                        <h3 style="color: var(--color-primary); font-size: 1.2em; margin-bottom: 0.5em;">Instructor</h3>
+                        <p><strong>Guðmundur Einarsson</strong></p>
+                        <p>gue20@hi.is</p>
+                    </div>
+                    
+                    <div class="fragment" style="margin-top: 1.5em;">
+                        <h3 style="color: var(--color-primary); font-size: 1.2em; margin-bottom: 0.5em;">Course Questions</h3>
+                        <p style="color: var(--color-text-secondary);">Use Canvas forums for course-related questions</p>
+                        <p style="font-size: 0.8em; color: var(--color-text-secondary);">This helps everyone benefit from Q&A</p>
+                    </div>
+                </div>
+            </section>
+                        
+            <!-- The Deep Learning Revolution - Before 2012 -->
+            <section data-sources='[{"text": "ImageNet Large Scale Visual Recognition Challenge 2011 Results", "url": "https://image-net.org/challenges/LSVRC/2011/results"}]'>
+                <h2>Before the Revolution</h2>
+                <h3 style="color: var(--color-text-secondary);">The State of AI</h3>
+                <ul style="font-size: 0.85em;">
+                    <li class="fragment">Computer vision relied on hand-crafted features (<span class="tooltip">SIFT<span class="tooltiptext bottom">Scale-Invariant Feature Transform: A computer vision algorithm developed in 1999 that detects and describes local features in images. SIFT features are invariant to scale, rotation, and partially invariant to illumination changes. Before deep learning, these hand-crafted features were the state-of-the-art for tasks like object recognition and image matching.</span></span>, <span class="tooltip">HOG<span class="tooltiptext bottom">Histogram of Oriented Gradients: A feature descriptor technique that counts occurrences of gradient orientation in localized portions of an image. Developed in 2005, HOG was particularly successful for pedestrian detection. It works by dividing the image into cells, computing gradients in each cell, and creating histograms of gradient directions.</span></span>)</li>
+                    <li class="fragment">Training limited to CPUs - weeks for modest networks</li>
+                    <li class="fragment">Lack of large labeled datasets</li>
+                    <li class="fragment">Deep networks suffered from <span class="tooltip">vanishing gradient problem<span class="tooltiptext bottom">A difficulty in training deep neural networks where gradients become exponentially small as they propagate back through many layers. This makes it nearly impossible to train networks with many layers using traditional activation functions like sigmoid or tanh, as the weights in early layers barely update.</span></span></li>
+                    <li class="fragment">Best ImageNet accuracy: ~74% (2011 results)</li>
+                </ul>
+            </section>
+            
+            <!-- The AlexNet Moment - Results -->
+            <section>
+                <h2>The AlexNet Moment</h2>
+                <h3 style="color: var(--color-accent);">September 30, 2012</h3>
+                <div class="fragment">
+                    <p><strong>ImageNet Challenge Results:</strong></p>
+                    <ul style="font-size: 0.9em;">
+                        <li>AlexNet achieves 15.3% top-5 error rate</li>
+                        <li>Runner-up: 26.2% (10.9 percentage points behind!)</li>
+                        <li>First use of <span class="tooltip">GPUs<span class="tooltiptext">Graphics Processing Units: Specialized processors originally designed for rendering graphics in video games and 3D applications. GPUs excel at parallel computation, making them ideal for the matrix operations in neural networks. AlexNet used two NVIDIA GTX 580 GPUs, reducing training time from weeks to days. This was revolutionary - modern deep learning wouldn't be possible without GPUs.</span></span> for deep learning at scale</li>
+                    </ul>
+                </div>
+            </section>
+            
+            <!-- The AlexNet Moment - Innovations -->
+            <section>
+                <h2>AlexNet's Key Innovations</h2>
+                <ul style="font-size: 0.85em;">
+                    <li class="fragment">8-layer deep <span class="tooltip">CNN<span class="tooltiptext">Convolutional Neural Network: A specialized type of neural network designed for processing grid-like data such as images. CNNs use convolutional layers that apply filters across the image to detect features like edges, shapes, and textures. The key insight is that the same feature detector (filter) can be useful across different parts of an image, leading to parameter sharing and translation invariance.</span></span> trained on 2 GPUs</li>
+                    <li class="fragment"><span class="tooltip">ReLU<span class="tooltiptext">Rectified Linear Unit: An activation function defined as f(x) = max(0, x). ReLU was revolutionary because it's much faster to compute than sigmoid or tanh, and it doesn't suffer from vanishing gradients for positive inputs. This simple change allowed training much deeper networks. Today, ReLU and its variants are the most common activation functions in deep learning.</span></span> activation (instead of sigmoid/tanh)</li>
+                    <li class="fragment"><span class="tooltip">Dropout<span class="tooltiptext">A regularization technique where random neurons are "dropped out" (set to zero) during training with a certain probability (typically 0.5). This prevents neurons from co-adapting too much and forces the network to learn more robust features. It's like training an ensemble of networks that share weights. During inference, all neurons are active but their outputs are scaled accordingly.</span></span> for regularization</li>
+                    <li class="fragment">Data augmentation techniques</li>
+                    <li class="fragment"><span class="tooltip">Local Response Normalization<span class="tooltiptext">A normalization technique inspired by lateral inhibition in neuroscience, where the activity of a neuron is normalized by the activities of its neighboring neurons. While innovative at the time, LRN has largely been replaced by Batch Normalization in modern architectures as it's more effective and easier to implement.</span></span></li>
+                </ul>
+                <div class="fragment mt-lg emphasis-box">
+                    <p>"We trained a large, deep convolutional neural network... achieving record-breaking results"</p>
+                    <p style="text-align: right; font-size: 0.8em;">- Krizhevsky, Sutskever & Hinton</p>
+                </div>
+            </section>
+            
+            <!-- After the Revolution - Immediate Impact -->
+            <section>
+                <h2 class="truncate-title">Immediate Impact (2013-2016)</h2>
+                <div class="columns">
+                    <div class="column">
+                        <h4>Rapid Progress</h4>
+                        <ul style="font-size: 0.85em;">
+                            <li class="fragment">2014: <span class="tooltip">VGGNet<span class="tooltiptext">Visual Geometry Group Network: Developed at Oxford, VGGNet showed that using very small (3×3) convolutional filters throughout the network could achieve excellent performance. Its simple, uniform architecture (VGG-16 has 16 layers, VGG-19 has 19) made it popular for understanding CNNs and for transfer learning. It achieved 7.3% top-5 error on ImageNet.</span></span>, <span class="tooltip">GoogLeNet<span class="tooltiptext">Google's winning architecture in ILSVRC 2014, also known as Inception v1. It introduced the "Inception module" - a block that performs convolutions with multiple filter sizes (1×1, 3×3, 5×5) in parallel, then concatenates the results. This allows the network to "choose" the best features at each level. It achieved 6.7% error with 22 layers but fewer parameters than VGGNet.</span></span></li>
+                            <li class="fragment">2015: <span class="tooltip">ResNet<span class="tooltiptext">Residual Network: Revolutionary architecture by Microsoft Research that introduced "skip connections" - direct connections that bypass one or more layers. This solved the degradation problem in very deep networks, allowing training of networks with 152 layers (and even 1000+ experimentally). ResNet won ImageNet 2015 with 3.57% error, surpassing human-level performance.</span></span> (3.57% error)</li>
+                            <li class="fragment">2016: Exceeds human performance</li>
+                            <li class="fragment">Industry adoption explodes</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h4>Key Breakthroughs</h4>
+                        <ul style="font-size: 0.85em;">
+                            <li class="fragment">Deeper networks (100+ layers)</li>
+                            <li class="fragment"><span class="tooltip">Skip connections<span class="tooltiptext">Also called residual connections or shortcuts. These are direct connections that bypass one or more layers, allowing the gradient to flow directly through the shortcut during backpropagation. The key insight: instead of learning a transformation H(x), the network learns the residual F(x) = H(x) - x. This makes it easier to learn identity mappings and enables training of very deep networks.</span></span></li>
+                            <li class="fragment"><span class="tooltip">Batch normalization<span class="tooltiptext">A technique that normalizes the inputs to each layer by the mean and variance of the current batch during training. This addresses "internal covariate shift" - the problem of layer inputs distribution changing during training. BatchNorm allows higher learning rates, reduces sensitivity to initialization, and often eliminates the need for dropout. It's become a standard component in most deep networks.</span></span></li>
+                            <li class="fragment"><span class="tooltip">Transfer learning<span class="tooltiptext">The practice of taking a neural network pre-trained on a large dataset (like ImageNet) and adapting it for a different but related task. You typically replace the final layer(s) and fine-tune on your specific dataset. This is revolutionary because it allows achieving great results with limited data and computational resources. Most computer vision applications today start with pre-trained models.</span></span></li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="fragment mt-lg" style="font-size: 0.85em;">
+                    Every major tech company established AI research labs
+                </p>
+            </section>
+            
+            <!-- Today's Deep Learning Landscape -->
+            <section data-sources='[{"text": "The Turing Post - Computer Vision History", "url": "https://www.turingpost.com/p/cvhistory6"}, {"text": "IEEE Spectrum - AlexNet Source Code", "url": "https://spectrum.ieee.org/alexnet-source-code"}, {"text": "Interview with Fei-Fei Li", "url": "https://www.youtube.com/watch?v=JgQ1FJ_wow8&t=811s"}]'>
+                <h2>Today's Landscape</h2>
+                <div class="columns">
+                    <div class="column">
+                        <h4>Foundation Models</h4>
+                        <ul style="font-size: 0.85em;">
+                            <li class="fragment"><span class="tooltip">Transformers<span class="tooltiptext">A neural network architecture introduced in 2017's "Attention is All You Need" paper. Unlike RNNs that process sequences step-by-step, Transformers use self-attention mechanisms to process all positions simultaneously. This parallelization, combined with the ability to capture long-range dependencies, revolutionized NLP. Transformers are the foundation of all modern language models.</span></span> revolutionize <span class="tooltip">NLP<span class="tooltiptext">Natural Language Processing: The field of AI focused on enabling computers to understand, interpret, and generate human language. Tasks include translation, sentiment analysis, question answering, and text generation. Before deep learning, NLP relied heavily on hand-crafted rules and statistical methods. Transformers have made NLP one of the most successful areas of AI.</span></span></li>
+                            <li class="fragment"><span class="tooltip">GPT<span class="tooltiptext">Generative Pre-trained Transformer: OpenAI's series of large language models trained to predict the next word in a sequence. GPT models are "autoregressive" - they generate text one token at a time. GPT-3 (175B parameters) showed that large models could perform many tasks without task-specific training, just by conditioning on prompts. GPT-4 further improved capabilities with multimodal inputs.</span></span>, <span class="tooltip">BERT<span class="tooltiptext">Bidirectional Encoder Representations from Transformers: Google's breakthrough model that pre-trains on masked language modeling (predicting missing words) and next sentence prediction. Unlike GPT's left-to-right processing, BERT looks at context from both directions. This bidirectional approach made it superior for tasks like question answering and named entity recognition.</span></span>, and beyond</li>
+                            <li class="fragment"><span class="tooltip">Multimodal models<span class="tooltiptext">AI models that can process and relate information from multiple modalities - text, images, audio, video, etc. Examples include CLIP (connects text and images), DALL-E (generates images from text), and GPT-4V (processes both text and images). These models are bringing us closer to AI that can understand the world more like humans do - through multiple senses.</span></span></li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h4>New Frontiers</h4>
+                        <ul style="font-size: 0.85em;">
+                            <li class="fragment"><span class="tooltip">Diffusion models<span class="tooltiptext">A class of generative models that learn to gradually denoise data, reversing a process that slowly adds noise to training data. Models like DALL-E 2, Midjourney, and Stable Diffusion have revolutionized image generation. The key insight: it's easier to learn small denoising steps than to generate images directly. This approach has also been applied to audio, video, and 3D generation.</span></span> for generation</li>
+                            <li class="fragment">AI agents and reasoning</li>
+                            <li class="fragment">Embodied AI in robotics</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="fragment mt-lg emphasis-box">
+                    <p style="font-size: 0.8em;">"That moment was pretty symbolic to the world of AI because three fundamental elements of modern AI converged for the first time. The first element was neural networks. The second element was big data, using ImageNet. And the third element was GPU computing."</p>
+                    <p style="text-align: right; font-size: 0.8em;">- Fei-Fei Li, 2024</p>
+                </div>
+            </section>
+            
+            <!-- What Can Deep Learning Do? -->
+            <section>
+                <h2>What Can Deep Learning Do?</h2>
+                <div class="columns">
+                    <div class="column">
+                        <h4>Traditional Domains</h4>
+                        <ul>
+                            <li class="fragment">Computer Vision</li>
+                            <li class="fragment">NLP</li>
+                            <li class="fragment">Speech Recognition</li>
+                            <li class="fragment">Reinforcement Learning</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h4>Emerging Applications</h4>
+                        <ul>
+                            <li class="fragment">Self-driving cars</li>
+                            <li class="fragment">AI agents and autonomous systems</li>
+                            <li class="fragment">Embodied intelligence</li>
+                            <li class="fragment">Scientific discovery</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="fragment mt-lg emphasis-box">
+                    Deep learning is transforming industries across the spectrum: healthcare diagnostics, climate science, drug discovery, and creative applications in art and media.
+                </p>
+            </section>
+            
+            <!-- About This Course -->
+            <section>
+                <h2>About This Course</h2>
+                <h3>Our Mission</h3>
+                <p class="fragment">Make deep learning approachable by teaching:</p>
+                <div class="fragment">
+                    <ul>
+                        <li><strong>Concepts</strong> - The theoretical foundations</li>
+                        <li><strong>Context</strong> - When and why to use techniques</li>
+                        <li><strong>Code</strong> - Practical implementation</li>
+                    </ul>
+                </div>
+                <div class="fragment mt-lg learning-objectives">
+                    <h3>💡 Key Philosophy</h3>
+                    <p>Combine rigorous mathematics with runnable code and interactive visualizations</p>
+                </div>
+            </section>
+            
+            <!-- Interactive Demo: Function Approximation -->
+            <section data-state="tuner-demo">
+                <h2>Interactive Demo</h2>
+                <div class="formula-display centered">
+                    <div class="formula">
+                        f(x) = <span class="param-a1">a₁</span>sin(<span class="param-b1">b₁</span>πx) + <span class="param-a2">a₂</span>cos(<span class="param-b2">b₂</span>πx) + <span class="param-a3">a₃</span>x²
+                    </div>
+                </div>
+                <div id="tuner-container" class="interactive-demo horizontal-layout">
+                    <div id="tuner-device" class="retro-device compact">
+                        <div class="control-panel">
+                            <div class="tuner-group compact" data-param="a1">
+                                <label class="param-a1">a₁</label>
+                                <input type="range" class="tuner" id="tuner-a1" min="-1" max="1" step="0.01" value="0.5">
+                                <span class="tuner-value param-a1">0.50</span>
+                            </div>
+                            <div class="tuner-group compact" data-param="b1">
+                                <label class="param-b1">b₁</label>
+                                <input type="range" class="tuner" id="tuner-b1" min="1" max="5" step="0.05" value="2.0">
+                                <span class="tuner-value param-b1">2.00</span>
+                            </div>
+                            <div class="tuner-group compact" data-param="a2">
+                                <label class="param-a2">a₂</label>
+                                <input type="range" class="tuner" id="tuner-a2" min="-1" max="1" step="0.01" value="0.5">
+                                <span class="tuner-value param-a2">0.50</span>
+                            </div>
+                            <div class="tuner-group compact" data-param="b2">
+                                <label class="param-b2">b₂</label>
+                                <input type="range" class="tuner" id="tuner-b2" min="1" max="5" step="0.05" value="3.0">
+                                <span class="tuner-value param-b2">3.00</span>
+                            </div>
+                            <div class="tuner-group compact" data-param="a3">
+                                <label class="param-a3">a₃</label>
+                                <input type="range" class="tuner" id="tuner-a3" min="-0.5" max="0.5" step="0.01" value="0.10">
+                                <span class="tuner-value param-a3">0.10</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="function-graph"></div>
+                </div>
+                <div class="demo-controls">
+                    <button class="button secondary" onclick="resetTuners()">Reset</button>
+                    <button class="button gradient-button" onclick="startGradientDescent()">Use Deep Learning</button>
+                    <div class="error-display">Error: <span id="error-value">0.00</span></div>
+                </div>
+            </section>
+
+            <!-- Interactive Demo: Overfitting -->
+            <section data-state="overfit-demo">
+                <h2 class="truncate-title">Interactive Demo: Overfitting</h2>
+                <p style="font-size: 0.8em; text-align: center; margin: 0 0 0.5em 0;">
+                    Fit a polynomial to <strong>50 noisy data points</strong> — what happens as you raise the degree?
+                </p>
+                <div id="overfit-container" class="interactive-demo horizontal-layout">
+                    <div id="overfit-device" class="retro-device compact">
+                        <div class="control-panel">
+                            <div class="tuner-group compact" data-param="degree">
+                                <label>Deg.</label>
+                                <input type="range" class="tuner" id="overfit-degree" min="1" max="50" step="1" value="1">
+                                <span class="tuner-value" id="overfit-degree-value">1</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="overfit-graph"></div>
+                </div>
+                <div class="demo-controls">
+                    <button class="button secondary" onclick="resetOverfitDemo()">Reset</button>
+                    <button class="button secondary" onclick="resampleOverfitData()">New Data</button>
+                    <div class="error-display">Training error: <span id="overfit-train-error">0.00</span></div>
+                    <div class="error-display" id="overfit-true-error-display">Deviation from true function: <span id="overfit-true-error">0.00</span></div>
+                </div>
+            </section>
+
+            <!-- Learning by Doing -->
+            <section>
+                <h2>Learning by Doing</h2>
+                <p>Traditional textbooks: exhaustive detail on each topic</p>
+                <p class="fragment"><strong>Our approach: Just-in-time learning</strong></p>
+                <ul>
+                    <li class="fragment">Learn concepts when you need them</li>
+                    <li class="fragment">Taste success early - train your first model quickly</li>
+                    <li class="fragment">One working example per notebook</li>
+                    <li class="fragment">Real datasets, practical applications</li>
+                </ul>
+                <div class="fragment mt-lg emphasis-box">
+                    <p>🚀 Start building, then understand deeply</p>
+                </div>
+            </section>
+            
+            <!-- Course Structure: Getting Started -->
+            <section>
+                <h2 class="truncate-title">Course Structure</h2>
+                <h3 style="color: var(--color-accent);">Getting Started</h3>
+                <ul style="font-size: 0.9em;">
+                    <li class="fragment"><strong>Chapter 1: Introduction</strong>
+                        <ul style="font-size: 0.9em; margin-top: 0.5em;">
+                            <li>The deep learning revolution</li>
+                            <li>Key concepts and terminology</li>
+                            <li>Course overview and goals</li>
+                        </ul>
+                    </li>
+                    <li class="fragment"><strong>Chapter 2: Preliminaries</strong>
+                        <ul style="font-size: 0.9em; margin-top: 0.5em;">
+                            <li>Data manipulation and preprocessing</li>
+                            <li><span class="tooltip">Linear algebra<span class="tooltiptext">The mathematics of vectors, matrices, and linear transformations. Essential for understanding how neural networks transform data through layers. Key concepts include matrix multiplication (how layers compute), eigenvalues (for understanding network dynamics), and vector spaces (for understanding representations).</span></span> essentials</li>
+                            <li><span class="tooltip">Calculus<span class="tooltiptext">The mathematics of change and optimization. In deep learning, we use derivatives to understand how changing weights affects the output, and gradients to find the direction of steepest improvement. The chain rule is fundamental to backpropagation - the algorithm that trains neural networks.</span></span> and <span class="tooltip">automatic differentiation<span class="tooltiptext">A technique to compute derivatives of complex functions automatically. Unlike symbolic or numerical differentiation, autodiff computes exact derivatives efficiently by breaking down computations into elementary operations and applying the chain rule. This is what makes training deep networks feasible - frameworks like PyTorch handle this automatically.</span></span></li>
+                            <li>Probability and statistics</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+            
+            <!-- Course Structure: Linear Models -->
+            <section>
+                <h2 class="truncate-title">Course Structure</h2>
+                <h3 style="color: var(--color-accent);">Linear Models</h3>
+                <ul style="font-size: 0.9em;">
+                    <li class="fragment"><strong>Chapter 3: Linear Neural Networks for Regression</strong>
+                        <ul style="font-size: 0.9em; margin-top: 0.5em;">
+                            <li><span class="tooltip">Linear regression<span class="tooltiptext">The simplest form of supervised learning where we fit a line (or hyperplane) to data. Despite its simplicity, linear regression introduces key concepts: loss functions (how we measure error), gradient descent (how we improve), and the bias-variance tradeoff. It's the foundation upon which neural networks are built.</span></span> from scratch</li>
+                            <li><span class="tooltip">Gradient descent<span class="tooltiptext">An optimization algorithm that finds the minimum of a loss function by repeatedly moving in the direction of steepest descent. Think of it like finding the lowest point in a valley by always walking downhill. The 'gradient' is the slope, and we use it to update our model's weights to reduce errors.</span></span> and optimization</li>
+                            <li><span class="tooltip">Vectorized implementation<span class="tooltiptext">Writing code that operates on entire arrays/matrices at once instead of using loops. This leverages optimized linear algebra libraries (like NumPy) and GPU parallelization, making code run 10-100x faster. For example, computing dot products of many vectors simultaneously rather than one at a time.</span></span></li>
+                        </ul>
+                    </li>
+                    <li class="fragment"><strong>Chapter 4: Linear Neural Networks for Classification</strong>
+                        <ul style="font-size: 0.9em; margin-top: 0.5em;">
+                            <li><span class="tooltip">Softmax regression<span class="tooltiptext">Generalizes logistic regression to multiple classes. The softmax function converts a vector of scores into a probability distribution over classes. This is how most neural networks handle multi-class classification - the final layer typically uses softmax with cross-entropy loss.</span></span></li>
+                            <li><span class="tooltip">Cross-entropy loss<span class="tooltiptext">A loss function that measures the difference between predicted probabilities and true labels in classification. It heavily penalizes confident wrong predictions. For example, if the model says '90% cat' but it's actually a dog, the loss is very high. It's the standard loss for classification tasks.</span></span></li>
+                            <li><span class="tooltip">Fashion-MNIST<span class="tooltiptext">A dataset of 70,000 grayscale images (28x28 pixels) of clothing items in 10 categories (T-shirt, trouser, dress, etc.). Created as a drop-in replacement for the handwritten digits MNIST dataset, it's more challenging and representative of real computer vision tasks while still being small enough for quick experiments.</span></span> dataset</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+            
+            <!-- Course Structure: First Deep Networks -->
+            <section>
+                <h2 class="truncate-title">Course Structure</h2>
+                <h3 style="color: var(--color-accent);">First Deep Networks</h3>
+                <ul style="font-size: 0.9em;">
+                    <li class="fragment"><strong>Chapter 5: <span class="tooltip">Multilayer Perceptrons<span class="tooltiptext">The first true neural networks with hidden layers between input and output. MLPs can theoretically approximate any continuous function (universal approximation theorem), but in practice, deeper and more specialized architectures work better. MLPs remain important for tabular data and as building blocks in larger architectures.</span></span></strong>
+                        <ul style="font-size: 0.9em; margin-top: 0.5em;">
+                            <li>Hidden layers and <span class="tooltip">activation functions<span class="tooltiptext">Non-linear functions applied after each layer's linear transformation. Without them, stacking layers would be pointless - multiple linear transformations collapse to a single one. Common functions include ReLU (max(0,x)), sigmoid (S-shaped curve), and tanh. They allow networks to learn complex, non-linear patterns in data.</span></span></li>
+                            <li><span class="tooltip">Backpropagation<span class="tooltiptext">The algorithm that makes training deep networks possible. It efficiently computes gradients by applying the chain rule backwards through the network. Developed in the 1980s, backprop is still the foundation of how we train neural networks today. The \"backward pass\" in modern frameworks implements this algorithm.</span></span> algorithm</li>
+                            <li><span class="tooltip">Weight initialization<span class="tooltiptext">The strategy for setting initial values of network weights before training. Poor initialization can cause vanishing/exploding gradients or slow convergence. Common methods include Xavier/Glorot (good for sigmoid/tanh) and He initialization (good for ReLU). The goal is to keep activations and gradients at reasonable scales throughout the network.</span></span> and <span class="tooltip">dropout<span class="tooltiptext">A regularization technique where random neurons are "turned off" during training with probability p (typically 0.5). This prevents neurons from co-adapting and forces the network to be robust. It's like training an ensemble of networks. During inference, all neurons are active but their outputs are scaled by (1-p).</span></span></li>
+                        </ul>
+                    </li>
+                    <li class="fragment"><strong>Chapter 6: Builders' Guide</strong>
+                        <ul style="font-size: 0.9em; margin-top: 0.5em;">
+                            <li><span class="tooltip">Layers, blocks, and models<span class="tooltiptext">The hierarchical organization of neural networks. A layer is a single transformation (e.g., linear, convolution). A block is a reusable group of layers (e.g., ResNet block). A model is the complete network made of blocks. This modular design makes it easy to build and experiment with complex architectures.</span></span></li>
+                            <li><span class="tooltip">Parameter management<span class="tooltiptext">Techniques for accessing, modifying, and sharing network weights (parameters). This includes initialization strategies, accessing specific layer weights, sharing parameters between layers, and saving/loading model weights. Modern frameworks handle this automatically but understanding it is crucial for debugging and custom architectures.</span></span></li>
+                            <li><span class="tooltip">Custom layers<span class="tooltiptext">Creating your own layer types beyond what the framework provides. This involves defining the forward pass (computation) and backward pass (gradient calculation). Useful for implementing new research ideas or domain-specific operations. Modern frameworks make this surprisingly easy with automatic differentiation.</span></span> and saving/loading</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+            
+            <!-- Course Structure: CNNs -->
+            <section>
+                <h2 class="truncate-title">Course Structure</h2>
+                <h3 style="color: var(--color-accent);">Convolutional Neural Networks</h3>
+                <ul style="font-size: 0.9em;">
+                    <li class="fragment"><strong>Chapter 7: Convolutional Neural Networks</strong>
+                        <ul style="font-size: 0.9em; margin-top: 0.5em;">
+                            <li><span class="tooltip">Convolution<span class="tooltiptext">A mathematical operation that slides a small matrix (filter/kernel) across an image, computing dot products at each position. This creates a feature map showing where certain patterns appear. Convolution is translation-equivariant: if an object moves in the input, its detection moves correspondingly in the output.</span></span> and cross-correlation</li>
+                            <li><span class="tooltip">Padding and stride<span class="tooltiptext">Techniques to control CNN output dimensions. Padding adds zeros around the input to preserve spatial dimensions after convolution. Stride is how many pixels the filter moves each step - stride 2 halves the output size. These control the trade-off between preserving spatial information and computational efficiency.</span></span></li>
+                            <li><span class="tooltip">Pooling layers<span class="tooltiptext">Layers that reduce spatial dimensions by taking the maximum (max pooling) or average (average pooling) of small regions. This makes the network more robust to small translations and reduces computation. For example, 2x2 max pooling takes the maximum value in each 2x2 region, reducing dimensions by half.</span></span></li>
+                            <li><span class="tooltip">LeNet<span class="tooltiptext">One of the first successful CNNs (1998) by Yann LeCun. LeNet-5 had 7 layers and was used for digit recognition. Though tiny by today's standards (60K parameters), it established the pattern of alternating convolution and pooling layers that influenced all future CNN architectures.</span></span> - the first ConvNet</li>
+                        </ul>
+                    </li>
+                    <li class="fragment"><strong>Chapter 8: Modern Convolutional Neural Networks</strong>
+                        <ul style="font-size: 0.9em; margin-top: 0.5em;">
+                            <li>AlexNet - deep learning breakthrough</li>
+                            <li>VGG - using blocks</li>
+                            <li>ResNet - <span class="tooltip">skip connections<span class="tooltiptext">Also called residual connections or shortcuts. These are direct connections that bypass one or more layers, allowing the gradient to flow directly through the shortcut during backpropagation. The key insight: instead of learning a transformation H(x), the network learns the residual F(x) = H(x) - x. This makes it easier to learn identity mappings and enables training of very deep networks.</span></span></li>
+                            <li>DenseNet and <span class="tooltip">EfficientNet<span class="tooltiptext">A family of models that achieves state-of-the-art accuracy with far fewer parameters than previous architectures. EfficientNet uses neural architecture search to find optimal depth, width, and resolution scaling. The key insight: it's better to scale all dimensions together rather than just making networks deeper.</span></span></li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+            
+            <!-- Course Structure: RNNs -->
+            <section>
+                <h2 class="truncate-title">Course Structure</h2>
+                <h3 style="color: var(--color-accent);">Recurrent Neural Networks</h3>
+                <ul style="font-size: 0.9em;">
+                    <li class="fragment"><strong>Chapter 9: Recurrent Neural Networks</strong>
+                        <ul style="font-size: 0.9em; margin-top: 0.5em;">
+                            <li><span class="tooltip">Sequence modeling<span class="tooltiptext">Processing data where order matters - text, speech, time series, video. Unlike images where we can process all pixels at once, sequences require handling variable lengths and maintaining context over time. This is fundamentally different from standard neural networks which assume fixed-size, independent inputs.</span></span></li>
+                            <li><span class="tooltip">Text preprocessing<span class="tooltiptext">Converting raw text into numerical format for neural networks. Steps include tokenization (splitting into words/subwords), building vocabulary, converting to indices, and handling unknown words. Modern approaches use subword tokenization (like BPE) to handle rare words and multiple languages effectively.</span></span></li>
+                            <li><span class="tooltip">Language models<span class="tooltiptext">Models that predict the probability of the next word given previous words. They learn grammar, facts, and reasoning from text. Can be used for generation (writing), completion, or as features for other tasks. Modern LMs like GPT are trained on massive text corpora and show emergent abilities like few-shot learning.</span></span></li>
+                            <li><span class="tooltip">Backpropagation through time<span class="tooltiptext">How we train RNNs by "unrolling" them over time steps and applying regular backpropagation. The challenge is that gradients must flow through many time steps, leading to vanishing (gradients → 0) or exploding (gradients → ∞) problems. This limits how far back RNNs can remember, motivating LSTM/GRU designs.</span></span></li>
+                        </ul>
+                    </li>
+                    <li class="fragment"><strong>Chapter 10: Modern Recurrent Neural Networks</strong>
+                        <ul style="font-size: 0.9em; margin-top: 0.5em;">
+                            <li><span class="tooltip">LSTM<span class="tooltiptext">Long Short-Term Memory: A sophisticated RNN architecture with gates that control information flow. LSTMs have a cell state (long-term memory) and three gates: forget gate (what to discard), input gate (what to store), and output gate (what to output). This design allows them to capture dependencies over hundreds of time steps.</span></span> - solving vanishing gradients</li>
+                            <li><span class="tooltip">GRU<span class="tooltiptext">Gated Recurrent Unit: A simplified version of LSTM with only two gates (reset and update) instead of three. GRUs achieve similar performance to LSTMs with fewer parameters, making them faster to train. They combine the forget and input gates into a single update gate, making the architecture more streamlined.</span></span> - simplified gating</li>
+                            <li><span class="tooltip">Bidirectional RNNs<span class="tooltiptext">RNNs that process sequences in both forward and backward directions, then combine the representations. This gives each position information about both past and future context. Extremely effective for tasks like named entity recognition where knowing what comes next helps. Can't be used for generation since future isn't available.</span></span></li>
+                            <li><span class="tooltip">Encoder-decoder architecture<span class="tooltiptext">A two-part architecture for sequence-to-sequence tasks (translation, summarization). The encoder processes the input sequence into a fixed representation, then the decoder generates the output sequence from this representation. The bottleneck forces the model to capture essential information. Attention mechanisms later removed this bottleneck limitation.</span></span></li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+            
+            <!-- Course Structure: Attention and Transformers -->
+            <section>
+                <h2 class="truncate-title">Course Structure</h2>
+                <h3 style="color: var(--color-accent);">Attention and Transformers</h3>
+                <ul style="font-size: 0.9em;">
+                    <li class="fragment"><strong>Chapter 11: <span class="tooltip">Attention Mechanisms<span class="tooltiptext">A mechanism where each position in a sequence attends to all positions to compute a representation. For each position, we compute query, key, and value vectors. The attention scores (softmax of query-key dot products) determine how much each position contributes to the output. This allows capturing relationships regardless of distance in the sequence.</span></span> & Transformers</strong>
+                        <ul style="font-size: 0.9em; margin-top: 0.5em;">
+                            <li><span class="tooltip">Attention pooling<span class="tooltiptext">Instead of simple averaging or max pooling, use learned weights to combine features. The weights are computed based on the features themselves - important parts get higher weights. This is the foundation of attention mechanisms: letting the model decide what to focus on rather than treating everything equally.</span></span></li>
+                            <li><span class="tooltip">Bahdanau attention<span class="tooltiptext">The first successful attention mechanism (2014) for neural machine translation. It allows the decoder to "attend" to different parts of the input sequence at each step, rather than relying on a single fixed representation. This solved the information bottleneck problem and dramatically improved translation quality for long sentences.</span></span></li>
+                            <li><span class="tooltip">Self-attention<span class="tooltiptext">A special case of attention where queries, keys, and values all come from the same sequence. This allows each position to attend to all other positions in the same sequence, capturing dependencies regardless of distance. Self-attention is the core mechanism that makes Transformers so powerful.</span></span> and <span class="tooltip">positional encoding<span class="tooltiptext">Since Transformers process all positions in parallel (no inherent order), we must inject position information. This is done by adding special vectors to the input embeddings that encode each position. The original paper used sine/cosine functions of different frequencies, but learned embeddings also work well.</span></span></li>
+                            <li>The <span class="tooltip">Transformer architecture<span class="tooltiptext">The revolutionary architecture from "Attention is All You Need" (2017). Built entirely on self-attention and feed-forward layers - no recurrence or convolution. Processes all positions in parallel, making it much faster to train than RNNs. The foundation of all modern language models (GPT, BERT, etc.) and increasingly used in vision too.</span></span></li>
+                            <li><span class="tooltip">Multi-head attention<span class="tooltiptext">Instead of one attention function, Transformers use multiple attention \"heads\" in parallel, each learning different relationships. The outputs are concatenated and linearly transformed. This allows the model to jointly attend to information from different representation subspaces at different positions.</span></span></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="fragment mt-lg emphasis-box" style="font-size: 0.9em;">
+                    <p>💡 Transformers are the foundation of modern NLP</p>
+                </div>
+            </section>
+            
+            <!-- Course Structure: Optimization and Performance -->
+            <section>
+                <h2 class="truncate-title">Course Structure</h2>
+                <h3 style="color: var(--color-accent);">Optimization and Performance</h3>
+                <ul style="font-size: 0.9em;">
+                    <li class="fragment"><strong>Chapter 12: Optimization Algorithms</strong>
+                        <ul style="font-size: 0.9em; margin-top: 0.5em;">
+                            <li><span class="tooltip">SGD<span class="tooltiptext">Stochastic Gradient Descent: The fundamental optimization algorithm that updates weights in the direction opposite to the gradient. \"Stochastic\" means we use a random subset (batch) of data for each update rather than the full dataset. Despite its simplicity, SGD with momentum often outperforms more complex optimizers.</span></span> and momentum</li>
+                            <li><span class="tooltip">AdaGrad<span class="tooltiptext">Adaptive Gradient: An optimizer that adapts the learning rate for each parameter based on historical gradients. Parameters with large gradients get smaller learning rates. Great for sparse data but can stop learning too early as rates decay to zero.</span></span> and <span class="tooltip">RMSprop<span class="tooltiptext">Root Mean Square Propagation: Fixes AdaGrad's aggressive learning rate decay by using an exponential moving average of squared gradients instead of accumulating all history. This keeps the learning rate adaptive but prevents it from vanishing. Often works better than AdaGrad in practice.</span></span></li>
+                            <li><span class="tooltip">Adam<span class="tooltiptext">Adaptive Moment Estimation: Combines ideas from momentum and RMSprop. Adam maintains running averages of both gradients (first moment) and squared gradients (second moment), using these to adapt the learning rate for each parameter. It's the default optimizer for most deep learning applications due to its robustness.</span></span> optimizer</li>
+                            <li><span class="tooltip">Learning rate scheduling<span class="tooltiptext">Changing the learning rate during training according to a schedule. Common strategies: step decay (drop by factor every N epochs), exponential decay, cosine annealing, or warm-up (start small, increase, then decay). This helps convergence - large rates explore, small rates refine. Critical for training large models.</span></span></li>
+                        </ul>
+                    </li>
+                    <li class="fragment"><strong>Chapter 13: Computational Performance</strong>
+                        <ul style="font-size: 0.9em; margin-top: 0.5em;">
+                            <li>Hardware: CPUs vs GPUs vs <span class="tooltip">TPUs<span class="tooltiptext">Tensor Processing Units: Google's custom chips designed specifically for neural networks. Optimized for matrix multiplications with reduced precision (bfloat16). Much faster and more power-efficient than GPUs for large models. Available on Google Cloud. TPUv4 pods can train models with trillions of parameters.</span></span></li>
+                            <li>Multiple GPUs and <span class="tooltip">parallelization<span class="tooltiptext">Techniques for training on multiple GPUs/machines. Data parallelism splits the batch across devices. Model parallelism splits the model itself. Pipeline parallelism splits layers across devices. Modern training often combines all three. Frameworks like PyTorch DDP and Horovod make this easier but it's still complex at scale.</span></span></li>
+                            <li><span class="tooltip">Training on the cloud<span class="tooltiptext">Using cloud services (AWS, Google Cloud, Azure) for training instead of local hardware. Benefits: access to latest GPUs/TPUs, scale up/down as needed, pre-configured environments. Considerations: data transfer costs, security, pricing (spot vs on-demand instances). Services like SageMaker and Vertex AI simplify deployment.</span></span></li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+            
+            <!-- Course Structure: Computer Vision -->
+            <section>
+                <h2 class="truncate-title">Course Structure</h2>
+                <h3 style="color: var(--color-accent);">Computer Vision</h3>
+                <ul style="font-size: 0.9em;">
+                    <li class="fragment"><strong>Chapter 14: Computer Vision</strong>
+                        <ul style="font-size: 0.9em; margin-top: 0.5em;">
+                            <li><span class="tooltip">Image augmentation<span class="tooltiptext">Creating variations of training images to improve generalization. Common augmentations: rotation, flipping, cropping, color jittering, mixup. This artificially increases dataset size and makes models robust to variations. Modern approaches like AutoAugment learn optimal augmentation policies. Critical for good performance with limited data.</span></span> techniques</li>
+                            <li><span class="tooltip">Fine-tuning<span class="tooltiptext">Taking a model pre-trained on a large dataset (like ImageNet) and adapting it to your specific task. You typically replace the final layer(s) and train on your data with a small learning rate. This transfers learned features and works amazingly well even with little data. The standard approach for most applications.</span></span> pretrained models</li>
+                            <li>Object detection: <span class="tooltip">R-CNN<span class="tooltiptext">Region-based CNN: A family of object detection methods that first propose regions likely to contain objects, then classify each region. Faster R-CNN improves speed with a Region Proposal Network. Though slower than YOLO, R-CNN methods often achieve higher accuracy, especially for small objects.</span></span> family</li>
+                            <li>Single shot detection: <span class="tooltip">YOLO<span class="tooltiptext">You Only Look Once: A family of real-time object detection models that treat detection as a regression problem. Unlike earlier methods that use region proposals, YOLO divides the image into a grid and predicts bounding boxes and class probabilities directly. This \"single shot\" approach enables real-time performance.</span></span></li>
+                            <li><span class="tooltip">Semantic segmentation<span class="tooltiptext">Classifying every pixel in an image into categories (road, car, person, sky, etc.). Unlike object detection which gives bounding boxes, segmentation provides pixel-perfect boundaries. Used in medical imaging, autonomous driving, photo editing. Architectures like U-Net and DeepLab are designed specifically for this task.</span></span></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="fragment mt-lg emphasis-box" style="font-size: 0.9em;">
+                    <p>🖼️ From image classification to pixel-level understanding</p>
+                </div>
+            </section>
+            
+            <!-- Course Structure: NLP -->
+            <section>
+                <h2 class="truncate-title">Course Structure</h2>
+                <h3 style="color: var(--color-accent);">Natural Language Processing</h3>
+                <ul style="font-size: 0.9em;">
+                    <li class="fragment"><strong>Chapter 15: NLP Pretraining</strong>
+                        <ul style="font-size: 0.9em; margin-top: 0.5em;">
+                            <li>Word embeddings: <span class="tooltip">Word2Vec<span class="tooltiptext">A technique that learns vector representations of words where similar words have similar vectors. It uses either CBOW (predict word from context) or Skip-gram (predict context from word) objectives. Word2Vec showed that word vectors can capture semantic relationships: vector(\"king\") - vector(\"man\") + vector(\"woman\") ≈ vector(\"queen\").</span></span> and <span class="tooltip">GloVe<span class="tooltiptext">Global Vectors: Combines the benefits of matrix factorization (like LSA) and local context window methods (like Word2Vec). GloVe constructs a co-occurrence matrix of words and factorizes it to get word vectors. It often produces better vectors for word analogy tasks than Word2Vec.</span></span></li>
+                            <li><span class="tooltip">Subword embedding<span class="tooltiptext">Breaking words into smaller pieces (subwords) for better coverage. Methods like Byte-Pair Encoding (BPE) or WordPiece handle rare words by decomposing them ("unhappiness" → "un" + "happiness"). This gives finite vocabulary while handling any word, crucial for multilingual models and avoiding out-of-vocabulary issues.</span></span></li>
+                            <li><span class="tooltip">BERT<span class="tooltiptext">Bidirectional Encoder Representations from Transformers: Google's breakthrough model that pre-trains on masked language modeling (predicting missing words) and next sentence prediction. Unlike GPT's left-to-right processing, BERT looks at context from both directions. This bidirectional approach made it superior for tasks like question answering and named entity recognition.</span></span> for understanding</li>
+                            <li><span class="tooltip">GPT<span class="tooltiptext">Generative Pre-trained Transformer: OpenAI's series of large language models trained to predict the next word in a sequence. GPT models are \"autoregressive\" - they generate text one token at a time. GPT-3 (175B parameters) showed that large models could perform many tasks without task-specific training, just by conditioning on prompts. GPT-4 further improved capabilities with multimodal inputs.</span></span> for generation</li>
+                        </ul>
+                    </li>
+                    <li class="fragment"><strong>Chapter 16: NLP Applications</strong>
+                        <ul style="font-size: 0.9em; margin-top: 0.5em;">
+                            <li><span class="tooltip">Sentiment analysis<span class="tooltiptext">Determining the emotional tone or opinion in text - positive, negative, or neutral. Can be fine-grained (1-5 stars) or aspect-based ("great food, terrible service"). Used in social media monitoring, product reviews, customer feedback. Modern approaches use pre-trained language models fine-tuned on labeled sentiment data.</span></span></li>
+                            <li><span class="tooltip">Natural language inference<span class="tooltiptext">Determining the logical relationship between two sentences: entailment (A implies B), contradiction (A contradicts B), or neutral. For example: "A man is running" entails "A person is moving". This tests deep language understanding and is used as a benchmark for language models.</span></span></li>
+                            <li><span class="tooltip">Question answering<span class="tooltiptext">Systems that answer questions based on given context or knowledge. Can be extractive (finding the answer span in text) or generative (creating new answer text). Modern QA systems use Transformers and can handle complex reasoning. Applications include search engines, virtual assistants, and educational tools.</span></span></li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+            
+            <!-- Course Structure: Advanced Topics 1 -->
+            <section>
+                <h2 class="truncate-title">Course Structure</h2>
+                <h3 style="color: var(--color-accent);">Advanced Topics I</h3>
+                <ul style="font-size: 0.9em;">
+                    <li class="fragment"><strong>Chapter 17: Reinforcement Learning</strong>
+                        <ul style="font-size: 0.9em; margin-top: 0.5em;">
+                            <li><span class="tooltip">Markov Decision Processes<span class="tooltiptext">Mathematical framework for modeling sequential decision-making under uncertainty. Consists of states, actions, transition probabilities, and rewards. The "Markov" property means the future depends only on the current state, not history. MDPs are the foundation of reinforcement learning - we're trying to find the optimal policy in an MDP.</span></span></li>
+                            <li><span class="tooltip">Q-Learning<span class="tooltiptext">A reinforcement learning algorithm that learns the value (Q) of taking each action in each state. Q(s,a) represents expected future reward. The algorithm updates Q-values based on experiences, eventually converging to optimal values. Deep Q-Networks (DQN) use neural networks to approximate Q-values for large state spaces.</span></span></li>
+                            <li><span class="tooltip">Deep Q-Networks (DQN)<span class="tooltiptext">Breakthrough that combined Q-learning with deep neural networks to play Atari games from pixels (DeepMind, 2013). Key innovations: experience replay (storing and resampling past experiences) and target networks (separate network for stable targets). This showed deep RL could learn complex behaviors from raw sensory input.</span></span></li>
+                            <li><span class="tooltip">Policy gradient methods<span class="tooltiptext">Instead of learning value functions, directly optimize the policy (action selection) using gradients. The REINFORCE algorithm estimates gradients using Monte Carlo sampling. More stable for continuous actions and stochastic policies. Advanced versions like PPO and TRPO are used in robotics and game AI.</span></span></li>
+                        </ul>
+                    </li>
+                    <li class="fragment"><strong>Chapter 18: Gaussian Processes</strong>
+                        <ul style="font-size: 0.9em; margin-top: 0.5em;">
+                            <li><span class="tooltip">Bayesian approach<span class="tooltiptext">Treating model parameters as probability distributions rather than fixed values. Instead of finding one "best" set of weights, we maintain uncertainty about them. This gives us principled uncertainty estimates - the model knows what it doesn't know. More computationally expensive but crucial for safety-critical applications.</span></span> to ML</li>
+                            <li><span class="tooltip">Kernel methods<span class="tooltiptext">Techniques that implicitly map data to high/infinite dimensional spaces using kernel functions (similarity measures). The "kernel trick" computes dot products in this space without explicitly doing the mapping. Examples: RBF (Gaussian) kernel, polynomial kernel. Gaussian Processes use kernels to define distributions over functions.</span></span></li>
+                            <li><span class="tooltip">Uncertainty quantification<span class="tooltiptext">Measuring how confident a model is in its predictions. Distinguishes epistemic uncertainty (model uncertainty from limited data) from aleatoric uncertainty (inherent noise). Critical for decision-making: a self-driving car should know when it's unsure. Methods include Bayesian neural networks, ensembles, and dropout at test time.</span></span></li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+            
+            <!-- Course Structure: Advanced Topics 2 -->
+            <section>
+                <h2 class="truncate-title">Course Structure</h2>
+                <h3 style="color: var(--color-accent);">Advanced Topics II</h3>
+                <ul style="font-size: 0.9em;">
+                    <li class="fragment"><strong>Chapter 19: Hyperparameter Optimization</strong>
+                        <ul style="font-size: 0.9em; margin-top: 0.5em;">
+                            <li><span class="tooltip">Grid and random search<span class="tooltiptext">Simple hyperparameter optimization methods. Grid search tries all combinations of specified values (exhaustive but expensive). Random search samples random combinations - surprisingly effective because usually only a few hyperparameters matter. Random search often finds good solutions faster than grid search for the same budget.</span></span></li>
+                            <li><span class="tooltip">Bayesian optimization<span class="tooltiptext">Smart hyperparameter search using probabilistic models. Builds a model (often Gaussian Process) of the objective function, then uses it to decide where to sample next. Balances exploration (uncertain regions) and exploitation (promising regions). Much more efficient than random search for expensive evaluations.</span></span></li>
+                            <li><span class="tooltip">Automated ML (AutoML)<span class="tooltiptext">Automating the entire machine learning pipeline: data preprocessing, feature engineering, model selection, hyperparameter tuning. Tools like AutoGluon, H2O AutoML, and Google AutoML make ML accessible to non-experts. Also includes Neural Architecture Search (NAS) for automatically designing network architectures.</span></span></li>
+                        </ul>
+                    </li>
+                    <li class="fragment"><strong>Chapter 20: Generative Adversarial Networks</strong>
+                        <ul style="font-size: 0.9em; margin-top: 0.5em;">
+                            <li>The <span class="tooltip">GAN<span class="tooltiptext">Generative Adversarial Networks: Two networks competing against each other - a generator creating fake samples and a discriminator trying to distinguish real from fake. Through this adversarial training, GANs can generate remarkably realistic images, though they're notoriously difficult to train and can suffer from mode collapse.</span></span> framework</li>
+                            <li><span class="tooltip">Deep Convolutional GANs<span class="tooltiptext">DCGAN - the first stable architecture for training GANs on images. Key insights: use strided convolutions (no pooling), batch normalization, ReLU in generator, LeakyReLU in discriminator. These architectural guidelines made GAN training much more reliable and became the foundation for most image GANs.</span></span></li>
+                            <li><span class="tooltip">StyleGAN<span class="tooltiptext">NVIDIA's GAN architecture that generates incredibly realistic images by controlling styles at different scales. Introduces style mixing, adaptive instance normalization, and progressive growing. Can generate and edit faces, art, and more with unprecedented quality. StyleGAN2/3 further improve quality and remove artifacts.</span></span> and applications</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+            
+            <!-- Course Structure: Final Chapter -->
+            <section>
+                <h2 class="truncate-title">Course Structure</h2>
+                <h3 style="color: var(--color-accent);">Real-World Applications</h3>
+                <ul style="font-size: 0.9em;">
+                    <li class="fragment"><strong>Chapter 21: Recommender Systems</strong>
+                        <ul style="font-size: 0.9em; margin-top: 0.5em;">
+                            <li><span class="tooltip">Collaborative filtering<span class="tooltiptext">Recommendation technique based on user-item interactions. User-based CF finds similar users and recommends what they liked. Item-based CF recommends similar items to what you've liked. The key insight: you don't need to understand content, just patterns in user behavior. Amazon's "Customers who bought X also bought Y" is item-based CF.</span></span></li>
+                            <li><span class="tooltip">Matrix factorization<span class="tooltiptext">Decomposing the user-item interaction matrix into low-rank factors (user and item embeddings). This compresses sparse data and enables prediction of missing values. Netflix Prize winner used sophisticated matrix factorization. Modern systems combine this with deep learning for better representations.</span></span></li>
+                            <li><span class="tooltip">Deep learning for recommendations<span class="tooltiptext">Using neural networks to learn complex user-item interactions. Can incorporate multiple data types (text, images, sequences) and model non-linear patterns. Examples: YouTube's video recommendations, Spotify's Discover Weekly. Often combines collaborative filtering with content understanding for best results.</span></span></li>
+                            <li><span class="tooltip">Real-world considerations<span class="tooltiptext">Practical challenges in recommendation systems: cold start (new users/items), scalability (millions of users/items), real-time serving, diversity vs accuracy trade-off, filter bubbles, fairness, and manipulation/attacks. Production systems must balance many objectives beyond just accuracy.</span></span></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="fragment mt-lg emphasis-box" style="font-size: 0.9em;">
+                    <p>📚 All chapters follow the <a href="https://d2l.ai">d2l.ai</a> book structure</p>
+                    <p>🔗 Free online with code examples and exercises</p>
+                </div>
+            </section>
+            
+            <!-- Prerequisites & Tools -->
+            <section>
+                <h2>Prerequisites & Tools</h2>
+                <div class="columns">
+                    <div class="column">
+                        <h4>What You Need</h4>
+                        <ul>
+                            <li class="fragment">Basic linear algebra</li>
+                            <li class="fragment">Elementary calculus</li>
+                            <li class="fragment">Probability basics</li>
+                            <li class="fragment">Python programming</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h4>What We'll Use</h4>
+                        <ul>
+                            <li class="fragment">PyTorch framework</li>
+                            <li class="fragment">Jupyter notebooks</li>
+                            <li class="fragment">GitHub for code</li>
+                            <li class="fragment">Discussion forum</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="fragment mt-lg">
+                    📚 All materials freely available at <a href="https://d2l.ai">d2l.ai</a>
+                </p>
+            </section>
+            
+            <!-- Exercise Slide -->
+            <section>
+                <h2>Let's Get Started! 🚀</h2>
+                <div class="learning-objectives">
+                    <h3>Your First Tasks</h3>
+                    <ol>
+                        <li class="fragment">Set up your development environment
+                            <ul style="font-size: 0.8em; margin-top: 0.5em;">
+                                <li>Complete installation guide: <a href="https://d2l.ai/chapter_installation/index.html">d2l.ai/chapter_installation</a></li>
+                            </ul>
+                        </li>
+                        <li class="fragment">Download the course notebooks
+                            <ul style="font-size: 0.8em; margin-top: 0.5em;">
+                                <li>Direct download: <a href="https://d2l.ai/d2l-en.zip">d2l.ai/d2l-en.zip</a></li>
+                                <li>GitHub repository: <a href="https://github.com/d2l-ai/d2l-en">github.com/d2l-ai/d2l-en</a></li>
+                            </ul>
+                        </li>
+                        <li class="fragment">Run your first example
+                            <ul style="font-size: 0.8em; margin-top: 0.5em;">
+                                <li>Open the first notebook and execute the cells</li>
+                                <li>Verify GPU setup (if available)</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+                <div class="fragment mt-lg" style="font-size: 0.8em;">
+                    <p><em>Optional: Join the course forum at <a href="https://discuss.d2l.ai">discuss.d2l.ai</a> for community support</em></p>
+                </div>
+            </section>
+            
+            <!-- Mathematical Notation Section -->
+            <section>
+                <h2>Mathematical Notation Reference</h2>
+                <p>Throughout this course, we'll use standard mathematical notation</p>
+                <p class="fragment">This is a quick reference - we'll cover details as needed</p>
+                <div class="fragment mt-lg emphasis-box">
+                    <p>💡 Don't worry about memorizing all of this!</p>
+                    <p style="font-size: 0.8em;">Full coverage in Chapter 2: Preliminaries</p>
+                </div>
+                <p class="fragment mt-lg">
+                    <small>Reference: <a href="https://d2l.ai/chapter_notation/index.html">d2l.ai notation guide</a></small>
+                </p>
+            </section>
+            
+            <!-- Numbers and Arrays I -->
+            <section>
+                <h2>Numbers and Arrays I</h2>
+                <div class="notation-table">
+                    <table style="font-size: 0.85em; margin: 0 auto;">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left; padding: 10px;">Notation</th>
+                                <th style="text-align: left; padding: 10px;">Meaning</th>
+                                <th style="text-align: left; padding: 10px;">Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$x$</td>
+                                <td style="padding: 10px;">Scalar (single number)</td>
+                                <td style="padding: 10px;">$x = 3.14$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\mathbf{x}$</td>
+                                <td style="padding: 10px;">Vector (1D array)</td>
+                                <td style="padding: 10px;">$\mathbf{x} = \begin{bmatrix}1\\2\\3\end{bmatrix}$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\mathbf{X}$</td>
+                                <td style="padding: 10px;">Matrix (2D array)</td>
+                                <td style="padding: 10px;">$\mathbf{X} = \begin{bmatrix}1 & 2\\3 & 4\end{bmatrix}$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\mathsf{X}$</td>
+                                <td style="padding: 10px;">Tensor (n-D array)</td>
+                                <td style="padding: 10px;">3D, 4D arrays, etc.</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\mathbf{I}$</td>
+                                <td style="padding: 10px;">Identity matrix</td>
+                                <td style="padding: 10px;">$\mathbf{I} = \begin{bmatrix}1 & 0\\0 & 1\end{bmatrix}$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Numbers and Arrays II -->
+            <section>
+                <h2>Numbers and Arrays II</h2>
+                <div class="notation-table">
+                    <table style="font-size: 0.85em; margin: 0 auto;">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left; padding: 10px;">Notation</th>
+                                <th style="text-align: left; padding: 10px;">Meaning</th>
+                                <th style="text-align: left; padding: 10px;">Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$x_i$, $[\mathbf{x}]_i$</td>
+                                <td style="padding: 10px;">$i$-th element of vector</td>
+                                <td style="padding: 10px;">$x_2 = 2$ in $\mathbf{x} = [1,2,3]$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$x_{ij}$, $[\mathbf{X}]_{ij}$</td>
+                                <td style="padding: 10px;">Element at row $i$, column $j$</td>
+                                <td style="padding: 10px;">$x_{12} = 2$ in example above</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="fragment mt-lg emphasis-box" style="font-size: 0.85em;">
+                    <p>💡 Bold lowercase = vectors, Bold uppercase = matrices</p>
+                </div>
+            </section>
+            
+            <!-- Set Theory I - Common Sets -->
+            <section>
+                <h2>Set Theory I - Common Sets</h2>
+                <div class="notation-table">
+                    <table style="font-size: 0.85em; margin: 0 auto;">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left; padding: 10px;">Notation</th>
+                                <th style="text-align: left; padding: 10px;">Meaning</th>
+                                <th style="text-align: left; padding: 10px;">Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\mathbb{R}$</td>
+                                <td style="padding: 10px;">Real numbers</td>
+                                <td style="padding: 10px;">$3.14, -2.5, \sqrt{2}$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\mathbb{Z}$</td>
+                                <td style="padding: 10px;">Integers</td>
+                                <td style="padding: 10px;">$..., -2, -1, 0, 1, 2, ...$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\mathbb{Z}^+$</td>
+                                <td style="padding: 10px;">Positive integers</td>
+                                <td style="padding: 10px;">$1, 2, 3, 4, ...$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\mathbb{R}^n$</td>
+                                <td style="padding: 10px;">n-dimensional vectors</td>
+                                <td style="padding: 10px;">$\mathbb{R}^3$ = 3D vectors</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\mathbb{R}^{a \times b}$</td>
+                                <td style="padding: 10px;">$a \times b$ matrices</td>
+                                <td style="padding: 10px;">$\mathbb{R}^{2 \times 3}$ = 2×3 matrices</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="fragment mt-lg" style="text-align: center;">
+                    <p style="font-size: 0.85em;">Example: If $\mathbf{x} \in \mathbb{R}^{784}$, then $\mathbf{x}$ is a 784-dimensional vector<br>
+                    <span style="font-size: 0.9em; color: var(--color-text-secondary);">(like a flattened 28×28 image)</span></p>
+                </div>
+            </section>
+            
+            <!-- Set Theory II - Operations -->
+            <section>
+                <h2>Set Theory II - Operations</h2>
+                <div class="notation-table">
+                    <table style="font-size: 0.85em; margin: 0 auto;">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left; padding: 10px;">Notation</th>
+                                <th style="text-align: left; padding: 10px;">Meaning</th>
+                                <th style="text-align: left; padding: 10px;">Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$|\mathcal{X}|$</td>
+                                <td style="padding: 10px;">Cardinality (size)</td>
+                                <td style="padding: 10px;">$|\{1,2,3\}| = 3$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\mathcal{A} \cup \mathcal{B}$</td>
+                                <td style="padding: 10px;">Union (A or B)</td>
+                                <td style="padding: 10px;">$\{1,2\} \cup \{2,3\} = \{1,2,3\}$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\mathcal{A} \cap \mathcal{B}$</td>
+                                <td style="padding: 10px;">Intersection (both)</td>
+                                <td style="padding: 10px;">$\{1,2\} \cap \{2,3\} = \{2\}$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\mathcal{A} \setminus \mathcal{B}$</td>
+                                <td style="padding: 10px;">Difference (A not B)</td>
+                                <td style="padding: 10px;">$\{1,2,3\} \setminus \{2\} = \{1,3\}$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Functions I -->
+            <section>
+                <h2>Functions I</h2>
+                <div class="notation-table">
+                    <table style="font-size: 0.85em; margin: 0 auto;">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left; padding: 10px;">Notation</th>
+                                <th style="text-align: left; padding: 10px;">Meaning</th>
+                                <th style="text-align: left; padding: 10px;">Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$f(\cdot)$</td>
+                                <td style="padding: 10px;">A function</td>
+                                <td style="padding: 10px;">$f(x) = x^2$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\log(\cdot)$</td>
+                                <td style="padding: 10px;">Natural logarithm (base $e$)</td>
+                                <td style="padding: 10px;">$\log(e) = 1$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\log_2(\cdot)$</td>
+                                <td style="padding: 10px;">Logarithm base 2</td>
+                                <td style="padding: 10px;">$\log_2(8) = 3$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\exp(\cdot)$</td>
+                                <td style="padding: 10px;">Exponential function</td>
+                                <td style="padding: 10px;">$\exp(x) = e^x$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\mathbf{1}(\cdot)$</td>
+                                <td style="padding: 10px;"><span class="tooltip">Indicator function<span class="tooltiptext">Returns 1 if condition is true, 0 otherwise</span></span></td>
+                                <td style="padding: 10px;">$\mathbf{1}(x > 0) = \begin{cases}1 & \text{if } x > 0\\0 & \text{else}\end{cases}$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Functions II -->
+            <section>
+                <h2>Functions II</h2>
+                <div class="notation-table">
+                    <table style="font-size: 0.85em; margin: 0 auto;">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left; padding: 10px;">Notation</th>
+                                <th style="text-align: left; padding: 10px;">Meaning</th>
+                                <th style="text-align: left; padding: 10px;">Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\mathbf{X}^\top$</td>
+                                <td style="padding: 10px;">Transpose</td>
+                                <td style="padding: 10px;">$\begin{bmatrix}1 & 2\\3 & 4\end{bmatrix}^\top = \begin{bmatrix}1 & 3\\2 & 4\end{bmatrix}$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\mathbf{X}^{-1}$</td>
+                                <td style="padding: 10px;">Matrix inverse</td>
+                                <td style="padding: 10px;">$\mathbf{X}\mathbf{X}^{-1} = \mathbf{I}$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\odot$</td>
+                                <td style="padding: 10px;"><span class="tooltip">Hadamard product<span class="tooltiptext">Element-wise multiplication</span></span></td>
+                                <td style="padding: 10px;">$[1,2] \odot [3,4] = [3,8]$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$[\cdot, \cdot]$</td>
+                                <td style="padding: 10px;">Concatenation</td>
+                                <td style="padding: 10px;">$[[1,2], [3,4]] = [1,2,3,4]$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\mathbf{1}_{\mathcal{X}}(z)$</td>
+                                <td style="padding: 10px;">Set membership indicator</td>
+                                <td style="padding: 10px;">1 if $z \in \mathcal{X}$, else 0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Operators & Norms -->
+            <section>
+                <h2>Operators & Norms</h2>
+                <div class="notation-table">
+                    <table style="font-size: 0.85em; margin: 0 auto;">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left; padding: 10px;">Notation</th>
+                                <th style="text-align: left; padding: 10px;">Meaning</th>
+                                <th style="text-align: left; padding: 10px;">Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\|\cdot\|_p$</td>
+                                <td style="padding: 10px;">$\ell_p$ norm</td>
+                                <td style="padding: 10px;">$\|\mathbf{x}\|_p = \left(\sum_i |x_i|^p\right)^{1/p}$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\|\cdot\|$</td>
+                                <td style="padding: 10px;">$\ell_2$ norm (default)</td>
+                                <td style="padding: 10px;">$\|[3,4]\| = 5$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\langle \mathbf{x}, \mathbf{y} \rangle$</td>
+                                <td style="padding: 10px;">Inner product</td>
+                                <td style="padding: 10px;">$\langle [1,2], [3,4] \rangle = 11$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\sum$</td>
+                                <td style="padding: 10px;">Summation</td>
+                                <td style="padding: 10px;">$\sum_{i=1}^3 i = 6$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\prod$</td>
+                                <td style="padding: 10px;">Product</td>
+                                <td style="padding: 10px;">$\prod_{i=1}^3 i = 6$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="fragment mt-lg emphasis-box" style="font-size: 0.85em;">
+                    <p>💡 $\stackrel{\textrm{def}}{=}$ means "is defined as"</p>
+                </div>
+            </section>
+            
+            <!-- Calculus -->
+            <section>
+                <h2>Calculus</h2>
+                <div class="notation-table">
+                    <table style="font-size: 0.85em; margin: 0 auto;">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left; padding: 10px;">Notation</th>
+                                <th style="text-align: left; padding: 10px;">Meaning</th>
+                                <th style="text-align: left; padding: 10px;">Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\frac{dy}{dx}$</td>
+                                <td style="padding: 10px;">Derivative of $y$ w.r.t. $x$</td>
+                                <td style="padding: 10px;">$\frac{d}{dx}(x^2) = 2x$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\frac{\partial y}{\partial x}$</td>
+                                <td style="padding: 10px;">Partial derivative</td>
+                                <td style="padding: 10px;">$\frac{\partial}{\partial x}(x^2 + y^2) = 2x$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\nabla_{\mathbf{x}} y$</td>
+                                <td style="padding: 10px;">Gradient of $y$ w.r.t. vector $\mathbf{x}$</td>
+                                <td style="padding: 10px;">$\nabla_{\mathbf{x}} f = \left[\frac{\partial f}{\partial x_1}, ..., \frac{\partial f}{\partial x_n}\right]$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\int_a^b f(x) \, dx$</td>
+                                <td style="padding: 10px;">Definite integral</td>
+                                <td style="padding: 10px;">$\int_0^1 x^2 \, dx = \frac{1}{3}$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\int f(x) \, dx$</td>
+                                <td style="padding: 10px;">Indefinite integral</td>
+                                <td style="padding: 10px;">$\int x^2 \, dx = \frac{x^3}{3} + C$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="fragment mt-lg emphasis-box" style="font-size: 0.85em;">
+                    <p style="font-size: 0.8em;"><strong>Key for DL:</strong> Gradients tell us how to update parameters</p>
+                    <p style="font-size: 0.8em;">$\mathbf{w} \leftarrow \mathbf{w} - \eta \nabla_{\mathbf{w}} L$ &nbsp;&nbsp; (gradient descent)</p>
+                </div>
+            </section>
+            
+            <!-- Probability I -->
+            <section>
+                <h2>Probability I</h2>
+                <div class="notation-table">
+                    <table style="font-size: 0.85em; margin: 0 auto;">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left; padding: 10px;">Notation</th>
+                                <th style="text-align: left; padding: 10px;">Meaning</th>
+                                <th style="text-align: left; padding: 10px;">Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$X$</td>
+                                <td style="padding: 10px;">Random variable</td>
+                                <td style="padding: 10px;">$X$ = outcome of dice roll</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$P$</td>
+                                <td style="padding: 10px;">Probability distribution</td>
+                                <td style="padding: 10px;">$P$ = uniform distribution</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$X \sim P$</td>
+                                <td style="padding: 10px;">$X$ follows distribution $P$</td>
+                                <td style="padding: 10px;">$X \sim \mathcal{N}(0, 1)$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$P(X = x)$</td>
+                                <td style="padding: 10px;">Probability of event</td>
+                                <td style="padding: 10px;">$P(\text{dice} = 6) = \frac{1}{6}$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$P(X \mid Y)$</td>
+                                <td style="padding: 10px;">Conditional probability</td>
+                                <td style="padding: 10px;">$P(\text{rain} \mid \text{clouds})$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Probability II -->
+            <section>
+                <h2>Probability II</h2>
+                <div class="notation-table">
+                    <table style="font-size: 0.85em; margin: 0 auto;">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left; padding: 10px;">Notation</th>
+                                <th style="text-align: left; padding: 10px;">Meaning</th>
+                                <th style="text-align: left; padding: 10px;">Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$p(\cdot)$</td>
+                                <td style="padding: 10px;">Probability density function</td>
+                                <td style="padding: 10px;">$p(x) = \frac{1}{\sqrt{2\pi}}e^{-x^2/2}$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\mathbb{E}[X]$</td>
+                                <td style="padding: 10px;">Expectation (mean)</td>
+                                <td style="padding: 10px;">$\mathbb{E}[\text{dice}] = 3.5$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$X \perp Y$</td>
+                                <td style="padding: 10px;">Independence</td>
+                                <td style="padding: 10px;">Coin flips are independent</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$X \perp Y \mid Z$</td>
+                                <td style="padding: 10px;">Conditional independence</td>
+                                <td style="padding: 10px;">$X \perp Y$ given $Z$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="fragment mt-lg" style="text-align: center;">
+                    <p style="font-size: 0.85em;">Example: $X \sim \mathcal{N}(\mu, \sigma^2)$ means $X$ follows a normal distribution</p>
+                </div>
+            </section>
+            
+            <!-- Statistics & Information Theory -->
+            <section>
+                <h2>Statistics & Information Theory</h2>
+                <div class="notation-table">
+                    <table style="font-size: 0.85em; margin: 0 auto;">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left; padding: 10px;">Notation</th>
+                                <th style="text-align: left; padding: 10px;">Meaning</th>
+                                <th style="text-align: left; padding: 10px;">Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\sigma_X$</td>
+                                <td style="padding: 10px;">Standard deviation</td>
+                                <td style="padding: 10px;">Spread of data</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\text{Var}(X)$</td>
+                                <td style="padding: 10px;">Variance = $\sigma_X^2$</td>
+                                <td style="padding: 10px;">$\text{Var}(X) = \mathbb{E}[(X - \mu)^2]$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\text{Cov}(X,Y)$</td>
+                                <td style="padding: 10px;">Covariance</td>
+                                <td style="padding: 10px;">$\mathbb{E}[(X-\mu_X)(Y-\mu_Y)]$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$\rho(X,Y)$</td>
+                                <td style="padding: 10px;">Correlation coefficient</td>
+                                <td style="padding: 10px;">$\rho = \frac{\text{Cov}(X,Y)}{\sigma_X \sigma_Y}$</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td style="padding: 10px;">$H(X)$</td>
+                                <td style="padding: 10px;">Entropy</td>
+                                <td style="padding: 10px;">$-\sum_x p(x) \log p(x)$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="fragment mt-lg emphasis-box" style="font-size: 0.85em;">
+                    <p>💡 $D_{\text{KL}}(P\|Q)$ = <span class="tooltip">KL divergence<span class="tooltiptext">Measures difference between distributions</span></span></p>
+                </div>
+            </section>
+            
+            <!-- Closing Slide -->
+            <section>
+                <h2>Welcome to Deep Learning!</h2>
+                <blockquote class="fragment">
+                    "The goal is to make deep learning concepts intuitive and engaging."
+                </blockquote>
+                <p class="fragment mt-lg">Questions?</p>
+                <p class="fragment">
+                    <small>Next lecture: Introduction to the Basics of Deep Learning</small>
+                </p>
+                <p class="fragment mt-lg" style="font-size: 0.75em; color: var(--color-text-secondary);">
+                    <small>⚠️ This repository may change throughout the course. If you have cloned it, <code>git pull</code> regularly to get the newest updates.</small>
+                </p>
+            </section>
+            
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/math/math.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js"></script>
+    
+    <!-- Shared utilities -->
+    <script src="../shared/js/d3-utils.js"></script>
+    <script src="../shared/js/animation-lib.js"></script>
+    <script src="../shared/js/neural-viz.js"></script>
+    <script src="../shared/js/tooltip-modal.js"></script>
+    <script src="../shared/js/source-modal-v2.js"></script>
+    <script src="../shared/js/title-handler.js"></script>
+    
+    <!-- Presentation specific -->
+    <script src="js/tuner-visualization.js"></script>
+    <script src="js/overfit-visualization.js"></script>
+    <script src="js/intro-animations.js"></script>
+    
+    <script>
+        
+        // Initialize Reveal.js
+        Reveal.initialize({
+            hash: true,
+            controls: true,
+            progress: true,
+            center: true,
+            transition: 'slide',
+            
+            // MathJax configuration
+            math: {
+                mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js',
+                config: 'TeX-AMS_SVG-full',
+                TeX: {
+                    Macros: {
+                        R: '\\mathbb{R}',
+                        set: ['\\left\\{#1\\right\\}', 1]
+                    }
+                }
+            },
+            
+            plugins: [ RevealHighlight, RevealNotes, RevealMath ]
+        });
+        
+        // Initialize tuner demo when its slide is shown
+        Reveal.on('slidechanged', (event) => {
+            if (event.currentSlide.getAttribute('data-state') === 'tuner-demo') {
+                if (!window.tunerInitialized && typeof window.initializeTunerDemo === 'function') {
+                    // Clear any existing content first
+                    const container = document.getElementById('function-graph');
+                    if (container) {
+                        container.innerHTML = '';
+                    }
+
+                    setTimeout(() => {
+                        window.initializeTunerDemo();
+                        window.tunerInitialized = true;
+                    }, 100);
+                }
+            }
+            if (event.currentSlide.getAttribute('data-state') === 'overfit-demo') {
+                if (!window.overfitInitialized && typeof window.initializeOverfitDemo === 'function') {
+                    const container = document.getElementById('overfit-graph');
+                    if (container) {
+                        container.innerHTML = '';
+                    }
+
+                    setTimeout(() => {
+                        window.initializeOverfitDemo();
+                        window.overfitInitialized = true;
+                    }, 100);
+                }
+            }
+        });
+
+        // Also check if we're starting on one of the demo slides
+        Reveal.on('ready', () => {
+            const currentSlide = Reveal.getCurrentSlide();
+            if (currentSlide && currentSlide.getAttribute('data-state') === 'tuner-demo') {
+                if (!window.tunerInitialized && typeof window.initializeTunerDemo === 'function') {
+                    const container = document.getElementById('function-graph');
+                    if (container) {
+                        container.innerHTML = '';
+                    }
+
+                    setTimeout(() => {
+                        window.initializeTunerDemo();
+                        window.tunerInitialized = true;
+                    }, 100);
+                }
+            }
+            if (currentSlide && currentSlide.getAttribute('data-state') === 'overfit-demo') {
+                if (!window.overfitInitialized && typeof window.initializeOverfitDemo === 'function') {
+                    const container = document.getElementById('overfit-graph');
+                    if (container) {
+                        container.innerHTML = '';
+                    }
+
+                    setTimeout(() => {
+                        window.initializeOverfitDemo();
+                        window.overfitInitialized = true;
+                    }, 100);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

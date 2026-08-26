@@ -1,0 +1,3256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Machine Learning Basics - Introduction to Deep Learning</title>
+    
+    <!-- Reveal.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+    <link rel="stylesheet" href="../shared/css/reveal-theme.css">
+    <link rel="stylesheet" href="../shared/css/common.css">
+    <link rel="stylesheet" href="css/basics-custom.css">
+    <link rel="stylesheet" href="../shared/css/quiz.css">
+    
+    <!-- Code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.css">
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            
+            <!-- Title Slide -->
+            <section class="title-slide">
+                <img src="../shared/images/uoi_logo_blue.png" alt="University of Iceland Logo" class="ui-logo">
+                <h1 class="truncate-title">Machine Learning Basics</h1>
+                <p>Chapter 1: Introduction</p>
+                <p>Based on "Dive into Deep Learning" by Zhang et al.</p>
+                <p class="mt-lg">
+                    <small>Instructor: Guðmundur Einarsson</small><br>
+                    <small>University of Iceland</small>
+                </p>
+                <p class="mt-lg"><small><em>Slides adapted from Hafsteinn Einarsson, 2025 fall course</em></small></p>
+            </section>
+            
+            <!-- What is Machine Learning? Section -->
+            <section>
+                <h2 class="truncate-title">What is Machine Learning?</h2>
+                <p class="fragment">The science of pattern recognition from data</p>
+            </section>
+            
+            <section>
+                <section>
+                    <h2 class="truncate-title">Traditional Programming</h2>
+                    <p>How we've built software for decades</p>
+                    <ul class="fragment">
+                        <li>Rigid set of rules</li>
+                        <li>Precise specifications</li>
+                        <li>Deterministic behavior</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Example: E-Commerce Platform</h2>
+                    <p>Building with traditional rules:</p>
+                    <ol class="fragment">
+                        <li>User interface in browser/mobile app</li>
+                        <li>Database for user state and transactions</li>
+                        <li>Business logic mapping circumstances to actions</li>
+                    </ol>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Programming Business Logic</h2>
+                    <pre class="fragment"><code class="python">def add_to_cart(user_id, product_id):
+    # Explicit rule for every action
+    if cart_exists(user_id):
+        cart.add_item(product_id)
+    else:
+        create_cart(user_id)
+        cart.add_item(product_id)</code></pre>
+                    <p class="fragment">Handle every corner case explicitly</p>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">When Traditional Programming Works</h2>
+                    <ul>
+                        <li class="fragment">Well-defined rules</li>
+                        <li class="fragment">Predictable scenarios</li>
+                        <li class="fragment">Limited edge cases</li>
+                        <li class="fragment">No adaptation needed</li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Perfect for deterministic tasks!</p>
+                    </div>
+                </section>
+                
+                <!-- Multiple Choice Question -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "When should you use traditional programming instead of machine learning?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "When dealing with image recognition tasks",
+                                "correct": false,
+                                "explanation": "Image recognition involves complex patterns that are difficult to encode with explicit rules. Machine learning excels at learning visual features from data."
+                            },
+                            {
+                                "text": "When you have well-defined rules and predictable scenarios",
+                                "correct": true,
+                                "explanation": "Traditional programming is perfect when you can explicitly define all the rules and the problem domain is deterministic. Examples include e-commerce transactions, database operations, and business logic."
+                            },
+                            {
+                                "text": "When the rules change frequently over time",
+                                "correct": false,
+                                "explanation": "If rules change frequently, machine learning can adapt by retraining on new data, whereas traditional programming would require constant manual updates."
+                            },
+                            {
+                                "text": "When you need to recognize speech or audio patterns",
+                                "correct": false,
+                                "explanation": "Speech and audio recognition involve complex, variable patterns that are nearly impossible to capture with explicit rules. ML models can learn these patterns from examples."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <section>
+                <section>
+                    <h2 class="truncate-title">When Traditional Programming Fails</h2>
+                    <p>Some problems resist explicit rules</p>
+                    <p class="fragment mt-lg">Even the smartest programmers struggle with these...</p>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Challenge Problems</h2>
+                    <ul>
+                        <li class="fragment"><strong>Weather Prediction:</strong> Tomorrow's weather from satellite images</li>
+                        <li class="fragment"><strong>Question Answering:</strong> Understanding free-form text questions</li>
+                        <li class="fragment"><strong>Person Detection:</strong> Identifying people in images</li>
+                        <li class="fragment"><strong>Recommendations:</strong> Suggesting products users haven't seen</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Why These Problems Are Hard</h2>
+                    <ul>
+                        <li class="fragment"><strong>Dynamic patterns:</strong> Rules change over time</li>
+                        <li class="fragment"><strong>Extreme complexity:</strong> Millions of interactions</li>
+                        <li class="fragment"><strong>Unknown principles:</strong> We don't know the rules</li>
+                        <li class="fragment"><strong>Subconscious processing:</strong> Beyond conscious understanding</li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>These require learning, not programming!</p>
+                    </div>
+                </section>
+
+                <section data-sources='[{"text": "xkcd #1425: Tasks", "url": "https://xkcd.com/1425/"}]'>
+                    <h2 class="truncate-title">This particular comic aged like milk</h2>
+                    <img src="images/xkcd-1425-tasks.png" alt="xkcd comic: a programmer says checking whether a photo is in a national park is an easy GIS lookup, but checking whether the photo contains a bird will take a research team and five years" style="max-height: 60vh;">
+                </section>
+
+                <!-- Multiple Choice Question -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Which characteristics make a problem suitable for machine learning?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "The underlying rules are unknown or too complex to write",
+                                "correct": true,
+                                "explanation": "ML excels when we cannot explicitly define the rules, such as in pattern recognition, natural language understanding, or complex decision-making."
+                            },
+                            {
+                                "text": "The problem requires simple arithmetic calculations",
+                                "correct": false,
+                                "explanation": "Simple arithmetic has well-defined rules that are easy to program. Traditional programming is more efficient for such deterministic calculations."
+                            },
+                            {
+                                "text": "Patterns in the data change over time",
+                                "correct": true,
+                                "explanation": "ML models can be retrained on new data to adapt to changing patterns, making them ideal for dynamic environments."
+                            },
+                            {
+                                "text": "You have access to large amounts of example data",
+                                "correct": true,
+                                "explanation": "ML algorithms learn from examples, so having sufficient quality data is crucial for training effective models."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+            
+            <section>
+                <h2 class="truncate-title">The Machine Learning Approach</h2>
+                <ul>
+                    <li class="fragment">Computer learns patterns from data</li>
+                    <li class="fragment">No explicit rules needed</li>
+                    <li class="fragment">Some approaches can even adapt to new situations
+                        <ul>
+                            <li class="fragment">What is a new situation?</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+         
+            <section data-sources='[{"text": "Dive into Deep Learning - Introduction", "url": "https://d2l.ai/chapter_introduction/index.html"}]'>
+                <p>Machine learning is the study of algorithms that can learn from experience, also known as...</p>
+                <h2 class="truncate-title">Programming with Data</h2>
+                <div class="emphasis-box fragment">
+                    <p>"Machine Learning is programming with data instead of explicit instructions"</p>
+                </div>
+                <p class="fragment mt-lg">The paradigm shift that changed computing</p>
+            </section>
+            
+            <section>
+                <section>
+                    <h2 class="truncate-title">Example: Wake Word Detection</h2>
+                    <img src="images/wake-word.svg" alt="Wake word detection diagram" style="width: 80%;">
+                    <p class="fragment">How does "Hey Siri" or "OK Google" work?</p>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Why Is Wake Word Detection Hard?</h2>
+                    <p>Consider the technical challenge:</p>
+                    <ul class="fragment">
+                        <li><strong>44,000 samples per second</strong></li>
+                        <li>Each sample = sound wave amplitude</li>
+                        <li>Must map raw audio → wake word detection</li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>What rule could reliably detect "Alexa" in all these samples?</p>
+                    </div>
+                    <p class="fragment mt-lg">We don't know how to write such rules from scratch!</p>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">How Wake Word Detection Works</h2>
+                    <ol>
+                        <li class="fragment">Continuously listen to audio</li>
+                        <li class="fragment">Extract audio features</li>
+                        <li class="fragment">Check if pattern matches wake word</li>
+                        <li class="fragment">Activate if confidence is high</li>
+                    </ol>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Traditional Approach Attempt</h2>
+                    <pre class="fragment"><code class="python">def detect_wake_word(audio):
+    if audio_matches_pattern("ah-lek-sah"):
+        return True
+    elif audio_matches_pattern("uh-lek-suh"):
+        return True
+    # ... hundreds more rules?
+    return False</code></pre>
+                    <p class="fragment mt-lg">Too many variations to code manually!</p>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">The ML Alternative</h2>
+                    <pre><code class="python">model = train_wake_word_detector(
+    positive_examples=["alexa_1.wav", "alexa_2.wav", ...],
+    negative_examples=["other_1.wav", "other_2.wav", ...]
+)
+
+def detect_wake_word(audio):
+    return model.predict(audio) > threshold</code></pre>
+                    <p class="fragment mt-lg">Learn patterns from examples instead!</p>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Why This Approach is Powerful</h2>
+                    <ul>
+                        <li class="fragment">Handles accent variations</li>
+                        <li class="fragment">Works in noisy environments</li>
+                        <li class="fragment">Improves with more data</li>
+                        <li class="fragment">No need to code every scenario</li>
+                        <li class="fragment">Can generalize to new speakers</li>
+                    </ul>
+                </section>
+                
+                <!-- Multiple Choice Question -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Why is machine learning better than traditional programming for wake word detection?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "ML uses less computational resources",
+                                "correct": false,
+                                "explanation": "ML models, especially neural networks, often require more computational resources than simple rule-based systems. The advantage is in handling complexity, not efficiency."
+                            },
+                            {
+                                "text": "ML can handle countless variations in pronunciation, accent, and background noise",
+                                "correct": true,
+                                "explanation": "Wake word detection must handle infinite variations: different accents, speaking speeds, background noise, and pronunciations. ML learns these patterns from examples rather than requiring explicit rules for each variation."
+                            },
+                            {
+                                "text": "ML code is simpler to write and understand",
+                                "correct": false,
+                                "explanation": "ML systems can be complex to implement and understand. The advantage is that they can solve problems that would be impossible to code with explicit rules."
+                            },
+                            {
+                                "text": "ML provides deterministic, predictable outputs",
+                                "correct": false,
+                                "explanation": "ML models are probabilistic and may give different confidence scores for similar inputs. Traditional programming is better for deterministic requirements."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+            
+            <section>
+                <h2 class="truncate-title">When to Use Machine Learning</h2>
+                <ul>
+                    <li class="fragment">Pattern recognition tasks</li>
+                    <li class="fragment">Rules are too complex to write</li>
+                    <li class="fragment">Need to adapt to changing data</li>
+                    <li class="fragment">Have sufficient training data</li>
+                </ul>
+                <div class="fragment emphasis-box">
+                    <p>ML transforms intractable coding problems into tractable data problems</p>
+                </div>
+            </section>
+            
+            <!-- Key Components Overview -->            
+            <section>
+                <section data-sources='[{"text": "Dive into Deep Learning - Key Components", "url": "https://d2l.ai/chapter_introduction/index.html#key-components"}]'>
+                    <h2 class="truncate-title">Key Components of ML</h2>
+                    <h3 style="color: var(--color-accent);">The Four Pillars</h3>
+                    <ol>
+                        <li class="fragment"><span class="tooltip">Data<span class="tooltiptext">The examples from which the model learns patterns. Quality and quantity of data often determine the success of ML projects.</span></span></li>
+                        <li class="fragment"><span class="tooltip">Models<span class="tooltiptext">Mathematical functions that transform inputs to outputs. Models have parameters that are adjusted during training.</span></span></li>
+                        <li class="fragment"><span class="tooltip">Objective Functions<span class="tooltiptext">Measures how well the model is performing. Also called loss functions, they guide the learning process.</span></span></li>
+                        <li class="fragment"><span class="tooltip">Optimization Algorithms<span class="tooltiptext">Methods for adjusting model parameters to minimize the objective function. Gradient descent is the most common.</span></span></li>
+                    </ol>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">How They Work Together</h2>
+                    <img src="images/ml-loop.svg" alt="Machine learning training loop" style="width: 70%;">
+                    <p class="fragment">An iterative process of improvement</p>
+                </section>
+
+                <section data-sources='[{"text": "Dive into Deep Learning - Training Process", "url": "https://d2l.ai/chapter_introduction/index.html#key-components"}]'>
+                    <h2 class="truncate-title">Wake Word Example Revisited</h2>
+                    <p>Let's see how our four pillars work for "Alexa" detection</p>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Problem: Audio snippet → "Yes/No" for wake word</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Step 1: Define the Problem</h2>
+                    <ul>
+                        <li class="fragment"><strong>Input:</strong> Audio snippet (e.g., 1 second)</li>
+                        <li class="fragment"><strong>Output:</strong> Binary decision (wake word or not)</li>
+                        <li class="fragment"><strong>Model family:</strong> Neural network for audio</li>
+                    </ul>
+                    <p class="fragment mt-lg">Must precisely define inputs and outputs first!</p>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Step 2: Choose Model Family</h2>
+                    <p>The model has adjustable "knobs" (parameters)</p>
+                    <ul class="fragment">
+                        <li>One setting → detects "Alexa"</li>
+                        <li>Different setting → could detect "Apricot"</li>
+                        <li>Same architecture, different parameters</li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Model family must be rich enough for the task</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Step 3: The Training Process</h2>
+                    <ol>
+                        <li class="fragment">Start with random parameters (useless model)</li>
+                        <li class="fragment">Grab labeled audio examples</li>
+                        <li class="fragment">Adjust parameters to improve predictions</li>
+                        <li class="fragment">Repeat until performance is satisfactory</li>
+                    </ol>
+                    <p class="fragment mt-lg">This is "learning" - finding the right parameter settings</p>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Programming with Data</h2>
+                    <div class="columns">
+                        <div class="column">
+                            <h4>Traditional</h4>
+                            <p style="font-size: 0.8em;">Write explicit rules for wake word detection</p>
+                        </div>
+                        <div class="column">
+                            <h4>Machine Learning</h4>
+                            <p style="font-size: 0.8em;">Write program that learns from wake word examples</p>
+                        </div>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>"Programming with data" instead of programming with rules</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Different Tasks, Different Models</h2>
+                    <p>Similar tasks can share model families:</p>
+                    <ul class="fragment">
+                        <li>"Alexa" detection ≈ "Apricot" detection</li>
+                        <li>Same architecture, different training</li>
+                    </ul>
+                    <p class="fragment mt-lg">But fundamentally different tasks need different models:</p>
+                    <ul class="fragment">
+                        <li>Image captioning needs vision + language models</li>
+                        <li>Translation needs sequence-to-sequence models</li>
+                    </ul>
+                </section>
+                
+                <!-- Multiple Choice Question -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "How do the four pillars of machine learning work together in the wake word detection example?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "Data: Thousands of audio recordings of people saying the wake word",
+                                "correct": true,
+                                "explanation": "Training data consists of positive examples (wake word utterances) and negative examples (other speech/sounds) that the model learns from."
+                            },
+                            {
+                                "text": "Model: A neural network that processes audio and outputs a detection score",
+                                "correct": true,
+                                "explanation": "The model architecture (e.g., a neural network) transforms audio input into a probability score indicating whether the wake word was detected."
+                            },
+                            {
+                                "text": "Objective: Minimize false positives while maintaining high detection rate",
+                                "correct": true,
+                                "explanation": "The loss function balances between detecting actual wake words (true positives) and avoiding false activations, guiding the training process."
+                            },
+                            {
+                                "text": "Optimization: Manually adjusting each parameter based on test results",
+                                "correct": false,
+                                "explanation": "Optimization algorithms like gradient descent automatically adjust millions of parameters based on the loss function. Manual adjustment would be impossible at this scale."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+            
+            <!-- Data Section -->
+              
+            <section>
+                <section>
+                    <h1 class="truncate-title">Data</h1>
+                    <h3 style="color: var(--ui-teal);">The Foundation of Machine Learning</h3>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">The Data Revolution in Deep Learning</h2>
+                    <ul>
+                        <li class="fragment">More data = more powerful models</li>
+                        <li class="fragment">Shift from small to big data transformed deep learning</li>
+                        <li class="fragment">Many modern models require large datasets to work</li>
+                        <li class="fragment">In small data regime, traditional methods often suffice</li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>The success of deep learning is largely due to data availability</p>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Data Quality: Garbage In, Garbage Out</h2>
+                    <ul>
+                        <li class="fragment">Having lots of data isn't enough - we need the <strong>right</strong> data</li>
+                        <li class="fragment">Mistakes in data → mistakes in predictions</li>
+                        <li class="fragment">Non-predictive features → learning failure</li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg" style="background: var(--ui-coral); color: white; padding: 1em; border-left: 4px solid #D65555;">
+                        <p><strong>Critical Applications:</strong> Predictive policing, resume screening, lending decisions</p>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">The Danger of Biased Data</h2>
+                    <div class="fragment">
+                        <h4 style="color: var(--ui-coral);">Representation Failures</h4>
+                        <p>Example: Skin cancer detection trained only on light skin</p>
+                    </div>
+                    <div class="fragment">
+                        <h4 style="color: var(--ui-coral);">Historical Bias Amplification</h4>
+                        <p>Resume screening learning from biased hiring history</p>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>⚠️ This happens without intent or awareness from data scientists</p>
+                    </div>
+                </section>
+                <section>
+                    <h2 class="truncate-title">Why Data Matters</h2>
+                    <ul>
+                        <li class="fragment">Models learn from examples</li>
+                        <li class="fragment">Data quality determines model quality</li>
+                        <li class="fragment">"Garbage in, garbage out"</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Quality vs Quantity</h2>
+                    <ul>
+                        <li class="fragment">More data usually helps</li>
+                        <li class="fragment">But quality is crucial</li>
+                        <li class="fragment">Clean, labeled data is expensive</li>
+                        <li class="fragment">Balance is key</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Data Representation</h2>
+                    <p>How we encode information for models</p>
+                    <ul class="fragment">
+                        <li>Images → Pixel values</li>
+                        <li>Text → Numerical vectors</li>
+                        <li>Audio → Frequency features</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Example: Images as Numbers</h2>
+                    <p>A 3×3 grayscale image:</p>
+                    <pre class="fragment"><code>[[255, 128,   0],
+ [128,  64, 128],
+ [  0, 128, 255]]</code></pre>
+                    <p class="fragment">Each number represents pixel brightness</p>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Example: Text as Vectors</h2>
+                    <p>Words mapped to numbers:</p>
+                    <pre class="fragment"><code>"deep" → [0.2, -0.5, 0.8, ...]
+"learning" → [-0.1, 0.7, 0.3, ...]</code></pre>
+                    <p class="fragment">Captures semantic relationships</p>
+                </section>
+                
+                <!-- Multiple Choice Question -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Which statements about data in machine learning are correct?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "Data quality is more important than data quantity",
+                                "correct": false,
+                                "explanation": "Both quality and quantity matter. While quality is crucial (garbage in, garbage out), having more high-quality data generally improves model performance. The key is finding the right balance."
+                            },
+                            {
+                                "text": "All data must be converted to numerical form before training",
+                                "correct": true,
+                                "explanation": "Machine learning models work with numbers. Images become pixel values, text becomes vectors, and audio becomes frequency features. This numerical representation is essential for mathematical operations."
+                            },
+                            {
+                                "text": "Clean, labeled data is typically expensive to obtain",
+                                "correct": true,
+                                "explanation": "Creating high-quality labeled datasets often requires expert annotation, quality control, and significant time investment, making it one of the most expensive parts of ML projects."
+                            },
+                            {
+                                "text": "Text vectors capture semantic relationships between words",
+                                "correct": true,
+                                "explanation": "Modern text embeddings (vectors) are designed to place semantically similar words closer together in vector space, allowing models to understand word relationships and meaning."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+            
+            <section>
+                <section data-sources='[{"text": "Wikipedia - Amanita phalloides", "url": "https://en.wikipedia.org/wiki/Amanita_phalloides"}]'>
+                    <h2 class="truncate-title">The Mushroom Example</h2>
+                    <img src="images/death-cap.jpg" alt="Death cap mushroom" style="width: 50%;">
+                    <p class="fragment">Death cap - highly poisonous!</p>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Why Mushroom Classification?</h2>
+                    <ul>
+                        <li class="fragment">Life-or-death importance</li>
+                        <li class="fragment">Subtle visual differences</li>
+                        <li class="fragment">Expert knowledge required</li>
+                        <li class="fragment">Interesting ML use case</li>
+                        <li class="fragment">Errors can be very costly</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">The Cost of Errors</h2>
+                    <div class="fragment">
+                        <p><strong>Mushroom Classification Example</strong></p>
+                        <p>Classifier: "20% chance this is poisonous"</p>
+                    </div>
+                    <div class="fragment" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px;">
+                        <div style="background: #F5F5F5; padding: 15px; border-radius: 8px; border: 2px solid #2DD2C0;">
+                            <h4 style="color: #2DD2C0; margin-bottom: 10px;">Eat It ✓</h4>
+                            <ul style="font-size: 0.9em;">
+                                <li>80% chance: Delicious dinner (+10)</li>
+                                <li>20% chance: Death (-∞)</li>
+                            </ul>
+                            <p style="font-weight: bold; color: #FC8484; margin-top: 10px;">Expected value: -∞</p>
+                        </div>
+                        <div style="background: #F5F5F5; padding: 15px; border-radius: 8px; border: 2px solid #10099F;">
+                            <h4 style="color: #10099F; margin-bottom: 10px;">Discard It ✗</h4>
+                            <ul style="font-size: 0.9em;">
+                                <li>100% chance: No dinner (-1)</li>
+                                <li>0% chance: Death (0)</li>
+                            </ul>
+                            <p style="font-weight: bold; color: #2DD2C0; margin-top: 10px;">Expected value: -1</p>
+                        </div>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p><strong>Key Insight:</strong> In critical applications, even small error probabilities can be unacceptable when the cost of false negatives is catastrophic.</p>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Traditional Approach</h2>
+                    <p>Field guides use complex decision trees:</p>
+                    <ul class="fragment">
+                        <li>"If cap is white AND gills are free..."</li>
+                        <li>"If ring is present AND volva exists..."</li>
+                        <li>"If spore print is white AND..."</li>
+                    </ul>
+                    <p class="fragment mt-lg">Problem: Too many rules, too many exceptions!</p>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Feature Engineering</h2>
+                    <p>What features help identify poisonous mushrooms?</p>
+                    <ul class="fragment">
+                        <li><span class="tooltip">Cap<span class="tooltiptext">The top part of the mushroom, varies in color, texture, and shape</span></span>: color, shape, surface texture</li>
+                        <li><span class="tooltip">Gills<span class="tooltiptext">The blade-like structures under the cap where spores are produced</span></span>: attachment, spacing, color</li>
+                        <li><span class="tooltip">Stem<span class="tooltiptext">The stalk supporting the cap, may have rings or bulbs</span></span>: color, ring, bulb shape</li>
+                        <li><span class="tooltip">Habitat<span class="tooltiptext">Where the mushroom grows - soil type, nearby trees, season</span></span>: location, season, substrate</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Data Collection Challenges</h2>
+                    <ul>
+                        <li class="fragment">Dangerous to collect poisonous samples</li>
+                        <li class="fragment">Seasonal availability</li>
+                        <li class="fragment">Geographic variation</li>
+                        <li class="fragment">Need expert verification</li>
+                        <li class="fragment">Imbalanced data (few deadly species)</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">ML Solution Benefits</h2>
+                    <ul>
+                        <li class="fragment">Learns subtle patterns humans miss</li>
+                        <li class="fragment">Handles complex feature interactions
+                            <ul>
+                                <li class="fragment">What is a feature interaction?</li>
+                            </ul>
+                        </li>
+                        <li class="fragment">Improves with more data</li>
+                        <li class="fragment">Can provide confidence scores</li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>ML can save lives by making expert knowledge accessible, but the benefit needs to outweigh the cost of mistakes (e.g. false negatives when someone is poisoned)</p>
+                    </div>
+                </section>
+                
+                <!-- Multiple Choice Question -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "What makes mushroom classification a good machine learning problem?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "The decision rules are simple and well-defined",
+                                "correct": false,
+                                "explanation": "Actually, mushroom identification involves complex rules with many exceptions, making it difficult to code traditional if-then rules. This complexity makes it ideal for ML."
+                            },
+                            {
+                                "text": "Expert knowledge is required for accurate identification",
+                                "correct": true,
+                                "explanation": "Mushroom identification requires expert mycological knowledge. ML can capture this expertise from labeled examples and make it widely accessible."
+                            },
+                            {
+                                "text": "Subtle visual differences determine toxicity",
+                                "correct": true,
+                                "explanation": "Small visual differences between edible and poisonous mushrooms are hard for humans to consistently identify but can be learned by ML models from many examples."
+                            },
+                            {
+                                "text": "Data collection presents unique challenges like seasonal availability",
+                                "correct": true,
+                                "explanation": "Mushroom data has challenges like seasonal availability, geographic variation, and safety concerns when collecting poisonous samples, making it a realistic ML problem."
+                            }
+                        ]
+                    }'></div>
+                </section>
+                
+            </section>
+            
+            <!-- Models Section -->
+            <section>
+                <section>
+                    <h1 class="truncate-title">Models</h1>
+                    <h3 style="color: var(--color-accent);">The Learning Structures</h3>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">What is a Model?</h2>
+                    <ul>
+                        <li class="fragment">A mathematical function</li>
+                        <li class="fragment">Transforms inputs to outputs</li>
+                        <li class="fragment">Has adjustable parameters</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Models as Function Approximators</h2>
+                    <p>Goal: Learn function f where</p>
+                    <div class="fragment">
+                        <p style="font-size: 1.5em;">y = f(x)</p>
+                        <p>Given input x, predict output y</p>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Notation: True vs Predicted Values</h2>
+                    <div style="display: flex; justify-content: space-around; align-items: center; margin-top: 2em;">
+                        <div style="flex: 1; text-align: center;">
+                            <div style="font-size: 2em; color: var(--ui-primary);">y</div>
+                            <p style="font-weight: bold; margin-top: 0.5em;">True Value</p>
+                            <ul style="text-align: left; display: inline-block;">
+                                <li>Actual label in data</li>
+                                <li>Ground truth</li>
+                                <li>What we want to predict</li>
+                            </ul>
+                        </div>
+                        <div style="flex: 1; text-align: center;">
+                            <div style="font-size: 2em; color: var(--ui-coral);">ŷ</div>
+                            <p style="font-weight: bold; margin-top: 0.5em;">Predicted Value</p>
+                            <p style="font-size: 0.9em; color: #666;">(pronounced "y-hat")</p>
+                            <ul style="text-align: left; display: inline-block;">
+                                <li>Model's prediction</li>
+                                <li>Output of f(x)</li>
+                                <li>Our estimate of y</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="fragment emphasis-box" style="margin-top: 2em;">
+                        <p>Loss measures the difference: L(y, ŷ)</p>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Parameters and Weights</h2>
+                    <ul>
+                        <li class="fragment">Parameters define the model's behavior</li>
+                        <li class="fragment">Adjusted during training</li>
+                        <li class="fragment">Capture learned patterns</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Simple Linear Model</h2>
+                    <pre><code class="python">def linear_model(x, w, b):
+    return w * x + b</code></pre>
+                    <ul class="fragment">
+                        <li>w: weight (slope)</li>
+                        <li>b: bias (intercept)</li>
+                        <li>Both are learned from data</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">From Simple to Deep Models</h2>
+                    <div class="fragment">
+                        <h4 style="color: var(--ui-primary);">Simple Models</h4>
+                        <p>Perfect for appropriately simple problems</p>
+                        <p style="font-size: 0.9em;">Linear regression, decision trees, basic classifiers</p>
+                    </div>
+                    <div class="fragment">
+                        <h4 style="color: var(--ui-teal);">Deep Models</h4>
+                        <p>Many successive transformations chained together</p>
+                        <p style="font-size: 0.9em;">The "deep" in deep learning = multiple layers</p>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Complex problems stretch the limits of classical methods</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Neural Network Preview</h2>
+                    <div id="simple-network-viz"></div>
+                    <p class="fragment">Multiple layers of transformations</p>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Model Capacity</h2>
+                    <ul>
+                        <li class="fragment">Ability to fit complex patterns</li>
+                        <li class="fragment">More parameters = higher capacity</li>
+                        <li class="fragment">Balance with overfitting risk</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Choosing the Right Model</h2>
+                    <ul>
+                        <li class="fragment">Problem complexity</li>
+                        <li class="fragment">Available data</li>
+                        <li class="fragment">Computational resources</li>
+                        <li class="fragment">Interpretability needs</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Models: Key Insights</h2>
+                    <ul>
+                        <li class="fragment">Functions with learnable parameters</li>
+                        <li class="fragment">Transform inputs to predictions</li>
+                        <li class="fragment">Capacity must match problem</li>
+                    </ul>
+                </section>
+                
+                <!-- Multiple Choice Question -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Which statements about machine learning models are correct?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "A model is a mathematical function that transforms inputs to outputs",
+                                "correct": true,
+                                "explanation": "Models are indeed mathematical functions. They take input data and produce predictions or outputs through learned transformations."
+                            },
+                            {
+                                "text": "More parameters always lead to better model performance",
+                                "correct": false,
+                                "explanation": "More parameters increase model capacity but can lead to overfitting. The key is finding the right balance between capacity and generalization."
+                            },
+                            {
+                                "text": "Parameters are adjusted during training to capture patterns in data",
+                                "correct": true,
+                                "explanation": "Training is the process of adjusting model parameters (weights and biases) to minimize the loss function and learn patterns from data."
+                            },
+                            {
+                                "text": "Model capacity should match the complexity of the problem",
+                                "correct": true,
+                                "explanation": "Simple problems need simple models, complex problems need higher capacity. Mismatched capacity leads to underfitting or overfitting."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+            
+            <!-- Objective Functions Section -->
+            <section>
+                <section>
+                    <h1 class="truncate-title">Objective Functions</h1>
+                    <h3 style="color: var(--ui-teal);">Measuring Success</h3>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Why We Need Objective Functions</h2>
+                    <p>Machine learning = learning from experience</p>
+                    <p class="fragment">But what constitutes "improvement"?</p>
+                    <ul class="fragment">
+                        <li>Different people might disagree on what's better</li>
+                        <li>We need formal, mathematical measures</li>
+                        <li>Enter: <strong>Objective Functions</strong></li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Convention: Lower is better (hence "loss functions")</p>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">What Are We Optimizing?</h2>
+                    <ul>
+                        <li class="fragment">Need to measure model performance</li>
+                        <li class="fragment">Quantify "how wrong" predictions are</li>
+                        <li class="fragment">Guide parameter updates</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Loss Functions Explained</h2>
+                    <p>Loss = measure of prediction error</p>
+                    <div class="fragment">
+                        <p>Lower loss = better predictions</p>
+                        <p>Goal: minimize loss</p>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Common Loss Functions</h2>
+                    <div class="fragment">
+                        <h4 style="color: var(--ui-primary);">Regression: Squared Error</h4>
+                        <p>Square of (prediction - true value)</p>
+                        <p style="font-size: 0.9em;">Easy to optimize, differentiable</p>
+                    </div>
+                    <div class="fragment">
+                        <h4 style="color: var(--ui-teal);">Classification: Error Rate</h4>
+                        <p>Fraction of incorrect predictions</p>
+                        <p style="font-size: 0.9em;">Hard to optimize directly → use surrogates</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Mean Squared Error</h2>
+                    <p>For regression problems:</p>
+                    <div class="math-display">
+                        $$\text{MSE} = \frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2$$
+                    </div>
+                    <p class="fragment">Penalizes large errors more</p>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Cross-Entropy Loss</h2>
+                    <p>For classification problems:</p>
+                    <div class="math-display">
+                        $$L = -\sum_{i} y_i \log(\hat{y}_i)$$
+                    </div>
+                    <p class="fragment">Measures prediction confidence</p>
+                    <p class="fragment">Can be derived based on the maximum likelihood approach</p>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Loss During Training vs Testing</h2>
+                    <p>Loss = function of model parameters</p>
+                    <div class="fragment">
+                        <h4 style="color: var(--ui-primary);">Training Loss</h4>
+                        <p>Like practice exam scores</p>
+                        <p style="font-size: 0.9em;">Used to update parameters</p>
+                    </div>
+                    <div class="fragment">
+                        <h4 style="color: var(--ui-coral);">Test Loss</h4>
+                        <p>Like final exam scores</p>
+                        <p style="font-size: 0.9em;">Measures real performance</p>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg" style="background: var(--ui-coral); color: white; border-left: 4px solid #D65555;">
+                        <p>⚠️ Good training score ≠ Good test score (overfitting)</p>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Training vs Validation Loss</h2>
+                    <ul>
+                        <li class="fragment">Training loss: on training data</li>
+                        <li class="fragment">Validation loss: on held-out data</li>
+                        <li class="fragment">Gap indicates overfitting</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Overfitting Preview</h2>
+                    <div id="overfitting-viz"></div>
+                    <p class="fragment">When overfitting, the model memorizes instead of generalizing</p>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Objective Functions: Summary</h2>
+                    <ul>
+                        <li class="fragment">Quantify model performance</li>
+                        <li class="fragment">Different losses for different tasks</li>
+                        <li class="fragment">Balance training and generalization</li>
+                    </ul>
+                </section>
+                
+                <!-- Multiple Choice Question -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Which statements about objective functions and loss are correct?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "Lower loss always means better model performance",
+                                "correct": false,
+                                "explanation": "Lower training loss is good, but if validation loss is high, the model is overfitting. We need to balance both training and validation performance."
+                            },
+                            {
+                                "text": "MSE is used for regression while cross-entropy is used for classification",
+                                "correct": true,
+                                "explanation": "MSE measures continuous prediction errors suitable for regression. Cross-entropy measures probability distribution differences, ideal for classification."
+                            },
+                            {
+                                "text": "The gap between training and validation loss indicates overfitting",
+                                "correct": true,
+                                "explanation": "When training loss is much lower than validation loss, the model has memorized training data rather than learning generalizable patterns."
+                            },
+                            {
+                                "text": "Objective functions guide how model parameters are updated",
+                                "correct": true,
+                                "explanation": "The gradient of the objective function determines the direction and magnitude of parameter updates during training."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+            
+            <!-- Optimization Section -->
+            <section>
+                <section>
+                    <h1 class="truncate-title">Optimization Algorithms</h1>
+                    <h3 style="color: var(--color-accent);">Finding the Best Parameters</h3>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Finding the Best Parameters</h2>
+                    <ul>
+                        <li class="fragment">Start with random parameters</li>
+                        <li class="fragment">Measure performance (loss)</li>
+                        <li class="fragment">Adjust to improve</li>
+                        <li class="fragment">Repeat until convergence</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">The Optimization Landscape</h2>
+                    <div id="loss-landscape-viz"></div>
+                    <p class="fragment">Finding the lowest point</p>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Gradient Descent Basics</h2>
+                    <ul>
+                        <li class="fragment">Compute gradient (slope)</li>
+                        <li class="fragment">Step in opposite direction</li>
+                        <li class="fragment">Like walking downhill in fog</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">The ML Training Loop</h2>
+                    <img src="images/ml-loop.svg" alt="Machine learning training loop" style="width: 70%;">
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Learning Rate Importance</h2>
+                    <ul>
+                        <li class="fragment">Too small: slow convergence</li>
+                        <li class="fragment">Too large: might overshoot</li>
+                        <li class="fragment">Critical hyperparameter</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Convergence</h2>
+                    <ul>
+                        <li class="fragment">Loss stops decreasing</li>
+                        <li class="fragment">Parameters stabilize</li>
+                        <li class="fragment">Model has "learned"</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Optimization: Key Points</h2>
+                    <ul>
+                        <li class="fragment">Iterative improvement process</li>
+                        <li class="fragment">Gradient descent is fundamental</li>
+                        <li class="fragment">Many variations exist</li>
+                    </ul>
+                </section>
+                
+                <!-- Multiple Choice Question -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Which statements about optimization in machine learning are correct?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "Gradient descent always finds the global minimum",
+                                "correct": false,
+                                "explanation": "Gradient descent can get stuck in local minima. It finds a minimum, but not necessarily the global one, especially in non-convex loss landscapes."
+                            },
+                            {
+                                "text": "The learning rate controls how big each optimization step is",
+                                "correct": true,
+                                "explanation": "Learning rate is multiplied by the gradient to determine step size. Too large can overshoot, too small makes training slow."
+                            },
+                            {
+                                "text": "Optimization is an iterative process that improves parameters gradually",
+                                "correct": true,
+                                "explanation": "Parameters are updated repeatedly based on the gradient until the loss converges or a stopping criterion is met."
+                            },
+                            {
+                                "text": "Convergence means the loss has reached exactly zero",
+                                "correct": false,
+                                "explanation": "Convergence means the loss has stopped decreasing significantly, not that it reaches zero. Most real problems never achieve zero loss."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+            
+            <!-- Types of Machine Learning -->
+            <section>
+                <section>
+                    <h1 class="truncate-title">Types of Machine Learning</h1>
+                    <h3 style="color: var(--color-accent);">Different Learning Paradigms</h3>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Three Main Paradigms</h2>
+                    <ol>
+                        <li class="fragment"><span class="tooltip">Supervised Learning<span class="tooltiptext">Learning from labeled examples where we know the correct answers</span></span></li>
+                        <li class="fragment"><span class="tooltip">Unsupervised Learning<span class="tooltiptext">Finding patterns in data without labels</span></span></li>
+                        <li class="fragment"><span class="tooltip">Reinforcement Learning<span class="tooltiptext">Learning through interaction and rewards</span></span></li>
+                    </ol>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Overview Comparison</h2>
+                    <table style="font-size: 0.8em;">
+                        <tr>
+                            <th>Type</th>
+                            <th>Data</th>
+                            <th>Goal</th>
+                        </tr>
+                        <tr class="fragment">
+                            <td>Supervised</td>
+                            <td>Labeled</td>
+                            <td>Predict labels</td>
+                        </tr>
+                        <tr class="fragment">
+                            <td>Unsupervised</td>
+                            <td>Unlabeled</td>
+                            <td>Find structure</td>
+                        </tr>
+                        <tr class="fragment">
+                            <td>Reinforcement</td>
+                            <td>Rewards</td>
+                            <td>Maximize reward</td>
+                        </tr>
+                    </table>
+                </section>
+                
+                <!-- Multiple Choice Question -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Match the learning paradigm with its characteristics:",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "Supervised learning requires labeled training data",
+                                "correct": true,
+                                "explanation": "Supervised learning needs input-output pairs where the correct output (label) is known for each training example."
+                            },
+                            {
+                                "text": "Unsupervised learning is used when we have clear target outputs",
+                                "correct": false,
+                                "explanation": "Unsupervised learning is used when we DO NOT have labels. It finds hidden patterns and structure in unlabeled data."
+                            },
+                            {
+                                "text": "Reinforcement learning learns from rewards and penalties",
+                                "correct": true,
+                                "explanation": "RL agents learn by taking actions and receiving feedback in the form of rewards or penalties, optimizing long-term reward."
+                            },
+                            {
+                                "text": "All three paradigms require the same type of training data",
+                                "correct": false,
+                                "explanation": "Each paradigm uses different data: supervised needs labels, unsupervised uses unlabeled data, and RL uses rewards/penalties."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+            
+            <!-- Supervised Learning Section -->
+            <section>
+                <section>
+                    <h1 class="truncate-title">Supervised Learning</h1>
+                    <h3 style="color: var(--color-accent);">Learning from Examples</h3>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">What is Supervised Learning?</h2>
+                    <ul>
+                        <li class="fragment">Given: input-output pairs</li>
+                        <li class="fragment">Learn: mapping function</li>
+                        <li class="fragment">Goal: predict new outputs</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Input-Output Pairs</h2>
+                    <p>Training data format:</p>
+                    <pre class="fragment"><code>(image of cat) → "cat"
+(image of dog) → "dog"
+(house features) → $500,000
+(email text) → "spam"</code></pre>
+                </section>
+                
+                <!-- Multiple Choice Question -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Which are valid examples of supervised learning tasks?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "Predicting house prices based on features like size and location",
+                                "correct": true,
+                                "explanation": "This is regression, a supervised learning task where we predict continuous values from labeled training data."
+                            },
+                            {
+                                "text": "Grouping customers by purchasing behavior without predefined categories",
+                                "correct": false,
+                                "explanation": "This is clustering, an unsupervised learning task since there are no predefined labels or categories."
+                            },
+                            {
+                                "text": "Classifying emails as spam or not spam",
+                                "correct": true,
+                                "explanation": "This is binary classification, a supervised task where we learn from labeled examples of spam and non-spam emails."
+                            },
+                            {
+                                "text": "Discovering hidden topics in a collection of documents",
+                                "correct": false,
+                                "explanation": "This is topic modeling, an unsupervised task that finds patterns without labeled training data."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+            
+            <!-- Regression -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Regression</h2>
+                    <h3 style="color: var(--color-accent);">Predicting Continuous Values</h3>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">What is Regression?</h2>
+                    <ul>
+                        <li class="fragment">Output is a continuous number</li>
+                        <li class="fragment">Examples: prices, temperatures, scores</li>
+                        <li class="fragment">Goal: minimize prediction error</li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Regression = predicting "how much" or "how many"</p>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Real-World Regression Tasks</h2>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1em; margin-top: 1em;">
+                        <div class="fragment">
+                            <h4 style="color: var(--ui-primary);">🏠 Real Estate</h4>
+                            <ul style="font-size: 0.9em;">
+                                <li>House prices</li>
+                                <li>Rental rates</li>
+                                <li>Property valuations</li>
+                            </ul>
+                        </div>
+                        <div class="fragment">
+                            <h4 style="color: var(--ui-primary);">📈 Finance</h4>
+                            <ul style="font-size: 0.9em;">
+                                <li>Stock prices</li>
+                                <li>Risk scores</li>
+                                <li>Loan amounts</li>
+                            </ul>
+                        </div>
+                        <div class="fragment">
+                            <h4 style="color: var(--ui-primary);">🌡️ Science</h4>
+                            <ul style="font-size: 0.9em;">
+                                <li>Temperature prediction</li>
+                                <li>Chemical concentrations</li>
+                                <li>Growth rates</li>
+                            </ul>
+                        </div>
+                        <div class="fragment">
+                            <h4 style="color: var(--ui-primary);">⚡ Engineering</h4>
+                            <ul style="font-size: 0.9em;">
+                                <li>Power consumption</li>
+                                <li>Load forecasting</li>
+                                <li>Performance metrics</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Linear Regression: The Foundation</h2>
+                    <div class="math-display">
+                        $$\hat{y} = wx + b$$
+                    </div>
+                    <ul class="fragment">
+                        <li><span style="color: var(--ui-primary);">w</span>: weight (slope) - relationship strength
+                            <ul>
+                                <li class="fragment">w is often referred to as the parameters of the linear model</li>
+                            </ul>
+                        </li>
+                        <li><span style="color: var(--ui-primary);">b</span>: bias (intercept) - baseline value
+                            <ul>
+                                <li class="fragment">How can b be a part of x and w?</li>
+                            </ul>
+                        </li>
+                        <li><span style="color: var(--ui-coral);">ŷ</span>: predicted value</li>
+                    </ul>
+                    <p class="fragment mt-lg">Multiple features: $\hat{y} = w_1x_1 + w_2x_2 + ... + b$</p>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Example: House Price Prediction</h2>
+                    <div id="regression-demo" style="display: flex; justify-content: center; align-items: center; margin: 0 auto;"></div>
+                    <p class="fragment">Each point is a house, line shows learned relationship</p>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Measuring Regression Performance</h2>
+                    <h3>Mean Squared Error (MSE)</h3>
+                    <div class="math-display">
+                        $$\text{MSE} = \frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2$$
+                    </div>
+                    <ul class="fragment">
+                        <li>Squares the errors (penalizes large errors more)
+                            <ul>
+                                <li class="fragment">Why can it be bad to penalize large errors more? What is the impact of outliers?</li>
+                            </ul>
+                        </li>
+                        <li>Always positive</li>
+                        <li>Lower is better</li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Other metrics: 
+                            <span class="tooltip" style="cursor: pointer; text-decoration: underline;">MAE<span class="tooltiptext">Mean Absolute Error: Average of absolute differences between predictions and actual values. Less sensitive to outliers than MSE.</span></span>
+                            (Mean Absolute Error), 
+                            <span class="tooltip" style="cursor: pointer; text-decoration: underline;">R² score<span class="tooltiptext">Coefficient of Determination: Proportion of variance in the dependent variable predictable from the independent variable(s). Ranges from 0 to 1, where 1 means perfect prediction.</span></span>
+                        </p>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Beyond Linear: Polynomial Regression</h2>
+                    <p>When relationships are non-linear:</p>
+                    <div class="math-display fragment">
+                        $$\hat{y} = w_0 + w_1x + w_2x^2 + w_3x^3 + ...$$
+                    </div>
+                    <ul class="fragment">
+                        <li>Can fit curves, not just lines</li>
+                        <li>More flexible but risk of overfitting</li>
+                        <li>Need to choose degree carefully</li>
+                    </ul>
+                </section>
+                
+                <!-- Multiple Choice Question -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Which statements about regression are correct?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "Regression predicts continuous numerical values",
+                                "correct": true,
+                                "explanation": "Regression is used when the output is a continuous number like price, temperature, or score, not discrete categories."
+                            },
+                            {
+                                "text": "MSE penalizes large errors more than small ones",
+                                "correct": true,
+                                "explanation": "Because MSE squares the errors, a prediction that is off by 10 contributes 100 to the loss, while being off by 2 only contributes 4."
+                            },
+                            {
+                                "text": "Linear regression can only fit straight lines",
+                                "correct": true,
+                                "explanation": "Linear regression fits a straight line. For curves, you need polynomial regression or other non-linear methods."
+                            },
+                            {
+                                "text": "Higher degree polynomials always give better predictions",
+                                "correct": false,
+                                "explanation": "Higher degree polynomials can overfit the training data, memorizing noise instead of learning patterns, leading to poor generalization."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+            
+            <!-- Classification -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Classification</h2>
+                    <h3 style="color: var(--color-accent);">Predicting Categories</h3>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">What is Classification?</h2>
+                    <ul>
+                        <li class="fragment">Output is a discrete category/class</li>
+                        <li class="fragment">Examples: spam/not spam, digit recognition</li>
+                        <li class="fragment">Can be binary or multi-class</li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Classification = predicting "which type" or "what category"</p>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Binary Classification</h2>
+                    <p>Two possible outcomes:</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2em; margin-top: 2em;">
+                        <div class="fragment">
+                            <h4 style="color: var(--color-success);">✓ Positive Class</h4>
+                            <ul style="font-size: 0.9em;">
+                                <li>Email is spam</li>
+                                <li>Transaction is fraud</li>
+                                <li>Patient has disease</li>
+                                <li>Image contains cat</li>
+                            </ul>
+                        </div>
+                        <div class="fragment">
+                            <h4 style="color: var(--ui-coral);">✗ Negative Class</h4>
+                            <ul style="font-size: 0.9em;">
+                                <li>Email is not spam</li>
+                                <li>Transaction is legitimate</li>
+                                <li>Patient is healthy</li>
+                                <li>Image doesn't contain cat</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p class="fragment mt-lg">Output: probability between 0 and 1</p>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Multi-Class Classification</h2>
+                    <p>More than two categories:</p>
+                    <div class="fragment">
+                        <img src="images/stackedanimals.png" alt="Stacked animals" style="max-height: 300px; width: auto;">
+                    </div>
+                    <div class="fragment" style="margin-top: 1em;">
+                        <p><strong>Examples:</strong></p>
+                        <ul style="display: inline-block; text-align: left;">
+                            <li>Digit recognition (0-9)</li>
+                            <li>Language detection (100+ languages)</li>
+                            <li>Product categories (electronics, clothing, food...)</li>
+                            <li>Disease diagnosis (multiple conditions)</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">From Scores to Probabilities</h2>
+                    <h3>The Softmax Function</h3>
+                    <p>Converts raw scores to probabilities:</p>
+                    <div class="math-display fragment">
+                        $$P(y=k) = \frac{e^{z_k}}{\sum_{j} e^{z_j}}$$
+                    </div>
+                    <div class="fragment">
+                        <p><strong>Example:</strong></p>
+                        <pre><code>Scores: [2.0, 1.0, 0.1]
+Probabilities: [0.66, 0.24, 0.10]
+Prediction: Class 0 (highest probability)</code></pre>
+                    </div>
+                    <p class="fragment">All probabilities sum to 1.0</p>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Decision Boundaries</h2>
+                    <p>How classifiers separate classes:</p>
+                    <div id="classification-boundary-viz" style="height: 400px;"></div>
+                    <p class="fragment">Linear boundaries for simple problems, non-linear for complex ones</p>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Measuring Classification Performance</h2>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1em;">
+                        <div class="fragment">
+                            <h4 style="color: var(--color-primary);">Accuracy</h4>
+                            <p style="font-size: 0.9em;">% of correct predictions</p>
+                            <p style="font-size: 0.8em;">Good for balanced datasets</p>
+                        </div>
+                        <div class="fragment">
+                            <h4 style="color: var(--color-primary);">Precision</h4>
+                            <p style="font-size: 0.9em;">% of positive predictions that are correct</p>
+                            <p style="font-size: 0.8em;">Important when false positives are costly</p>
+                        </div>
+                        <div class="fragment">
+                            <h4 style="color: var(--color-primary);">Recall</h4>
+                            <p style="font-size: 0.9em;">% of actual positives correctly identified</p>
+                            <p style="font-size: 0.8em;">Important when false negatives are costly</p>
+                        </div>
+                        <div class="fragment">
+                            <h4 style="color: var(--color-primary);">F1 Score</h4>
+                            <p style="font-size: 0.9em;">Harmonic mean of precision and recall</p>
+                            <p style="font-size: 0.8em;">Balanced metric</p>
+                        </div>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Confusion Matrix</h2>
+                    <p>Visualizing classification errors:</p>
+                    <table style="margin: 1em auto;">
+                        <tr>
+                            <th></th>
+                            <th colspan="2">Predicted</th>
+                        </tr>
+                        <tr>
+                            <th rowspan="2">Actual</th>
+                            <td style="background: #d4edda;">True Positive</td>
+                            <td style="background: #f8d7da;">False Positive</td>
+                        </tr>
+                        <tr>
+                            <td style="background: #f8d7da;">False Negative</td>
+                            <td style="background: #d4edda;">True Negative</td>
+                        </tr>
+                    </table>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Shows exactly where the model makes mistakes</p>
+                    </div>
+                </section>
+                
+                <!-- Multiple Choice Question -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Which statements about classification are correct?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "Classification predicts discrete categories, not continuous values",
+                                "correct": true,
+                                "explanation": "Classification assigns inputs to discrete classes (cat/dog, spam/not spam) while regression predicts continuous numbers."
+                            },
+                            {
+                                "text": "Softmax ensures all class probabilities sum to 1",
+                                "correct": true,
+                                "explanation": "The softmax function normalizes scores into a probability distribution where all values are between 0 and 1 and sum to exactly 1."
+                            },
+                            {
+                                "text": "Accuracy is always the best metric for classification",
+                                "correct": false,
+                                "explanation": "Accuracy can be misleading for imbalanced datasets. If 99% of emails are not spam, always predicting not spam gives 99% accuracy but catches no spam."
+                            },
+                            {
+                                "text": "Binary classification can use a threshold on probability to make decisions",
+                                "correct": true,
+                                "explanation": "Binary classifiers output a probability (0-1) and use a threshold (typically 0.5) to decide the class. This threshold can be adjusted based on needs."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+            
+            <!-- Tagging -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Tagging</h2>
+                    <h3 style="color: var(--color-accent);">Multi-Label Problems</h3>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Multi-Label vs Multi-Class</h2>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2em; margin-top: 1em;">
+                        <div class="fragment">
+                            <h4 style="color: var(--color-primary);">Multi-Class</h4>
+                            <p style="font-size: 0.9em;">One label per item</p>
+                            <ul style="font-size: 0.8em;">
+                                <li>Animal: cat OR dog OR bird</li>
+                                <li>Sentiment: positive OR negative</li>
+                                <li>Digit: 0 OR 1 OR ... OR 9</li>
+                            </ul>
+                        </div>
+                        <div class="fragment">
+                            <h4 style="color: var(--color-accent);">Multi-Label</h4>
+                            <p style="font-size: 0.9em;">Multiple labels per item</p>
+                            <ul style="font-size: 0.8em;">
+                                <li>Movie: action AND comedy AND sci-fi</li>
+                                <li>Article: tech AND business AND AI</li>
+                                <li>Image: person AND car AND tree</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Labels are not mutually exclusive in multi-label problems</p>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Real-World Tagging Applications</h2>
+                    <div class="fragment">
+                        <h4 style="color: var(--ui-primary);">📽️ Content Tagging</h4>
+                        <p>Netflix movie: [Drama, Thriller, Based on Book, Award-Winning]</p>
+                    </div>
+                    <div class="fragment">
+                        <h4 style="color: var(--ui-primary);">🏥 Medical Diagnosis</h4>
+                        <p>Patient conditions: [Diabetes, Hypertension, Obesity]</p>
+                    </div>
+                    <div class="fragment">
+                        <h4 style="color: var(--ui-primary);">📸 Image Annotation</h4>
+                        <p>Photo tags: [Sunset, Beach, People, Vacation, Summer]</p>
+                    </div>
+                    <div class="fragment">
+                        <h4 style="color: var(--ui-primary);">📰 Document Classification</h4>
+                        <p>Research paper: [Machine Learning, Computer Vision, Neural Networks]</p>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">How Multi-Label Works</h2>
+                    <p>Independent binary classifiers for each label:</p>
+                    <div class="fragment">
+                        <pre><code>Input: Movie description
+                        
+Output probabilities:
+- Action: 0.85 ✓
+- Comedy: 0.72 ✓
+- Drama:  0.23 ✗
+- Horror: 0.05 ✗
+- Sci-Fi: 0.91 ✓
+
+Threshold: 0.5
+Tags: [Action, Comedy, Sci-Fi]</code></pre>
+                    </div>
+                    <p class="fragment">Each label has its own probability threshold</p>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Challenges in Multi-Label Learning</h2>
+                    <ul>
+                        <li class="fragment"><strong>Label Correlation:</strong> Some labels often appear together</li>
+                        <li class="fragment"><strong>Label Imbalance:</strong> Some tags are rare</li>
+                        <li class="fragment"><strong>Threshold Selection:</strong> Different thresholds for different labels</li>
+                        <li class="fragment"><strong>Evaluation Complexity:</strong> Partial matches complicate metrics</li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Example: "Action" and "Adventure" often co-occur in movies</p>
+                    </div>
+                </section>
+                
+                <!-- Multiple Choice Question -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Which statements about multi-label classification (tagging) are correct?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "An item can have multiple labels simultaneously",
+                                "correct": true,
+                                "explanation": "In multi-label classification, each item can belong to multiple categories at once, like a movie being both action and comedy."
+                            },
+                            {
+                                "text": "Labels in multi-label problems are mutually exclusive",
+                                "correct": false,
+                                "explanation": "Labels are NOT mutually exclusive in multi-label problems. An item can have multiple labels, unlike multi-class where only one label is assigned."
+                            },
+                            {
+                                "text": "Each label can have its own probability threshold",
+                                "correct": true,
+                                "explanation": "Different labels may need different thresholds. For example, common tags might use 0.5 while rare important tags might use a lower threshold."
+                            },
+                            {
+                                "text": "Multi-label is the same as multi-class classification",
+                                "correct": false,
+                                "explanation": "Multi-class assigns exactly one label from many options. Multi-label can assign zero, one, or many labels to each item."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+            
+            <!-- Search -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Search and Ranking</h2>
+                    <h3 style="color: var(--color-accent);">Ordering Results by Relevance</h3>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">The Ranking Problem</h2>
+                    <p>Not just finding results, but ordering them:</p>
+                    <div class="fragment">
+                        <p><strong>Query:</strong> "machine learning"</p>
+                        <p><strong>Challenge:</strong> Millions of results - which first?</p>
+                    </div>
+                    <ul class="fragment">
+                        <li>Most relevant at the top</li>
+                        <li>Personalized to user</li>
+                        <li>Consider multiple factors</li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Users rarely look past the first page!</p>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Learning to Rank</h2>
+                    <p>ML learns what makes results relevant:</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1em; margin-top: 1em;">
+                        <div class="fragment">
+                            <h4 style="color: var(--ui-primary);">Input Features</h4>
+                            <ul style="font-size: 0.8em;">
+                                <li>Query-document similarity</li>
+                                <li>Document quality/authority</li>
+                                <li>User location/history</li>
+                                <li>Freshness of content</li>
+                            </ul>
+                        </div>
+                        <div class="fragment">
+                            <h4 style="color: var(--color-accent);">Training Signal</h4>
+                            <ul style="font-size: 0.8em;">
+                                <li>Click-through rates</li>
+                                <li>Dwell time on page</li>
+                                <li>Bounce rates</li>
+                                <li>Manual relevance labels</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Applications Beyond Web Search</h2>
+                    <div class="fragment">
+                        <h4>🛍️ E-commerce Product Search</h4>
+                        <p style="font-size: 0.9em;">Rank products by relevance, price, reviews, availability</p>
+                    </div>
+                    <div class="fragment">
+                        <h4>📧 Email Priority Inbox</h4>
+                        <p style="font-size: 0.9em;">Rank emails by importance to user</p>
+                    </div>
+                    <div class="fragment">
+                        <h4>📱 App Store Rankings</h4>
+                        <p style="font-size: 0.9em;">Rank apps by relevance, quality, popularity</p>
+                    </div>
+                    <div class="fragment">
+                        <h4>💼 Job Matching</h4>
+                        <p style="font-size: 0.9em;">Rank candidates or positions by fit</p>
+                    </div>
+                </section>
+                
+                <!-- Multiple Choice Question -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Which statements about search and ranking are correct?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "Ranking is about ordering results by relevance, not just finding them",
+                                "correct": true,
+                                "explanation": "Search finds matching results, but ranking determines the order, which is crucial since users rarely look beyond the first few results."
+                            },
+                            {
+                                "text": "Click-through rate is a useful training signal for learning to rank",
+                                "correct": true,
+                                "explanation": "User clicks indicate which results are relevant for queries, providing implicit feedback to train ranking models."
+                            },
+                            {
+                                "text": "All users should see the same ranking for the same query",
+                                "correct": false,
+                                "explanation": "Modern search systems personalize rankings based on user history, location, and preferences for better relevance."
+                            },
+                            {
+                                "text": "Learning to rank can use multiple features beyond text matching",
+                                "correct": true,
+                                "explanation": "Ranking models consider many features: text relevance, page authority, freshness, user context, and more."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+            
+            <!-- Recommender Systems -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Recommender Systems</h2>
+                    <h3 style="color: var(--color-accent);">Personalized Suggestions</h3>
+                </section>
+                
+                <section data-sources='[{"text": "Collaborative Filtering for Implicit Feedback Datasets", "url": "http://yifanhu.net/PUB/cf.pdf"}]'>
+                    <h2 class="truncate-title">Why Recommendations Matter</h2>
+                    <img src="images/deeplearning-amazon.jpg" alt="Amazon recommendations" style="width: 60%;">
+                    <ul class="fragment">
+                        <li>35% of Amazon purchases from recommendations</li>
+                        <li>75% of Netflix viewing from recommendations</li>
+                        <li>Crucial for user engagement</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Two Main Approaches</h2>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1em;">
+                        <div class="fragment">
+                            <h4 style="color: var(--ui-primary);">Collaborative Filtering</h4>
+                            <p style="font-size: 0.9em;">"Users like you also liked..."</p>
+                            <ul style="font-size: 0.8em;">
+                                <li>Based on user behavior</li>
+                                <li>Find similar users</li>
+                                <li>Recommend their favorites</li>
+                                <li>No content analysis needed</li>
+                            </ul>
+                        </div>
+                        <div class="fragment">
+                            <h4 style="color: var(--color-accent);">Content-Based</h4>
+                            <p style="font-size: 0.9em;">"Because you liked X..."</p>
+                            <ul style="font-size: 0.8em;">
+                                <li>Analyze item features</li>
+                                <li>Find similar items</li>
+                                <li>Match user preferences</li>
+                                <li>Works for new items</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Modern systems combine both approaches</p>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">The Cold Start Problem</h2>
+                    <p>How to recommend when you have no data?</p>
+                    <ul class="fragment">
+                        <li><strong>New Users:</strong> No history to learn from</li>
+                        <li><strong>New Items:</strong> No ratings or interactions</li>
+                    </ul>
+                    <div class="fragment">
+                        <p><strong>Solutions:</strong></p>
+                        <ul>
+                            <li>Ask for preferences during onboarding</li>
+                            <li>Use demographic information</li>
+                            <li>Show popular items initially</li>
+                            <li>Use content features for new items</li>
+                        </ul>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Matrix Factorization</h2>
+                    <p>Core technique for collaborative filtering:</p>
+                    <div class="fragment">
+                        <p>User-Item matrix → User factors × Item factors</p>
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxyZWN0IHg9IjEwIiB5PSI1MCIgd2lkdGg9IjE1MCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiMxMDA5OUYiIG9wYWNpdHk9IjAuMyIgc3Ryb2tlPSIjMTAwOTlGIiBzdHJva2Utd2lkdGg9IjIiLz4KICAgIDx0ZXh0IHg9Ijg1IiB5PSIxMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiMxMDA5OUYiIGZvbnQtd2VpZ2h0PSJib2xkIj5Vc2VyLUl0ZW08L3RleHQ+CiAgICA8dGV4dCB4PSI4NSIgeT0iMTIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEyIiBmaWxsPSIjNjY2Ij5TcGFyc2UgTWF0cml4PC90ZXh0PgogICAgCiAgICA8dGV4dCB4PSIxODAiIHk9IjEwMCIgZm9udC1zaXplPSIyNCIgZmlsbD0iIzMzMyI+4omIPC90ZXh0PgogICAgCiAgICA8cmVjdCB4PSIyMjAiIHk9IjUwIiB3aWR0aD0iODAiIGhlaWdodD0iMTAwIiBmaWxsPSIjMkREMkMwIiBvcGFjaXR5PSIwLjMiIHN0cm9rZT0iIzJERDJDMCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8dGV4dCB4PSIyNjAiIHk9IjEwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzJERDJDMCIgZm9udC13ZWlnaHQ9ImJvbGQiPlVzZXI8L3RleHQ+CiAgICA8dGV4dCB4PSIyNjAiIHk9IjEyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzY2NiI+RmFjdG9yczwvdGV4dD4KICAgIAogICAgPHRleHQgeD0iMzIwIiB5PSIxMDAiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiMzMzMiPsOXPC90ZXh0PgogICAgCiAgICA8cmVjdCB4PSIzNjAiIHk9IjcwIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRkM4NDg0IiBvcGFjaXR5PSIwLjMiIHN0cm9rZT0iI0ZDODQ4NCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8dGV4dCB4PSI0MzUiIHk9IjEwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNCIgZmlsbD0iI0ZDODQ4NCIgZm9udC13ZWlnaHQ9ImJvbGQiPkl0ZW0gRmFjdG9yczwvdGV4dD4KPC9zdmc+" alt="Matrix factorization diagram" style="width: 100%; max-width: 600px;">
+                    </div>
+                    <p class="fragment">Learns latent features automatically</p>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">The Danger of Recommendation Rabbit Holes</h2>
+                    <div class="fragment">
+                        <h4 style="color: var(--ui-coral);">Filter Bubbles</h4>
+                        <p style="font-size: 0.9em;">Users only see content similar to past behavior</p>
+                        <p style="font-size: 0.7em;">Limits exposure to diverse perspectives</p>
+                    </div>
+                    <div class="fragment">
+                        <h4 style="color: var(--ui-coral);">Echo Chambers</h4>
+                        <p style="font-size: 0.9em;">Reinforces existing beliefs and biases</p>
+                        <p style="font-size: 0.7em;">Can amplify misinformation</p>
+                    </div>
+                    <div class="fragment">
+                        <h4 style="color: var(--ui-coral);">Addiction Patterns</h4>
+                        <p style="font-size: 0.9em;">Optimizing for engagement can exploit psychology</p>
+                        <p style="font-size: 0.7em;">Particularly harmful for vulnerable users</p>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>⚠️ Recommender systems shape what billions of people see online</p>
+                    </div>
+                </section>
+                
+                <!-- Multiple Choice Question -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Which statements about recommender systems are correct?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "Collaborative filtering needs user behavior data to work",
+                                "correct": true,
+                                "explanation": "Collaborative filtering relies on user interactions (views, purchases, ratings) to find patterns and similar users."
+                            },
+                            {
+                                "text": "Content-based recommendations work well for new items",
+                                "correct": true,
+                                "explanation": "Content-based methods analyze item features, so they can recommend new items with similar features to what users liked before."
+                            },
+                            {
+                                "text": "The cold start problem only affects new users",
+                                "correct": false,
+                                "explanation": "Cold start affects both new users (no history) and new items (no interactions), making recommendations difficult for both."
+                            },
+                            {
+                                "text": "Matrix factorization discovers latent features from user-item interactions",
+                                "correct": true,
+                                "explanation": "Matrix factorization automatically learns hidden patterns (latent features) that explain user preferences and item characteristics."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+            
+            <!-- Sequence Learning -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Sequence Learning</h2>
+                    <h3 style="color: var(--color-accent);">Temporal Dependencies</h3>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">When Order Matters</h2>
+                    <p>Sequential data is everywhere:</p>
+                    <ul class="fragment">
+                        <li><strong>Language:</strong> Word order determines meaning</li>
+                        <li><strong>Time Series:</strong> Stock prices, weather patterns</li>
+                        <li><strong>Audio/Video:</strong> Temporal progression</li>
+                        <li><strong>User Behavior:</strong> Click sequences, navigation paths</li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>"Time is an arrow" ≠ "Arrow an is time"</p>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Challenges of Sequential Data</h2>
+                    <ul>
+                        <li class="fragment"><strong>Variable Length:</strong> Sequences can be any length</li>
+                        <li class="fragment"><strong>Long-Range Dependencies:</strong> Early events affect later ones</li>
+                        <li class="fragment"><strong>Temporal Patterns:</strong> Trends, seasonality, cycles</li>
+                        <li class="fragment"><strong>Context Window:</strong> How much history to consider?</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Types of Sequence Problems</h2>
+                    <div style="font-size: 0.9em;">
+                        <div class="fragment">
+                            <h4 style="color: var(--ui-primary);">One-to-Many</h4>
+                            <p>Image → Caption (words)</p>
+                        </div>
+                        <div class="fragment">
+                            <h4 style="color: var(--ui-primary);">Many-to-One</h4>
+                            <p>Sentence → Sentiment</p>
+                        </div>
+                        <div class="fragment">
+                            <h4 style="color: var(--ui-primary);">Many-to-Many (Synchronized)</h4>
+                            <p>Video → Frame labels</p>
+                        </div>
+                        <div class="fragment">
+                            <h4 style="color: var(--ui-primary);">Many-to-Many (Sequence-to-Sequence)</h4>
+                            <p>English text → French text</p>
+                        </div>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Example: Speech Recognition</h2>
+                    <img src="images/speech.png" alt="Speech waveform" style="width: 70%;">
+                    <div class="fragment">
+                        <p>Audio waveform → Text transcription</p>
+                        <ul style="font-size: 0.9em;">
+                            <li>Variable length input and output</li>
+                            <li>Temporal alignment challenges</li>
+                            <li>Context helps disambiguate</li>
+                        </ul>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Recurrent Neural Networks Preview</h2>
+                    <p>Networks with memory:</p>
+                    <div class="fragment">
+                        <pre><code>For each time step t:
+    hidden_state[t] = f(input[t], hidden_state[t-1])
+    output[t] = g(hidden_state[t])</code></pre>
+                    </div>
+                    <ul class="fragment">
+                        <li>Maintains state across time steps</li>
+                        <li>Can handle variable length sequences</li>
+                        <li>Foundation for 
+                            <span class="tooltip" style="cursor: pointer; text-decoration: underline;">LSTMs<span class="tooltiptext">Long Short-Term Memory: RNN variant with gates (forget, input, output) to control information flow, solving vanishing gradient problem</span></span> 
+                            and 
+                            <span class="tooltip" style="cursor: pointer; text-decoration: underline;">GRUs<span class="tooltiptext">Gated Recurrent Units: Simplified LSTM with only reset and update gates, fewer parameters but similar performance</span></span>
+                        </li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Later evolved into Transformers (ChatGPT, etc.)</p>
+                    </div>
+                </section>
+                
+                <!-- Multiple Choice Question -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Which statements about sequence learning are correct?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "Order of elements is crucial in sequential data",
+                                "correct": true,
+                                "explanation": "In sequences, the order carries meaning. Shuffling words in a sentence or frames in a video destroys the information."
+                            },
+                            {
+                                "text": "All sequences must have the same length for ML models",
+                                "correct": false,
+                                "explanation": "Modern sequence models like RNNs and Transformers can handle variable-length sequences, though some may use padding internally."
+                            },
+                            {
+                                "text": "Recurrent networks maintain a hidden state across time steps",
+                                "correct": true,
+                                "explanation": "RNNs use hidden states to carry information forward, allowing them to remember previous inputs when processing sequences."
+                            },
+                            {
+                                "text": "Machine translation is a sequence-to-sequence problem",
+                                "correct": true,
+                                "explanation": "Translation takes a sequence in one language and produces a sequence in another, with potentially different lengths."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+            
+            <!-- Unsupervised Learning -->
+            <section>
+                <section>
+                    <h1 class="truncate-title">Unsupervised Learning</h1>
+                    <h3 style="color: var(--color-accent);">Finding Hidden Patterns</h3>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Learning Without Labels</h2>
+                    <ul>
+                        <li class="fragment">No correct answers provided</li>
+                        <li class="fragment">Find structure in data</li>
+                        <li class="fragment">Often used for exploration</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Clustering Example</h2>
+                    <div id="clustering-viz-raw"></div>
+                    <p class="fragment">Can you spot the groups?</p>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">The Hidden Clusters</h2>
+                    <div id="clustering-viz-labeled"></div>
+                    <p class="fragment">Groups emerge naturally — these points were sampled from three different distributions</p>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Try It: K-Means Clustering</h2>
+                    <div class="demo-controls" style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px; padding: 10px; background: #f9f9f9; border-radius: 5px; z-index: 100; position: relative;">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            Number of clusters (k):
+                            <input type="range" id="kmeans-k-slider" min="1" max="6" value="3" style="width: 150px;">
+                            <span id="kmeans-k-value" style="font-family: monospace;">3</span>
+                        </label>
+                        <button id="kmeans-run-btn" style="background: #10099F; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">Run K-Means</button>
+                    </div>
+                    <div id="clustering-viz-kmeans"></div>
+                    <p class="fragment">The algorithm finds cluster assignments without ever seeing the true labels</p>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Dimensionality Reduction</h2>
+                    <ul>
+                        <li class="fragment">Compress high-dimensional data</li>
+                        <li class="fragment">Preserve important information</li>
+                        <li class="fragment">Enable visualization</li>
+                        <li class="fragment">What are examples of dimensionality reduction methods?</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Masked Language Modeling</h2>
+                    <p>Foundation of modern NLP (BERT, GPT)</p>
+                    <div class="fragment">
+                        <p style="font-family: monospace; background: #f5f5f5; padding: 1em;">
+                            The cat sat on [MASK] mat → the
+                        </p>
+                    </div>
+                    <ul class="fragment">
+                        <li>Hide parts of the input text</li>
+                        <li>Model learns to predict missing words</li>
+                        <li>No manual labels needed!</li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Powers embedding models such as BERT and other variations power GPT models</p>
+                    </div>
+                </section>
+                
+                <section data-sources='[{"text": "Masked Autoencoders Are Scalable Vision Learners (MAE) - He et al., 2022", "url": "https://arxiv.org/abs/2111.06377"}, {"text": "SimMIM: A Simple Framework for Masked Image Modeling - Xie et al., 2022", "url": "https://arxiv.org/abs/2111.09886"}, {"text": "BEiT: BERT Pre-Training of Image Transformers - Bao et al., 2022", "url": "https://arxiv.org/abs/2106.08254"}]'>
+                    <h2 class="truncate-title">Masked Image Modeling</h2>
+                    <p>Self-supervised learning for computer vision</p>
+                    <div class="fragment">
+                        <p>🖼️ → 🖼️❓❓🖼️ → 🖼️🖼️🖼️🖼️</p>
+                        <p style="font-size: 0.9em;">Original → Masked → Reconstructed</p>
+                    </div>
+                    <ul class="fragment">
+                        <li>Mask random patches of images</li>
+                        <li>Model learns visual representations</li>
+                        <li>Used in <span class="tooltip">MAE<span class="tooltiptext">Masked Autoencoders (MAE): A self-supervised learning method by Meta AI that masks 75% of image patches and trains a Vision Transformer to reconstruct them, achieving state-of-the-art results on ImageNet.</span></span>, <span class="tooltip">SimMIM<span class="tooltiptext">Simple Masked Image Modeling (SimMIM): Microsoft's approach that uses a simple random masking strategy with a lightweight prediction head, proving that complex designs aren't necessary for masked image modeling.</span></span>, and others</li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Achieves state-of-the-art with less labeled data</p>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Self-Supervised Learning</h2>
+                    <ul>
+                        <li class="fragment">Create labels from data itself</li>
+                        <li class="fragment">Example: predict next word</li>
+                        <li class="fragment">Foundation of modern NLP</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Unsupervised Applications</h2>
+                    <ul>
+                        <li class="fragment">Customer segmentation</li>
+                        <li class="fragment">Anomaly detection</li>
+                        <li class="fragment">Data compression</li>
+                        <li class="fragment">Feature learning</li>
+                    </ul>
+                </section>
+                
+                <!-- Multiple Choice Question -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Which statements about unsupervised learning are correct?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "Clustering algorithms group similar data points without predefined categories",
+                                "correct": true,
+                                "explanation": "Clustering finds natural groupings in data based on similarity, without needing labeled categories beforehand."
+                            },
+                            {
+                                "text": "Unsupervised learning requires more labeled data than supervised learning",
+                                "correct": false,
+                                "explanation": "Unsupervised learning uses NO labeled data - that is its defining characteristic. It finds patterns in unlabeled data."
+                            },
+                            {
+                                "text": "Dimensionality reduction helps visualize high-dimensional data",
+                                "correct": true,
+                                "explanation": "Techniques like PCA and t-SNE reduce dimensions while preserving structure, enabling visualization of complex data."
+                            },
+                            {
+                                "text": "Self-supervised learning creates its own labels from the data",
+                                "correct": true,
+                                "explanation": "Self-supervised learning generates labels from the data itself, like predicting the next word in a sentence or masked tokens."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+            
+            <!-- Reinforcement Learning -->
+            <section>
+                <section>
+                    <h1 class="truncate-title">Reinforcement Learning</h1>
+                    <h3 style="color: var(--color-accent);">Learning from Interaction</h3>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Beyond Supervised Learning</h2>
+                    <p>Not all learning needs labeled data</p>
+                    <ul class="fragment">
+                        <li><strong>Unsupervised Learning:</strong> Find patterns without labels</li>
+                        <li><strong>Self-Supervised:</strong> Create labels from data itself</li>
+                        <li><strong>Reinforcement:</strong> Learn from interaction</li>
+                    </ul>
+                </section>
+                
+                <section data-sources='[{"text": "Dive into Deep Learning - Unsupervised Learning", "url": "https://d2l.ai/chapter_introduction/index.html#unsupervised-and-self-supervised-learning"}]'>
+                    <h2 class="truncate-title">Unsupervised Learning</h2>
+                    <p>"Do some data science with it!"</p>
+                    <ul class="fragment">
+                        <li><span class="tooltip">Clustering<span class="tooltiptext">Grouping similar data points together, like organizing photos by content or grouping users by behavior</span></span>: Group similar items</li>
+                        <li><span class="tooltip">Dimensionality Reduction<span class="tooltiptext">Finding the most important features that capture the essence of the data, like PCA</span></span>: Find key features</li>
+                        <li><span class="tooltip">Density Estimation<span class="tooltiptext">Learning the underlying probability distribution of the data to generate new samples</span></span>: Learn data distribution</li>
+                        <li><span class="tooltip">Anomaly Detection<span class="tooltiptext">Identifying unusual patterns that don't conform to expected behavior</span></span>: Find outliers</li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>No labels needed - let the data speak for itself!</p>
+                    </div>
+                </section>
+                
+                <section data-sources='[{"text": "BERT: Pre-training of Deep Bidirectional Transformers - Devlin et al., 2018", "url": "https://arxiv.org/abs/1810.04805"}, {"text": "Unsupervised Visual Representation Learning - Doersch et al., 2015", "url": "https://arxiv.org/abs/1505.05192"}]'>
+                    <h2 class="truncate-title">Self-Supervised Learning</h2>
+                    <p>Creating supervision from the data itself</p>
+                    <div class="fragment">
+                        <p><strong>Text:</strong> Mask words and predict them</p>
+                        <pre><code>"The [MASK] jumped over the fence" → "dog"</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <p><strong>Images:</strong> Predict relative positions or masked patches</p>
+                        <p style="font-size: 0.9em;">🖼️ → 🖼️❓❓🖼️ → 🖼️🖼️🖼️🖼️</p>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Learn representations without manual labeling!</p>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Offline vs Online Learning</h2>
+                    <img src="../shared/images/data-collection.svg" alt="Data collection for supervised learning" style="width: 60%;">
+                    <p class="fragment">Traditional ML: Collect data → Train → Deploy</p>
+                    <p class="fragment">But what if our model affects the environment?</p>
+                </section>
+                
+                <section data-sources='[{"text": "Reinforcement Learning: An Introduction - Sutton & Barto", "url": "http://incompleteideas.net/book/the-book.html"}]'>
+                    <h2 class="truncate-title">Reinforcement Learning</h2>
+                    <img src="../shared/images/rl-environment.svg" alt="Reinforcement learning environment" style="width: 60%;">
+                    <ul class="fragment">
+                        <li>Agent takes <strong>actions</strong></li>
+                        <li>Environment provides <strong>rewards</strong></li>
+                        <li>Learn through <strong>trial and error</strong></li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Actions impact future observations!</p>
+                    </div>
+                </section>
+                
+                <section data-sources='[{"text": "Dive into Deep Learning - Chapter 1.3.2", "url": "https://d2l.ai/chapter_introduction/index.html#unsupervised-and-self-supervised-learning"}]'>
+                    <h2 class="truncate-title">Unsupervised and Self-Supervised Learning</h2>
+                    <p>Learning without explicit labels</p>
+                    <div class="fragment">
+                        <p style="font-size: 0.9em;">Unlike supervised learning with its "dictatorial boss" telling you exactly what to do...</p>
+                    </div>
+                    <div class="fragment">
+                        <p style="font-size: 0.9em;">Unsupervised learning is like having a boss who says:<br/>
+                        <em>"Here's data - do some data science with it!"</em></p>
+                    </div>
+                </section>
+                
+                <section data-sources='[{"text": "Principal Component Analysis", "url": "https://en.wikipedia.org/wiki/Principal_component_analysis"}, {"text": "Clustering Algorithms", "url": "https://scikit-learn.org/stable/modules/clustering.html"}]'>
+                    <h2 class="truncate-title">Key Unsupervised Learning Tasks</h2>
+                    <ul>
+                        <li class="fragment"><span class="tooltip">Clustering<span class="tooltiptext">Finding groups in data: photos → landscapes, dogs, babies, cats</span></span>
+                            <br/><small>Group similar data points together</small></li>
+                        <li class="fragment"><span class="tooltip">Dimensionality Reduction<span class="tooltiptext">Like describing body shape with just a few measurements for tailoring</span></span>
+                            <br/><small>Find key parameters (PCA, subspace estimation)</small></li>
+                        <li class="fragment"><span class="tooltip">Representation Learning<span class="tooltiptext">Example: "Rome" - "Italy" + "France" = "Paris"</span></span>
+                            <br/><small>Map objects to meaningful vectors</small></li>
+                        <li class="fragment"><span class="tooltip">Causality Discovery<span class="tooltiptext">Understanding relationships between house prices, pollution, crime, education</span></span>
+                            <br/><small>Find root causes in data</small></li>
+                    </ul>
+                </section>
+                
+                <section data-sources='[{"text": "BERT: Pre-training of Deep Bidirectional Transformers - Devlin et al., 2018", "url": "https://arxiv.org/abs/1810.04805"}, {"text": "Unsupervised Visual Representation Learning by Context Prediction - Doersch et al., 2015", "url": "https://arxiv.org/abs/1505.05192"}]'>
+                    <h2 class="truncate-title">Self-Supervised Learning</h2>
+                    <p>Creating supervision from the data itself</p>
+                    <div style="display: flex; justify-content: space-around; margin-top: 30px;">
+                        <div class="fragment" style="flex: 1; margin: 10px;">
+                            <h4>Text</h4>
+                            <p style="font-size: 0.8em;">Fill in the [MASK]</p>
+                            <p style="font-size: 0.7em; color: #666;">"The cat sat on the [MASK]"<br/>→ predict: "mat"</p>
+                        </div>
+                        <div class="fragment" style="flex: 1; margin: 10px;">
+                            <h4>Images</h4>
+                            <p style="font-size: 0.8em;">Predict relative positions</p>
+                            <p style="font-size: 0.7em; color: #666;">Two image patches<br/>→ predict: above/below/left/right</p>
+                        </div>
+                    </div>
+                    <p class="fragment" style="margin-top: 20px; font-size: 0.85em;">
+                        💡 No manual labeling required - the data provides its own supervision!
+                    </p>
+                </section>
+                
+                <section data-sources='[{"text": "Auto-Encoding Variational Bayes - Kingma & Welling, 2014", "url": "https://arxiv.org/abs/1312.6114"}, {"text": "Generative Adversarial Nets - Goodfellow et al., 2014", "url": "https://arxiv.org/abs/1406.2661"}, {"text": "Denoising Diffusion Probabilistic Models - Ho et al., 2020", "url": "https://arxiv.org/abs/2006.11239"}]'>
+                    <h2 class="truncate-title">Deep Generative Models</h2>
+                    <p>Learning to generate new data</p>
+                    <ul>
+                        <li class="fragment"><span class="tooltip">Variational Autoencoders (VAEs)<span class="tooltiptext">Encode data to latent space, then decode back. Can generate new samples by sampling the latent space.</span></span>
+                            <small> - 2014</small></li>
+                        <li class="fragment"><span class="tooltip">Generative Adversarial Networks (GANs)<span class="tooltiptext">Two networks compete: generator creates fake data, discriminator tries to detect fakes.</span></span>
+                            <small> - 2014</small></li>
+                        <li class="fragment"><span class="tooltip">Normalizing Flows<span class="tooltiptext">Transform simple distributions to complex ones through invertible functions.</span></span>
+                            <small> - 2014-2017</small></li>
+                        <li class="fragment"><span class="tooltip">Diffusion Models<span class="tooltiptext">Gradually add noise to data, then learn to reverse the process to generate new samples.</span></span>
+                            <small> - 2020-2021</small></li>
+                    </ul>
+                    <p class="fragment" style="margin-top: 20px; font-size: 0.9em;">
+                        These models learn data distributions and can generate new, realistic samples
+                    </p>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Interacting with an Environment</h2>
+                    <div style="text-align: center; margin: 20px 0;">
+                        <img src="../shared/images/data-collection.svg" alt="Data collection in supervised learning" style="max-width: 60%; height: auto;">
+                        <p style="font-size: 0.8em; margin-top: 10px;">Supervised Learning: Collect data → Train offline → Deploy</p>
+                    </div>
+                    <div class="fragment">
+                        <p style="font-size: 0.9em;">But real agents need to:</p>
+                        <ul style="font-size: 0.85em;">
+                            <li>Take actions that affect the environment</li>
+                            <li>Learn from consequences of actions</li>
+                            <li>Adapt to changing conditions</li>
+                        </ul>
+                    </div>
+                    <p class="fragment" style="font-size: 0.85em; color: #666;">
+                        This leads us to Reinforcement Learning...
+                    </p>
+                </section>
+                
+                <!-- Multiple Choice Question -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Which statements about unsupervised and self-supervised learning are correct?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "Unsupervised learning requires labeled training data",
+                                "correct": false,
+                                "explanation": "Unsupervised learning works with unlabeled data, finding patterns and structure without explicit labels."
+                            },
+                            {
+                                "text": "Self-supervised learning creates supervision signals from the data itself",
+                                "correct": true,
+                                "explanation": "Self-supervised learning cleverly uses the data structure to create training signals, like predicting masked words or image patches."
+                            },
+                            {
+                                "text": "Clustering is an example of unsupervised learning",
+                                "correct": true,
+                                "explanation": "Clustering groups similar data points together without needing labels, making it a classic unsupervised task."
+                            },
+                            {
+                                "text": "Deep generative models can create new data samples",
+                                "correct": true,
+                                "explanation": "Models like VAEs, GANs, and diffusion models learn data distributions and can generate new, realistic samples."
+                            },
+                            {
+                                "text": "PCA is a supervised learning technique",
+                                "correct": false,
+                                "explanation": "Principal Component Analysis (PCA) is an unsupervised technique for dimensionality reduction that finds principal components without labels."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+            
+            <!-- Historical Context -->
+             
+            <section>
+                <section>
+                    <h1 class="truncate-title">Historical Roots</h1>
+                    <h3 style="color: var(--color-accent);">Where It All Began</h3>
+                </section>
+                
+                <section data-sources='[{"text": "Dive into Deep Learning - Roots", "url": "https://d2l.ai/chapter_introduction/index.html#roots"}]'>
+                    <h2 class="truncate-title">The Desire to Predict</h2>
+                    <p>Humans have sought to analyze data and predict outcomes for centuries</p>
+                    <ul class="fragment">
+                        <li><span class="tooltip">Bernoulli distribution<span class="tooltiptext">Named after Jacob Bernoulli (1655-1705), models binary outcomes with probability p</span></span> (1655-1705)</li>
+                        <li><span class="tooltip">Gaussian distribution<span class="tooltiptext">Discovered by Carl Friedrich Gauss (1777-1855), the normal distribution that appears everywhere in nature</span></span> (1777-1855)</li>
+                        <li><span class="tooltip">Least mean squares<span class="tooltiptext">Gauss's algorithm still used today for regression and optimization</span></span> algorithm</li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>These tools enabled the experimental approach in natural sciences</p>
+                    </div>
+                </section>
+                
+                <section data-sources='[{"text": "Jacob Köbel's Geometry", "url": "https://www.maa.org/press/periodicals/convergence/mathematical-treasures-jacob-kobels-geometry"}]'>
+                    <h2 class="truncate-title">Medieval Statistics: Köbel's Algorithm</h2>
+                    <img src="images/koebel.jpg" alt="Köbel measuring feet" style="width: 30%;">
+                    <p class="fragment">Jacob Köbel (1460-1533): Early data collection</p>
+                    <ol class="fragment" style="font-size: 0.9em;">
+                        <li>Measure 16 adult men's feet</li>
+                        <li>Sum the measurements</li>
+                        <li>Divide by 16 for average</li>
+                        <li>Improvement: Remove outliers (shortest/longest)</li>
+                    </ol>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>One of the earliest examples of a <span class="tooltip">trimmed mean<span class="tooltiptext">A robust statistical measure that removes extreme values before averaging</span></span>!</p>
+                    </div>
+                </section>
+                
+                <section data-sources='[{"text": "Ronald Fisher - Wikipedia", "url": "https://en.wikipedia.org/wiki/Ronald_Fisher"}, {"text": "The Iris Dataset", "url": "https://archive.ics.uci.edu/ml/datasets/iris"}]'>
+                    <h2 class="truncate-title">The Rise of Modern Statistics</h2>
+                    <p><strong>Ronald Fisher (1890-1962)</strong></p>
+                    <ul class="fragment">
+                        <li><span class="tooltip">Linear discriminant analysis<span class="tooltiptext">A method for finding linear combinations of features that characterize or separate classes</span></span></li>
+                        <li><span class="tooltip">Fisher information matrix<span class="tooltiptext">Measures the amount of information that an observable random variable carries about unknown parameters</span></span></li>
+                        <li>Applications in genetics</li>
+                        <li>The famous <strong>Iris dataset</strong> (1936)</li>
+                    </ul>
+                    <div class="fragment" style="background: #fff3cd; padding: 10px; border-radius: 5px; margin-top: 20px;">
+                        <p style="font-size: 0.85em;">⚠️ Note: Fisher was also a proponent of eugenics, reminding us that data science can be misused</p>
+                    </div>
+                </section>
+                
+                <section data-sources='[{"text": "Claude Shannon - Information Theory", "url": "https://en.wikipedia.org/wiki/Claude_Shannon"}, {"text": "Computing Machinery and Intelligence - Turing, 1950", "url": "https://doi.org/10.1093/mind/LIX.236.433"}]'>
+                    <h2 class="truncate-title">Information Theory & Computation</h2>
+                    <div style="display: flex; justify-content: space-around; margin-top: 30px;">
+                        <div class="fragment" style="flex: 1; margin: 10px;">
+                            <h4>Claude Shannon (1916-2001)</h4>
+                            <p style="font-size: 0.85em;">Information theory</p>
+                            <ul style="font-size: 0.8em;">
+                                <li>Entropy</li>
+                                <li>Channel capacity</li>
+                                <li>Data compression</li>
+                            </ul>
+                        </div>
+                        <div class="fragment" style="flex: 1; margin: 10px;">
+                            <h4>Alan Turing (1912-1954)</h4>
+                            <p style="font-size: 0.85em;">"Can machines think?"</p>
+                            <ul style="font-size: 0.8em;">
+                                <li>Turing test</li>
+                                <li>Computability</li>
+                                <li>Machine intelligence</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                
+                <section data-sources='[{"text": "The Organization of Behavior - Hebb, 1949", "url": "https://doi.org/10.1002/1097-4679(195007)6:3%3C307::AID-JCLP2270060338%3E3.0.CO;2-K"}, {"text": "The Perceptron - Rosenblatt, 1958", "url": "https://doi.org/10.1037/h0042519"}]'>
+                    <h2 class="truncate-title">Biological Inspiration</h2>
+                    <p><strong>Donald Hebb (1904-1985)</strong></p>
+                    <blockquote class="fragment" style="font-size: 0.9em;">
+                        "Neurons that fire together, wire together"
+                    </blockquote>
+                    <ul class="fragment">
+                        <li><span class="tooltip">Hebbian learning rule<span class="tooltiptext">Synaptic connections strengthen when neurons activate simultaneously - the basis for associative learning</span></span></li>
+                        <li>Positive reinforcement of connections</li>
+                        <li>Foundation for gradient descent</li>
+                        <li>Inspired Rosenblatt's perceptron</li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>The biological metaphor gave "neural networks" their name</p>
+                    </div>
+                </section>
+                
+                <section data-sources='[{"text": "Early Neural Network Models", "url": "https://en.wikipedia.org/wiki/Artificial_neural_network#History"}]'>
+                    <h2 class="truncate-title">Core Neural Network Principles</h2>
+                    <p>Key ideas that persist today:</p>
+                    <ul class="fragment">
+                        <li><strong>Layers:</strong> Alternating linear and nonlinear processing</li>
+                        <li><strong>Backpropagation:</strong> Using chain rule to adjust all parameters</li>
+                        <li><strong>Networks:</strong> Interconnected computational units</li>
+                    </ul>
+                    <p class="fragment mt-lg">But from 1995-2005, neural networks fell out of favor...</p>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">The AI Winter (1995-2005)</h2>
+                    <p>Why neural networks struggled:</p>
+                    <ul class="fragment">
+                        <li><strong>Computational expense:</strong> Training was too slow</li>
+                        <li><strong>Small datasets:</strong> MNIST's 60,000 digits was "huge"</li>
+                        <li><strong>Better alternatives:</strong> 
+                            <ul>
+                                <li>Kernel methods (SVMs)</li>
+                                <li>Decision trees</li>
+                                <li>Graphical models</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>These methods gave predictable results with theoretical guarantees</p>
+                    </div>
+                </section>
+                
+                <!-- Multiple Choice Question -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Which historical contributions are fundamental to modern machine learning?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "The least squares method of Gauss (1805) for optimization",
+                                "correct": true,
+                                "explanation": "Least squares remains fundamental to regression and optimization in ML, used in everything from linear models to neural network training."
+                            },
+                            {
+                                "text": "The trimmed mean of Köbel (1535) for robust statistics",
+                                "correct": true,
+                                "explanation": "The concept of removing outliers before averaging is still used in robust statistics and data preprocessing."
+                            },
+                            {
+                                "text": "The Iris dataset of Fisher (1936) proved ML was possible",
+                                "correct": false,
+                                "explanation": "While the Iris dataset is famous and still used for demonstrations, it did not prove ML was possible - it is just a convenient test dataset."
+                            },
+                            {
+                                "text": "The Hebbian learning rule (1949) inspired gradient descent",
+                                "correct": true,
+                                "explanation": "Hebbian learning about reinforcing connections directly inspired the gradient-based learning algorithms used in neural networks."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <section>
+                <section data-sources='[{"text": "McCulloch & Pitts (1943) - A Logical Calculus of Ideas", "url": "https://doi.org/10.1007/BF02478259"}, {"text": "Rosenblatt (1958) - The Perceptron", "url": "https://doi.org/10.1037/h0042519"}, {"text": "Rumelhart et al. (1986) - Learning representations by back-propagating errors", "url": "https://doi.org/10.1038/323533a0"}, {"text": "Krizhevsky et al. (2012) - ImageNet Classification with Deep CNNs", "url": "https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html"}]'>
+                    <h2 class="truncate-title">Neural Network History</h2>
+                    <ul>
+                        <li class="fragment">1943: <span class="tooltip" style="cursor: pointer; text-decoration: underline;">McCulloch-Pitts neuron<span class="tooltiptext">First mathematical model of artificial neuron, using binary threshold logic</span></span></li>
+                        <li class="fragment">1958: <span class="tooltip" style="cursor: pointer; text-decoration: underline;">Perceptron<span class="tooltiptext">Rosenblatt's linear classifier that could learn from examples</span></span></li>
+                        <li class="fragment">1986: <span class="tooltip" style="cursor: pointer; text-decoration: underline;">Backpropagation<span class="tooltiptext">Algorithm to efficiently compute gradients in multi-layer networks</span></span></li>
+                        <li class="fragment">2012: <span class="tooltip" style="cursor: pointer; text-decoration: underline;">Deep learning revolution<span class="tooltiptext">AlexNet wins ImageNet by huge margin, starting the modern deep learning era</span></span></li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">The Deep Learning Era</h2>
+                    <ul>
+                        <li class="fragment">Enabled by GPUs</li>
+                        <li class="fragment">Big data availability</li>
+                        <li class="fragment">Algorithmic improvements</li>
+                        <li class="fragment">Transforming every field</li>
+                    </ul>
+                </section>
+                
+                <!-- Multiple Choice Question -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Which statements about the history of machine learning are correct?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "Linear regression, developed in 1805, forms a foundation for modern ML",
+                                "correct": true,
+                                "explanation": "Linear regression and least squares methods from the early 1800s remain fundamental techniques in machine learning today."
+                            },
+                            {
+                                "text": "The perceptron was the first successful deep neural network",
+                                "correct": false,
+                                "explanation": "The perceptron (1958) was a single-layer network. Deep networks with multiple layers came much later."
+                            },
+                            {
+                                "text": "Backpropagation (1986) enabled training of multi-layer neural networks",
+                                "correct": true,
+                                "explanation": "Backpropagation solved the problem of training networks with hidden layers, making deep learning possible."
+                            },
+                            {
+                                "text": "The deep learning revolution began around 2012 with GPU acceleration",
+                                "correct": true,
+                                "explanation": "The victory of AlexNet in the 2012 ImageNet challenge, powered by GPUs, marked the beginning of the deep learning era we are in today."
+                            }
+                        ]
+                    }'></div>
+                </section>
+                
+                <!-- Road to Deep Learning: Vertical Transitions -->
+                <section data-sources='[{"text": "Moore\'s Law - Intel Processors", "url": "https://www.intel.com/content/www/us/en/history/museum-gordon-moore-law.html"}, {"text": "Kryder\'s Law - Storage Density", "url": "https://doi.org/10.1109/MSSC.2009.932311"}]'>
+                    <h2 class="truncate-title">The Road to Deep Learning</h2>
+                    <div class="emphasis-box">
+                        <p>The confluence of <span class="tooltip">big data<span class="tooltiptext">World Wide Web, social networks, IoT sensors</span></span>, 
+                        <span class="tooltip">cheap storage<span class="tooltiptext">Kryder's Law: Storage density doubles annually</span></span>, and 
+                        <span class="tooltip">GPU computing<span class="tooltiptext">Originally for gaming, revolutionized deep learning</span></span> enabled the deep learning revolution</p>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Data vs Compute Evolution</h2>
+                    <table style="font-size: 0.8em;">
+                        <thead>
+                            <tr>
+                                <th>Decade</th>
+                                <th>Dataset Size</th>
+                                <th>Memory</th>
+                                <th>Compute (FLOPS)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="fragment">
+                                <td>1970</td>
+                                <td>100 <span class="tooltip">(Iris)<span class="tooltiptext">Classic 150-sample flower classification dataset</span></span></td>
+                                <td>1 KB</td>
+                                <td>100K (Intel 8080)</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td>1980</td>
+                                <td>1K <span class="tooltip">(Boston Housing)<span class="tooltiptext">506 samples of house prices with 13 features</span></span></td>
+                                <td>100 KB</td>
+                                <td>1M (Intel 80186)</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td>1990</td>
+                                <td>10K <span class="tooltip">(MNIST)<span class="tooltiptext">60,000 handwritten digit images</span></span></td>
+                                <td>10 MB</td>
+                                <td>10M (Intel 80486)</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td>2000</td>
+                                <td>10M (Web pages)</td>
+                                <td>100 MB</td>
+                                <td>1G (Intel Core)</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td>2010</td>
+                                <td>10G (Advertising)</td>
+                                <td>1 GB</td>
+                                <td>1T <span class="tooltip">(NVIDIA C2050)<span class="tooltiptext">First Fermi GPU, 515 GFLOPS, game-changer for deep learning</span></span></td>
+                            </tr>
+                            <tr class="fragment">
+                                <td>2020</td>
+                                <td>1T (Social networks)</td>
+                                <td>100 GB</td>
+                                <td>1P <span class="tooltip">(NVIDIA DGX-2)<span class="tooltiptext">2 PFLOPS, 16 V100 GPUs, designed for AI</span></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+                
+                <section data-sources='[{"text": "Srivastava et al. (2014) - Dropout", "url": "https://jmlr.org/papers/v15/srivastava14a.html"}, {"text": "Bahdanau et al. (2014) - Attention Mechanisms", "url": "https://arxiv.org/abs/1409.0473"}, {"text": "Vaswani et al. (2017) - Attention is All You Need", "url": "https://arxiv.org/abs/1706.03762"}]'>
+                    <h2 class="truncate-title">Key Algorithmic Breakthroughs</h2>
+                    <ul>
+                        <li class="fragment"><strong>Dropout (2014)</strong>: <span class="tooltip">Regularization by noise<span class="tooltiptext">Randomly drop neurons during training to prevent overfitting</span></span></li>
+                        <li class="fragment"><strong>Attention (2014)</strong>: <span class="tooltip">Learnable memory pointers<span class="tooltiptext">Focus on relevant parts of input, solving the long-sequence problem</span></span></li>
+                        <li class="fragment"><strong>Transformers (2017)</strong>: <span class="tooltip">Attention-only architecture<span class="tooltiptext">No recurrence or convolution, just self-attention layers</span></span></li>
+                        <li class="fragment"><strong>Scaling Laws (2020)</strong>: Predictable improvements with size</li>
+                    </ul>
+                </section>
+                
+                <section data-sources='[{"text": "Brown et al. (2020) - GPT-3", "url": "https://arxiv.org/abs/2005.14165"}, {"text": "OpenAI (2023) - GPT-4", "url": "https://arxiv.org/abs/2303.08774"}, {"text": "Touvron et al. (2023) - LLaMA", "url": "https://arxiv.org/abs/2302.13971"}]'>
+                    <h2 class="truncate-title">Language Model Revolution</h2>
+                    <ul>
+                        <li class="fragment"><strong>GPT-3 (2020)</strong>: 175B parameters, <span class="tooltip">few-shot learning<span class="tooltiptext">Learn new tasks from just a few examples in the prompt</span></span></li>
+                        <li class="fragment"><strong>ChatGPT (2022)</strong>: <span class="tooltip">RLHF<span class="tooltiptext">Reinforcement Learning from Human Feedback for alignment</span></span></li>
+                        <li class="fragment"><strong>GPT-4 (2023)</strong>: Multimodal capabilities</li>
+                        <li class="fragment"><strong>Open Models</strong>: LLaMA, Mistral democratizing AI</li>
+                    </ul>
+                </section>
+                
+                <section data-sources='[{"text": "Goodfellow et al. (2014) - GANs", "url": "https://arxiv.org/abs/1406.2661"}, {"text": "Ho et al. (2020) - Denoising Diffusion", "url": "https://arxiv.org/abs/2006.11239"}, {"text": "Ramesh et al. (2022) - DALL-E 2", "url": "https://arxiv.org/abs/2204.06125"}]'>
+                    <h2 class="truncate-title">Generative Model Revolution</h2>
+                    <ul>
+                        <li class="fragment"><strong>GANs (2014)</strong>: <span class="tooltip">Adversarial training<span class="tooltiptext">Generator vs Discriminator: learning by competition</span></span></li>
+                        <li class="fragment"><strong>Diffusion Models (2020)</strong>: <span class="tooltip">Denoising approach<span class="tooltiptext">Learn to reverse noise addition process</span></span></li>
+                        <li class="fragment"><strong>DALL-E 2 (2022)</strong>: Text-to-image generation</li>
+                        <li class="fragment"><strong>Stable Diffusion</strong>: Open-source creative AI</li>
+                    </ul>
+                </section>
+                
+                <section data-sources='[{"text": "You et al. (2017) - Large Batch Training", "url": "https://arxiv.org/abs/1708.03888"}, {"text": "Jia et al. (2018) - ImageNet in 4 Minutes", "url": "https://arxiv.org/abs/1807.11205"}]'>
+                    <h2 class="truncate-title">Distributed Training Breakthroughs</h2>
+                    <ul>
+                        <li class="fragment">Training on 1000+ GPUs simultaneously</li>
+                        <li class="fragment">Batch sizes: 32 → 64,000 images</li>
+                        <li class="fragment">ResNet-50 training: Days → 7 minutes</li>
+                        <li class="fragment">Enabling massive model scale</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Deep Learning Frameworks Evolution</h2>
+                    <ul>
+                        <li class="fragment"><strong>Gen 1</strong>: Caffe, Torch, Theano</li>
+                        <li class="fragment"><strong>Gen 2</strong>: TensorFlow, Keras, CNTK</li>
+                        <li class="fragment"><strong>Gen 3</strong>: <span class="tooltip">PyTorch<span class="tooltiptext">Imperative, Pythonic, dynamic graphs</span></span>, JAX</li>
+                        <li class="fragment">From PhD homework → 10 lines of code</li>
+                    </ul>
+                </section>
+                
+                <!-- Multiple Choice Question for Road to Deep Learning -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "What key factors enabled the deep learning revolution?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "GPUs originally designed for gaming provided massive parallel computing",
+                                "correct": true,
+                                "explanation": "GPUs like NVIDIA C2050 (2010) provided teraflops of compute, making deep learning practical."
+                            },
+                            {
+                                "text": "Memory growth kept pace with dataset growth",
+                                "correct": false,
+                                "explanation": "Actually, memory growth lagged behind data growth, forcing models to be more memory-efficient."
+                            },
+                            {
+                                "text": "Attention mechanisms solved the long-sequence problem",
+                                "correct": true,
+                                "explanation": "Attention allowed models to focus on relevant parts without storing entire sequences in fixed representations."
+                            },
+                            {
+                                "text": "Deep learning frameworks made implementation accessible",
+                                "correct": true,
+                                "explanation": "Frameworks like PyTorch reduced complex implementations from research projects to 10 lines of code."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Success Stories Section with Vertical Transitions -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">AI Success Stories</h2>
+                    <div class="emphasis-box">
+                        <p>From hidden applications to headline-grabbing achievements</p>
+                    </div>
+                </section>
+                
+                <section data-sources='[{"text": "MNIST Dataset History", "url": "http://yann.lecun.com/exdb/mnist/"}]'>
+                    <h2 class="truncate-title">Traditional ML Applications</h2>
+                    <ul>
+                        <li class="fragment"><span class="tooltip">OCR<span class="tooltiptext">Optical Character Recognition for mail sorting since 1990s</span></span> - Source of MNIST dataset</li>
+                        <li class="fragment">Check reading & credit scoring</li>
+                        <li class="fragment">Fraud detection (PayPal, Stripe, Visa)</li>
+                        <li class="fragment">Search, recommendations, ranking</li>
+                    </ul>
+                    <p class="fragment"><em>ML has been pervasive, albeit often hidden</em></p>
+                </section>
+                
+                <section data-sources='[{"text": "Xiong et al. (2018) - Microsoft Speech Recognition", "url": "https://arxiv.org/abs/1708.02021"}]'>
+                    <h2 class="truncate-title">Intelligent Assistants</h2>
+                    <ul>
+                        <li class="fragment"><strong>Siri, Alexa, Google Assistant</strong> (before 2022)</li>
+                        <li class="fragment"><strong>ChatGPT, Claude, Gemini</strong> (after 2022)</li>
+                        <li class="fragment">Speech recognition: <span class="tooltip">Human parity<span class="tooltiptext">5.1% word error rate matching professional transcribers</span></span> (2018)</li>
+                        <li class="fragment">From light switches to appointments</li>
+                        <li class="fragment">Most visible AI in daily life</li>
+                    </ul>
+                </section>
+                
+                <section data-sources='[{"text": "Lin et al. (2010) - ImageNet Baseline", "url": "https://ieeexplore.ieee.org/document/5540121"}, {"text": "Hu et al. (2018) - SENet", "url": "https://arxiv.org/abs/1709.01507"}]'>
+                    <h2 class="truncate-title">Computer Vision Breakthroughs</h2>
+                    <table style="font-size: 0.9em;">
+                        <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>ImageNet Top-5 Error</th>
+                                <th>Model</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="fragment">
+                                <td>2010</td>
+                                <td>28%</td>
+                                <td>Traditional ML</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td>2012</td>
+                                <td>16%</td>
+                                <td><span class="tooltip">AlexNet<span class="tooltiptext">First deep CNN, started the revolution</span></span></td>
+                            </tr>
+                            <tr class="fragment">
+                                <td>2015</td>
+                                <td>3.5%</td>
+                                <td><span class="tooltip">ResNet<span class="tooltiptext">152 layers with skip connections</span></span></td>
+                            </tr>
+                            <tr class="fragment">
+                                <td>2017</td>
+                                <td>2.25%</td>
+                                <td><span class="tooltip">SENet<span class="tooltiptext">Squeeze-and-Excitation Networks</span></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="fragment">Also: Birdsong ID, skin cancer diagnosis</p>
+                </section>
+                
+                <section data-sources='[{"text": "Campbell et al. (2002) - Deep Blue", "url": "https://doi.org/10.1016/S0004-3702(01)00129-1"}, {"text": "Silver et al. (2016) - AlphaGo", "url": "https://doi.org/10.1038/nature16961"}, {"text": "Brown & Sandholm (2017) - Libratus", "url": "https://www.ijcai.org/proceedings/2017/772"}]'>
+                    <h2 class="truncate-title">Game-Playing AI Milestones</h2>
+                    <ul>
+                        <li class="fragment"><strong>1992</strong>: TD-Gammon (Backgammon)</li>
+                        <li class="fragment"><strong>1997</strong>: <span class="tooltip">Deep Blue<span class="tooltiptext">Beat Kasparov using massive parallelism & special hardware</span></span> (Chess)</li>
+                        <li class="fragment"><strong>2016</strong>: <span class="tooltip">AlphaGo<span class="tooltiptext">Deep learning + Monte Carlo tree search</span></span> (Go)</li>
+                        <li class="fragment"><strong>2017</strong>: <span class="tooltip">Libratus<span class="tooltiptext">Handled partial observability in no-limit poker</span></span> (Poker)</li>
+                        <li class="fragment"><strong>2019</strong>: AlphaStar (StarCraft II)</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Self-Driving Vehicles</h2>
+                    <ul>
+                        <li class="fragment">Tesla Autopilot, Waymo, NVIDIA Drive</li>
+                        <li class="fragment">Deep learning for <span class="tooltip">perception<span class="tooltiptext">Object detection, lane detection, pedestrian tracking</span></span></li>
+                        <li class="fragment">Challenges: Reasoning, rule incorporation</li>
+                        <li class="fragment">Partial autonomy achieved, full autonomy pending</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Scientific Applications</h2>
+                    <ul>
+                        <li class="fragment"><strong>Biology</strong>: <span class="tooltip">AlphaFold<span class="tooltiptext">Protein structure prediction breakthrough</span></span></li>
+                        <li class="fragment"><strong>Physics</strong>: Particle detection, gravitational waves</li>
+                        <li class="fragment"><strong>Astronomy</strong>: Galaxy classification, exoplanet discovery</li>
+                        <li class="fragment"><strong>Medicine</strong>: Drug discovery, diagnosis</li>
+                        <li class="fragment"><strong>Climate</strong>: Weather prediction, climate modeling</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">AI Ethics & Concerns</h2>
+                    <ul>
+                        <li class="fragment">Not AGI: Task-specific, engineered systems</li>
+                        <li class="fragment">Real concerns:
+                            <ul>
+                                <li>Job automation impact</li>
+                                <li>Algorithmic bias</li>
+                                <li>Privacy & surveillance</li>
+                                <li>Decision transparency</li>
+                            </ul>
+                        </li>
+                        <li class="fragment">Need careful, ethical deployment</li>
+                    </ul>
+                </section>
+                
+                <!-- Multiple Choice Question for Success Stories -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Which statements about AI success stories are true?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "ImageNet error rates dropped from 28% to 2.25% between 2010-2017",
+                                "correct": true,
+                                "explanation": "This dramatic improvement showcases the power of deep learning in computer vision."
+                            },
+                            {
+                                "text": "Full self-driving has been achieved by multiple companies",
+                                "correct": false,
+                                "explanation": "Only partial autonomy has been achieved. Full autonomy remains challenging due to reasoning and rule incorporation requirements."
+                            },
+                            {
+                                "text": "Speech recognition has achieved human parity for some applications",
+                                "correct": true,
+                                "explanation": "Microsoft achieved 5.1% word error rate in 2018, matching professional transcribers."
+                            },
+                            {
+                                "text": "AI systems today have artificial general intelligence",
+                                "correct": false,
+                                "explanation": "Current AI systems are task-specific and engineered. AGI that can reason about itself and modify its architecture does not exist."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+            
+
+            <!-- The Essence of Deep Learning Section with Vertical Transitions -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">The Essence of Deep Learning</h2>
+                    <div class="emphasis-box">
+                        <p>What makes deep learning <em>deep</em> and why it revolutionized AI</p>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">What Makes It "Deep"?</h2>
+                    <ul>
+                        <li class="fragment">Many <span class="tooltip">layers<span class="tooltiptext">Each layer learns increasingly abstract representations</span></span> of transformations</li>
+                        <li class="fragment">Operations at each layer learned <em>jointly</em> from data</li>
+                        <li class="fragment">Not just stacked processing steps</li>
+                        <li class="fragment">Depth enables hierarchical feature learning</li>
+                    </ul>
+                </section>
+                
+                <section data-sources='[{"text": "Canny (1987) - Edge Detection", "url": "https://doi.org/10.1109/TPAMI.1986.4767851"}, {"text": "Lowe (2004) - SIFT Features", "url": "https://doi.org/10.1023/B:VISI.0000029664.99615.94"}]'>
+                    <h2 class="truncate-title">End-to-End Training Revolution</h2>
+                    <div style="display: flex; justify-content: space-around; margin: 20px 0;">
+                        <div class="fragment" style="flex: 1; padding: 10px;">
+                            <h4>Traditional ML Pipeline</h4>
+                            <ol style="font-size: 0.8em;">
+                                <li><span class="tooltip">Feature Engineering<span class="tooltiptext">Canny edges, SIFT, HOG, manually designed</span></span></li>
+                                <li>Feature Selection</li>
+                                <li>Model Training</li>
+                                <li>Separate tuning</li>
+                            </ol>
+                        </div>
+                        <div class="fragment" style="flex: 1; padding: 10px;">
+                            <h4>Deep Learning Pipeline</h4>
+                            <ol style="font-size: 0.8em;">
+                                <li>Raw Data Input</li>
+                                <li><span class="tooltip">Learned Features<span class="tooltiptext">Network discovers optimal representations</span></span></li>
+                                <li>Joint Optimization</li>
+                                <li>End-to-end training</li>
+                            </ol>
+                        </div>
+                    </div>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">From Manual to Learned Features</h2>
+                    <ul>
+                        <li class="fragment"><strong>Before</strong>: Domain experts design features</li>
+                        <li class="fragment"><strong>Problem</strong>: Human ingenuity is limited</li>
+                        <li class="fragment"><strong>Deep Learning</strong>: Automatic feature discovery</li>
+                        <li class="fragment"><strong>Result</strong>: Superior accuracy across domains</li>
+                    </ul>
+                    <p class="fragment"><em>Millions of automatic choices beat manual design</em></p>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Unified Tools Across Domains</h2>
+                    <ul>
+                        <li class="fragment">Same architectures work for:
+                            <ul>
+                                <li>Computer Vision</li>
+                                <li>Natural Language Processing</li>
+                                <li>Speech Recognition</li>
+                                <li>Medical Imaging</li>
+                            </ul>
+                        </li>
+                        <li class="fragment">Eliminated domain-specific boundaries</li>
+                        <li class="fragment">Transfer learning across modalities</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Parametric → Nonparametric</h2>
+                    <ul>
+                        <li class="fragment"><strong>Scarce data era</strong>: Simplifying assumptions needed</li>
+                        <li class="fragment"><strong>Big data era</strong>: Let data speak for itself</li>
+                        <li class="fragment">Like physics: Analytical → Numerical simulations</li>
+                        <li class="fragment">Trade-off: Accuracy vs Interpretability</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">The Empirical Revolution</h2>
+                    <ul>
+                        <li class="fragment">Accept <span class="tooltip">suboptimal solutions<span class="tooltiptext">Good enough often beats theoretically perfect</span></span></li>
+                        <li class="fragment">Embrace <span class="tooltip">nonconvex optimization<span class="tooltiptext">Local minima are often good enough in practice</span></span></li>
+                        <li class="fragment">Try first, prove later</li>
+                        <li class="fragment">Rapid experimentation culture</li>
+                    </ul>
+                </section>
+                
+                <section>
+                    <h2 class="truncate-title">Open Source Culture</h2>
+                    <ul>
+                        <li class="fragment">Shared tools across academia & industry</li>
+                        <li class="fragment">Released models & datasets</li>
+                        <li class="fragment">Collaborative progress</li>
+                        <li class="fragment">Lowered barriers to entry</li>
+                    </ul>
+                    <p class="fragment"><em>From PhD homework → 10 lines of code</em></p>
+                </section>
+                
+                <!-- Multiple Choice Question for Essence of Deep Learning -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "What are the key characteristics that define deep learning?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "Many layers of transformations learned jointly from data",
+                                "correct": true,
+                                "explanation": "The depth and joint optimization of all layers is what makes deep learning powerful."
+                            },
+                            {
+                                "text": "Manual feature engineering followed by neural networks",
+                                "correct": false,
+                                "explanation": "Deep learning replaces manual feature engineering with automatic feature learning."
+                            },
+                            {
+                                "text": "End-to-end training from raw data to outputs",
+                                "correct": true,
+                                "explanation": "Deep learning trains the entire pipeline jointly, from raw inputs to final predictions."
+                            },
+                            {
+                                "text": "Requires theoretical proofs before implementation",
+                                "correct": false,
+                                "explanation": "Deep learning embraces empiricism - trying things that work before proving why they work."
+                            },
+                            {
+                                "text": "Unified tools working across different domains",
+                                "correct": true,
+                                "explanation": "The same architectures work for vision, language, speech, eliminating domain boundaries."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Summary -->
+            <section>
+                <h2 class="truncate-title">Key Concepts Recap</h2>
+                <ul>
+                    <li class="fragment">ML = Programming with data</li>
+                    <li class="fragment">Four components: data, models, objectives, optimization</li>
+                    <li class="fragment">Three paradigms: supervised, unsupervised, reinforcement</li>
+                    <li class="fragment">Wide range of applications</li>
+                </ul>
+            </section>
+            
+            <section>
+                <h2 class="truncate-title">What's Next?</h2>
+                <ul>
+                    <li class="fragment">Mathematical foundations</li>
+                    <li class="fragment">Linear models in depth</li>
+                    <li class="fragment">Neural network basics</li>
+                    <li class="fragment">Hands-on implementation</li>
+                </ul>
+            </section>
+            
+        </div>
+    </div>
+    
+    <!-- Reveal.js Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/math/math.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.js"></script>
+    
+    <!-- D3.js for visualizations -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <!-- Shared utilities -->
+    <script src="../shared/js/d3-utils.js"></script>
+    <script src="../shared/js/animation-lib.js"></script>
+    <script src="../shared/js/neural-viz.js"></script>
+    <script src="../shared/js/source-modal-v2.js"></script>
+    <script src="../shared/js/tooltip-modal.js"></script>
+    <script src="../shared/js/title-handler.js"></script>
+    <script src="../shared/js/multiple-choice.js"></script>
+    
+    <!-- Lecture-specific scripts -->
+    <script src="js/basics-animations.js"></script>
+    <script src="js/regression-demo.js"></script>
+    <script src="js/classification-demo.js"></script>
+    <script src="js/gradient-viz.js"></script>
+    
+    <script>
+        // Loss Landscape Visualization
+        function createLossLandscape() {
+            const container = document.getElementById('loss-landscape-viz');
+            if (!container || container.hasChildNodes()) return;
+            
+            const width = 600;
+            const height = 400;
+            const margin = {top: 20, right: 20, bottom: 40, left: 40};
+            
+            const svg = d3.select(container)
+                .append('svg')
+                .attr('viewBox', `0 0 ${width} ${height}`)
+                .attr('preserveAspectRatio', 'xMidYMid meet')
+                .style('max-width', '100%')
+                .style('height', 'auto');
+            
+            // Create scales
+            const xScale = d3.scaleLinear()
+                .domain([-3, 3])
+                .range([margin.left, width - margin.right]);
+            
+            const yScale = d3.scaleLinear()
+                .domain([-3, 3])
+                .range([height - margin.bottom, margin.top]);
+            
+            // Loss function (quadratic bowl)
+            const lossFunction = (x, y) => x*x + y*y;
+            
+            // Create contour lines
+            const contourData = [];
+            const levels = [0.5, 1, 2, 4, 8, 16];
+            
+            levels.forEach(level => {
+                const points = [];
+                for (let angle = 0; angle <= 2 * Math.PI; angle += 0.1) {
+                    const r = Math.sqrt(level);
+                    points.push([
+                        xScale(r * Math.cos(angle)),
+                        yScale(r * Math.sin(angle))
+                    ]);
+                }
+                contourData.push(points);
+            });
+            
+            // Draw contour lines
+            const lineGenerator = d3.line();
+            
+            contourData.forEach((contour, i) => {
+                svg.append('path')
+                    .attr('d', lineGenerator(contour))
+                    .attr('fill', 'none')
+                    .attr('stroke', '#EEEEEE')
+                    .attr('stroke-width', 1)
+                    .attr('opacity', 0.6);
+            });
+            
+            // Gradient descent path
+            let currentX = 2.5;
+            let currentY = 2;
+            const learningRate = 0.1;
+            const path = [[currentX, currentY]];
+            
+            // Compute gradient descent steps
+            for (let i = 0; i < 50; i++) {
+                const gradX = 2 * currentX;
+                const gradY = 2 * currentY;
+                
+                currentX -= learningRate * gradX;
+                currentY -= learningRate * gradY;
+                
+                path.push([currentX, currentY]);
+                
+                // Stop if converged (close to minimum)
+                if (Math.abs(currentX) < 0.01 && Math.abs(currentY) < 0.01) {
+                    break;
+                }
+            }
+            
+            // Draw gradient lines with direct colors
+            const gradientGroup = svg.append('g').attr('class', 'gradient-lines');
+            
+            for (let i = 0; i < path.length - 1; i++) {
+                const [x1, y1] = path[i];
+                const [x2, y2] = path[i + 1];
+                
+                // Draw gradient arrow with direct color
+                gradientGroup.append('line')
+                    .attr('x1', xScale(x1))
+                    .attr('y1', yScale(y1))
+                    .attr('x2', xScale(x2))
+                    .attr('y2', yScale(y2))
+                    .attr('stroke', '#FFA05F')  // Direct orange color
+                    .attr('stroke-width', 2)
+                    .attr('marker-end', 'url(#arrowhead)')
+                    .attr('opacity', 0)
+                    .transition()
+                    .delay(i * 100)
+                    .duration(300)
+                    .attr('opacity', 0.8);
+            }
+            
+            // Add arrow marker definition
+            svg.append('defs').append('marker')
+                .attr('id', 'arrowhead')
+                .attr('markerWidth', 10)
+                .attr('markerHeight', 10)
+                .attr('refX', 8)
+                .attr('refY', 3)
+                .attr('orient', 'auto')
+                .append('polygon')
+                .attr('points', '0 0, 10 3, 0 6')
+                .attr('fill', '#FFA05F');  // Direct orange color
+            
+            // Animated point
+            const point = svg.append('circle')
+                .attr('cx', xScale(path[0][0]))
+                .attr('cy', yScale(path[0][1]))
+                .attr('r', 8)
+                .attr('fill', '#10099F')  // Direct blue color
+                .attr('stroke', '#FFFFFF')
+                .attr('stroke-width', 2);
+            
+            // Animate the point along the path
+            let stepIndex = 0;
+            function animateStep() {
+                if (stepIndex < path.length - 1) {
+                    stepIndex++;
+                    const [x, y] = path[stepIndex];
+                    
+                    point.transition()
+                        .duration(300)
+                        .attr('cx', xScale(x))
+                        .attr('cy', yScale(y))
+                        .on('end', () => {
+                            setTimeout(animateStep, 100);
+                        });
+                    
+                    // Color changes as it approaches minimum
+                    if (stepIndex === path.length - 1) {
+                        point.transition()
+                            .duration(500)
+                            .attr('fill', '#2DD2C0');  // Direct teal color at minimum
+                    }
+                }
+            }
+            
+            // Start animation after a delay
+            setTimeout(animateStep, 1000);
+            
+            // Add axes
+            svg.append('g')
+                .attr('transform', `translate(0,${yScale(0)})`)
+                .call(d3.axisBottom(xScale).ticks(5))
+                .attr('opacity', 0.3);
+            
+            svg.append('g')
+                .attr('transform', `translate(${xScale(0)},0)`)
+                .call(d3.axisLeft(yScale).ticks(5))
+                .attr('opacity', 0.3);
+            
+            // Add labels
+            svg.append('text')
+                .attr('x', width / 2)
+                .attr('y', height - 5)
+                .attr('text-anchor', 'middle')
+                .attr('font-size', '12px')
+                .attr('fill', '#666')
+                .text('Parameter 1');
+            
+            svg.append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('x', -height / 2)
+                .attr('y', 15)
+                .attr('text-anchor', 'middle')
+                .attr('font-size', '12px')
+                .attr('fill', '#666')
+                .text('Parameter 2');
+            
+            // Add minimum point marker
+            svg.append('circle')
+                .attr('cx', xScale(0))
+                .attr('cy', yScale(0))
+                .attr('r', 4)
+                .attr('fill', '#FC8484')  // Direct coral color
+                .attr('stroke', '#FFFFFF')
+                .attr('stroke-width', 2);
+            
+            svg.append('text')
+                .attr('x', xScale(0) + 10)
+                .attr('y', yScale(0) - 10)
+                .attr('font-size', '11px')
+                .attr('fill', '#FC8484')  // Direct coral color
+                .text('Minimum');
+        }
+        
+        // Initialize Reveal.js
+        Reveal.initialize({
+            hash: true,
+            controls: true,
+            progress: true,
+            center: true,
+            transition: 'slide',
+            math: {
+                mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js',
+                config: 'TeX-AMS_SVG-full',
+                TeX: {
+                    Macros: {
+                        R: '\\mathbb{R}',
+                        set: ['\\left\\{#1\\right\\}', 1]
+                    }
+                }
+            },
+            plugins: [ RevealMath, RevealHighlight, RevealNotes ]
+        });
+        
+        // Initialize visualizations when slides are ready
+        Reveal.on('ready', () => {
+            if (typeof initBasicsAnimations !== 'undefined') {
+                initBasicsAnimations();
+            }
+            // Initialize loss landscape on the appropriate slide
+            createLossLandscape();
+        });
+        
+        // Reinitialize visualizations when changing slides
+        Reveal.on('slidechanged', () => {
+            // Check if we're on the loss landscape slide
+            const lossViz = document.getElementById('loss-landscape-viz');
+            if (lossViz && !lossViz.hasChildNodes()) {
+                createLossLandscape();
+            }
+        });
+    </script>
+</body>
+</html>
