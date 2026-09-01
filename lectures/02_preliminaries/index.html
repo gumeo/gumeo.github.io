@@ -1,0 +1,3477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Manipulation with N-dimensional Arrays - Introduction to Deep Learning</title>
+    
+    <!-- Reveal.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+    <link rel="stylesheet" href="../shared/css/reveal-theme.css">
+    <link rel="stylesheet" href="../shared/css/common.css">
+    <link rel="stylesheet" href="css/preliminaries-custom.css">
+    <link rel="stylesheet" href="../shared/css/quiz.css">
+    
+    <!-- Code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.css">
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            
+            <!-- Title Slide -->
+            <section class="title-slide">
+                <img src="../shared/images/uoi_logo_blue.png" alt="University of Iceland Logo" class="ui-logo">
+                <h1 class="truncate-title">Data Manipulation with N-dimensional Arrays</h1>
+                <p>Chapter 2.1: Preliminaries</p>
+                <p>Based on "Dive into Deep Learning" by Zhang et al.</p>
+                <p class="mt-lg">
+                    <small>Instructor: Guðmundur Einarsson</small><br>
+                    <small>University of Iceland</small>
+                </p>
+                <p class="mt-lg"><small><em>Based on slides from Hafsteinn Einarsson</em></small></p>
+            </section>
+
+            <!-- Learning Objectives -->
+            <section>
+                <h2 class="truncate-title">Learning Objectives</h2>
+                <ul>
+                    <li class="fragment">Understand <span class="tooltip">tensors<span class="tooltiptext">A tensor is a generalization of vectors and matrices to potentially higher dimensions. In deep learning, tensors are the fundamental data structure for storing and manipulating data.</span></span> and their role in deep learning</li>
+                    <li class="fragment">Master tensor creation and manipulation</li>
+                    <li class="fragment">Learn indexing, slicing, and reshaping operations</li>
+                    <li class="fragment">Understand <span class="tooltip">broadcasting<span class="tooltiptext">Broadcasting is a mechanism that allows operations on tensors of different shapes by automatically expanding dimensions to make them compatible.</span></span> mechanism</li>
+                    <li class="fragment">Optimize memory usage in tensor operations</li>
+                    <li class="fragment">Convert between different data formats</li>
+                </ul>
+            </section>
+
+            <!-- Section 1: Getting Started with Tensors -->
+            <section>
+                <section data-sources='[{"text": "Dive into Deep Learning - Chapter 2.1", "url": "https://d2l.ai/chapter_preliminaries/ndarray.html"}]'>
+                    <h2 class="truncate-title">What are Tensors?</h2>
+                    <div class="fragment">
+                        <p>A <span class="tooltip">tensor<span class="tooltiptext">A (possibly multidimensional) array of numerical values. The fundamental data structure in deep learning frameworks.</span></span> represents an n-dimensional array of numerical values</p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <ul>
+                            <li><strong>0D tensor:</strong> Scalar (single number)</li>
+                            <li><strong>1D tensor:</strong> Vector</li>
+                            <li><strong>2D tensor:</strong> Matrix</li>
+                            <li><strong>3D+ tensor:</strong> Higher-order tensor</li>
+                        </ul>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Tensors are the foundation of all deep learning computations!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Creating Tensors: arange()</h2>
+                    <p>Create a vector of evenly spaced values</p>
+                    <pre class="fragment"><code class="python" data-line-numbers>import torch
+
+# Create a tensor with values from 0 to 11
+x = torch.arange(12, dtype=torch.float32)
+print(x)</code></pre>
+                    <pre class="fragment"><code class="plaintext">tensor([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., 11.])</code></pre>
+                    <div class="fragment">
+                        <p class="mt-md">Each value is called an <span class="tooltip">element<span class="tooltiptext">An individual value within a tensor. Elements can be accessed and modified using indexing.</span></span> of the tensor</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Tensor Properties</h2>
+                    <p>Inspect tensor characteristics</p>
+                    <pre class="fragment"><code class="python" data-line-numbers># Number of elements
+print(x.numel())  # 12
+
+# Shape of the tensor
+print(x.shape)     # torch.Size([12])
+
+# Data type
+print(x.dtype)     # torch.float32</code></pre>
+                    <div class="fragment mt-lg">
+                        <div class="emphasis-box">
+                            <p><strong>Shape</strong> tells us the size along each dimension</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Reshaping Tensors</h2>
+                    <p>Change shape without altering values</p>
+                    <pre class="fragment"><code class="python" data-line-numbers># Reshape vector to 3x4 matrix
+X = x.reshape(3, 4)
+print(X)</code></pre>
+                    <pre class="fragment"><code class="plaintext">tensor([[ 0.,  1.,  2.,  3.],
+        [ 4.,  5.,  6.,  7.],
+        [ 8.,  9., 10., 11.]])</code></pre>
+                    <div class="fragment">
+                        <pre><code class="python" data-line-numbers># Use -1 to infer dimension
+X = x.reshape(-1, 4)  # Same as reshape(3, 4)
+X = x.reshape(3, -1)  # Same as reshape(3, 4)</code></pre>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Creating Special Tensors</h2>
+                    <p>Initialize with specific values</p>
+                    <pre class="fragment"><code class="python" data-line-numbers># Tensor of zeros
+zeros = torch.zeros((2, 3, 4))
+
+# Tensor of ones  
+ones = torch.ones((2, 3, 4))
+
+# Random values from standard normal distribution
+randn = torch.randn(3, 4)</code></pre>
+                    <div class="fragment">
+                        <pre><code class="python" data-line-numbers># From Python list
+tensor = torch.tensor([[2, 1, 4, 3],
+                       [1, 2, 3, 4],
+                       [4, 3, 2, 1]])</code></pre>
+                    </div>
+                </section>
+
+                <!-- Quiz for Getting Started Section -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "What is the shape of a tensor created with torch.zeros((3, 2, 4))?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "(3, 2, 4)",
+                                "correct": true,
+                                "explanation": "Correct! The shape is exactly what we specify: 3 along the first dimension, 2 along the second, and 4 along the third."
+                            },
+                            {
+                                "text": "(24,)",
+                                "correct": false,
+                                "explanation": "This would be the shape if we flattened the tensor to 1D, but zeros() creates a tensor with the exact shape specified."
+                            },
+                            {
+                                "text": "(2, 3, 4)",
+                                "correct": false,
+                                "explanation": "The dimensions are in the wrong order. The shape follows the exact order specified in the function call."
+                            },
+                            {
+                                "text": "(4, 2, 3)",
+                                "correct": false,
+                                "explanation": "The dimensions are reversed. The shape maintains the order specified in the function call."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section 2: Indexing and Slicing -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Indexing and Slicing</h2>
+                    <p>Access and modify tensor elements</p>
+                    <div class="fragment">
+                        <ul>
+                            <li>Similar to Python lists</li>
+                            <li>Zero-based indexing</li>
+                            <li>Negative indexing from end</li>
+                            <li>Slicing with start:stop syntax</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Basic Indexing</h2>
+                    <pre class="fragment"><code class="python" data-line-numbers>X = torch.arange(12).reshape(3, 4)
+
+# Access last row
+print(X[-1])
+# tensor([8., 9., 10., 11.])
+
+# Access rows 1 and 2
+print(X[1:3])
+# tensor([[4., 5., 6., 7.],
+#         [8., 9., 10., 11.]])</code></pre>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Writing Elements</h2>
+                    <p>Modify tensor values by index</p>
+                    <pre class="fragment"><code class="python" data-line-numbers># Modify single element
+X[1, 2] = 17
+print(X)</code></pre>
+                    <pre class="fragment"><code class="plaintext">tensor([[ 0.,  1.,  2.,  3.],
+        [ 4.,  5., 17.,  7.],
+        [ 8.,  9., 10., 11.]])</code></pre>
+                    <pre class="fragment"><code class="python" data-line-numbers># Modify multiple elements
+X[:2, :] = 12  # First two rows
+print(X)</code></pre>
+                    <pre class="fragment"><code class="plaintext">tensor([[12., 12., 12., 12.],
+        [12., 12., 12., 12.],
+        [ 8.,  9., 10., 11.]])</code></pre>
+                </section>
+
+                <!-- Quiz for Indexing Section -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Given X = torch.arange(20).reshape(4, 5), what does X[1:3, 2:4] select?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "A 2x2 submatrix from rows 1-2 and columns 2-3",
+                                "correct": true,
+                                "explanation": "Correct! The slice [1:3, 2:4] selects rows 1 and 2 (stopping before 3) and columns 2 and 3 (stopping before 4)."
+                            },
+                            {
+                                "text": "A 3x4 submatrix",
+                                "correct": false,
+                                "explanation": "The slice notation stop:start excludes the stop index, so we get 2 rows (1,2) and 2 columns (2,3), not 3x4."
+                            },
+                            {
+                                "text": "Elements at positions (1,2) and (3,4)",
+                                "correct": false,
+                                "explanation": "Slicing selects a rectangular region, not individual elements. This would select a 2x2 submatrix."
+                            },
+                            {
+                                "text": "All elements from row 1 to row 3",
+                                "correct": false,
+                                "explanation": "The second dimension [2:4] limits the columns selected, not all columns are included."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section 3: Operations -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Tensor Operations</h2>
+                    <p>Mathematical operations on tensors</p>
+                    <div class="fragment">
+                        <ul>
+                            <li><strong>Elementwise operations:</strong> Apply to each element</li>
+                            <li><strong>Unary operations:</strong> Single input (e.g., exp, log)</li>
+                            <li><strong>Binary operations:</strong> Two inputs (e.g., +, -, *, /)</li>
+                        </ul>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Operations preserve tensor shape when inputs have same shape</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Unary Operations</h2>
+                    <p>Operations on single tensors</p>
+                    <pre class="fragment"><code class="python" data-line-numbers>x = torch.tensor([1.0, 2, 4, 8])
+
+# Exponential function
+print(torch.exp(x))
+# tensor([2.7183e+00, 7.3891e+00, 5.4598e+01, 2.9810e+03])</code></pre>
+                    <div class="fragment mt-lg">
+                        <p>Mathematical notation: <span class="tooltip">f: ℝ → ℝ<span class="tooltiptext">A function that maps from any real number to another real number, applied elementwise to each tensor element.</span></span></p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Binary Operations</h2>
+                    <p>Operations on pairs of tensors</p>
+                    <pre class="fragment"><code class="python" data-line-numbers>x = torch.tensor([1.0, 2, 4, 8])
+y = torch.tensor([2, 2, 2, 2])
+
+print(x + y)  # tensor([ 3.,  4.,  6., 10.])
+print(x - y)  # tensor([-1.,  0.,  2.,  6.])
+print(x * y)  # tensor([ 2.,  4.,  8., 16.])
+print(x / y)  # tensor([0.5, 1.0, 2.0, 4.0])
+print(x ** y) # tensor([ 1.,  4., 16., 64.])</code></pre>
+                    <div class="fragment mt-lg">
+                        <p>Mathematical notation: <span class="tooltip">f: ℝ, ℝ → ℝ<span class="tooltiptext">A function that takes two real numbers and returns a real number, applied elementwise to pairs of tensor elements.</span></span></p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Concatenation</h2>
+                    <p>Combine tensors along an axis</p>
+                    <pre class="fragment"><code class="python" data-line-numbers>X = torch.arange(12, dtype=torch.float32).reshape((3,4))
+Y = torch.tensor([[2.0, 1, 4, 3],
+                  [1, 2, 3, 4],
+                  [4, 3, 2, 1]])
+
+# Concatenate along rows (axis 0)
+Z1 = torch.cat((X, Y), dim=0)
+print(Z1.shape)  # torch.Size([6, 4])
+
+# Concatenate along columns (axis 1)
+Z2 = torch.cat((X, Y), dim=1)
+print(Z2.shape)  # torch.Size([3, 8])</code></pre>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Logical Operations</h2>
+                    <p>Element-wise comparisons</p>
+                    <pre class="fragment"><code class="python" data-line-numbers>X = torch.arange(12).reshape(3, 4)
+Y = X.clone()
+Y[1, 2] = 6  # Same as X[1, 2]
+
+print(X == Y)</code></pre>
+                    <pre class="fragment"><code class="plaintext">tensor([[True, True, True, True],
+        [True, True, True, True],
+        [True, True, True, True]])</code></pre>
+                    <div class="fragment">
+                        <pre><code class="python" data-line-numbers># Sum all elements
+print(X.sum())  # tensor(66.)</code></pre>
+                    </div>
+                </section>
+
+                <!-- Quiz for Operations Section -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "What happens when you perform x * y on two tensors of shape (3, 4)?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "Element-wise multiplication, result has shape (3, 4)",
+                                "correct": true,
+                                "explanation": "Correct! The * operator performs element-wise multiplication, preserving the shape of the input tensors."
+                            },
+                            {
+                                "text": "Matrix multiplication",
+                                "correct": false,
+                                "explanation": "Matrix multiplication requires the @ operator or torch.matmul(). The * operator performs element-wise multiplication."
+                            },
+                            {
+                                "text": "Dot product, result is a scalar",
+                                "correct": false,
+                                "explanation": "A dot product would reduce the dimensions. The * operator performs element-wise multiplication, preserving shape."
+                            },
+                            {
+                                "text": "Error - shapes must be different for multiplication",
+                                "correct": false,
+                                "explanation": "Element-wise operations work perfectly with same-shaped tensors. Different shapes would trigger broadcasting rules."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section 4: Broadcasting -->
+            <section>
+                <section data-sources='[{"text": "NumPy Broadcasting Documentation", "url": "https://numpy.org/doc/stable/user/basics.broadcasting.html"}]'>
+                    <h2 class="truncate-title">Broadcasting Mechanism</h2>
+                    <p>Operations on different-shaped tensors</p>
+                    <div class="fragment">
+                        <p><span class="tooltip">Broadcasting<span class="tooltiptext">A mechanism that automatically expands tensors to compatible shapes for element-wise operations without actually copying data.</span></span> enables operations between tensors of different shapes</p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>Two-step process:</strong></p>
+                        <ol>
+                            <li>Expand arrays by copying elements along axes with length 1</li>
+                            <li>Perform element-wise operation on resulting arrays</li>
+                        </ol>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Broadcasting Example</h2>
+                    <pre class="fragment"><code class="python" data-line-numbers>a = torch.arange(3).reshape((3, 1))
+b = torch.arange(2).reshape((1, 2))
+
+print("a:")
+print(a)
+print("\nb:")
+print(b)</code></pre>
+                    <pre class="fragment"><code class="plaintext">a:
+tensor([[0],
+        [1],
+        [2]])
+
+b:
+tensor([[0, 1]])</code></pre>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Broadcasting Addition</h2>
+                    <pre class="fragment"><code class="python" data-line-numbers># a is (3, 1), b is (1, 2)
+# Broadcasting expands to (3, 2)
+result = a + b
+print(result)</code></pre>
+                    <pre class="fragment"><code class="plaintext">tensor([[0, 1],
+        [1, 2],
+        [2, 3]])</code></pre>
+                    <div class="fragment">
+                        <div class="emphasis-box" style="padding: 0.1em">
+                            <p>Broadcasting conceptually replicates:<br>
+                            a → [[0, 0], [1, 1], [2, 2]]<br>
+                            b → [[0, 1], [0, 1], [0, 1]]</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Broadcasting Rules</h2>
+                    <div class="fragment">
+                        <p><strong>Two tensors are compatible for broadcasting if:</strong></p>
+                        <ol>
+                            <li>Their dimensions are equal, OR</li>
+                            <li>One of them is 1, OR</li>
+                            <li>One of them doesn't exist</li>
+                        </ol>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <pre><code class="python" data-line-numbers># Examples of compatible shapes:
+# (3, 1) and (1, 4) → (3, 4)
+# (5, 3, 4) and (3, 4) → (5, 3, 4)
+# (5, 3, 4) and (1, 4) → (5, 3, 4)
+# (15, 3, 5) and (15, 1, 5) → (15, 3, 5)</code></pre>
+                    </div>
+                </section>
+
+                <!-- Quiz for Broadcasting Section -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Which pair of tensor shapes can be broadcast together?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "(3, 1, 4) and (1, 5, 4)",
+                                "correct": true,
+                                "explanation": "Correct! These shapes are compatible: dimension 0 (3 and 1), dimension 1 (1 and 5), dimension 2 (4 and 4). Result shape: (3, 5, 4)."
+                            },
+                            {
+                                "text": "(3, 4) and (4, 3)",
+                                "correct": false,
+                                "explanation": "These shapes are incompatible. The dimensions dont match (3≠4 and 4≠3) and neither is 1."
+                            },
+                            {
+                                "text": "(5, 2) and (3, 2)",
+                                "correct": false,
+                                "explanation": "Incompatible in the first dimension (5≠3 and neither is 1). Broadcasting requires dimensions to be equal or one of them to be 1."
+                            },
+                            {
+                                "text": "(3, 4, 5) and (2, 1)",
+                                "correct": false,
+                                "explanation": "The second tensor needs to be aligned from the right. (2, 1) cant broadcast with (4, 5) as 2≠4."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section 5: Saving Memory -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Memory Management</h2>
+                    <p>Efficient tensor operations</p>
+                    <div class="fragment">
+                        <p>Operations can allocate new memory unnecessarily</p>
+                        <pre><code class="python" data-line-numbers>before = id(Y)
+Y = Y + X  # Creates new tensor
+print(id(Y) == before)  # False</code></pre>
+                    </div>
+                    <div class="fragment mt-lg emphasis-box">
+                        <p>In ML, we update millions of parameters frequently - memory efficiency matters!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">In-Place Operations</h2>
+                    <p>Modify tensors without allocating new memory</p>
+                    <pre class="fragment"><code class="python" data-line-numbers># Method 1: Slice notation
+Z = torch.zeros_like(Y)
+print('id(Z):', id(Z))
+Z[:] = X + Y  # In-place assignment
+print('id(Z):', id(Z))  # Same ID!</code></pre>
+                    <pre class="fragment"><code class="python" data-line-numbers># Method 2: In-place operators
+before = id(X)
+X += Y  # Equivalent to X[:] = X + Y
+print(id(X) == before)  # True</code></pre>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">In-Place Operation Methods</h2>
+                    <p>PyTorch provides in-place method variants</p>
+                    <pre class="fragment"><code class="python" data-line-numbers># Operations ending with _ are in-place
+X.add_(Y)     # X += Y
+X.mul_(2)     # X *= 2
+X.sub_(1)     # X -= 1
+X.div_(2)     # X /= 2
+
+# These modify X directly without new allocation</code></pre>
+                    <div class="fragment">
+                        <div class="emphasis-box">
+                            <p>⚠️ Be careful: In-place operations can break gradient computation!</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Quiz for Memory Section -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Which operation modifies the tensor in-place without allocating new memory?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "X[:] = X + Y",
+                                "correct": true,
+                                "explanation": "Correct! Using slice notation with assignment modifies the existing tensor in-place without allocating new memory."
+                            },
+                            {
+                                "text": "X = X + Y",
+                                "correct": false,
+                                "explanation": "This creates a new tensor for X + Y and then reassigns the variable X to point to it, allocating new memory."
+                            },
+                            {
+                                "text": "Z = X + Y",
+                                "correct": false,
+                                "explanation": "This creates a new tensor Z with the result of X + Y, allocating new memory."
+                            },
+                            {
+                                "text": "Y = torch.add(X, Y)",
+                                "correct": false,
+                                "explanation": "torch.add creates a new tensor with the result, then Y is reassigned to point to this new tensor."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section 6: Conversion -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Converting Between Formats</h2>
+                    <p>Interoperability with NumPy and Python</p>
+                    <div class="fragment">
+                        <ul>
+                            <li>Convert to/from NumPy arrays</li>
+                            <li>Extract Python scalars</li>
+                            <li>Share memory (PyTorch) or copy (other frameworks)</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">NumPy Conversion</h2>
+                    <pre class="fragment"><code class="python" data-line-numbers># PyTorch to NumPy
+X = torch.ones(5)
+A = X.numpy()
+print(type(A))  # <class 'numpy.ndarray'>
+
+# NumPy to PyTorch
+B = torch.from_numpy(A)
+print(type(B))  # <class 'torch.Tensor'></code></pre>
+                    <div class="fragment">
+                        <div class="emphasis-box">
+                            <p>⚠️ PyTorch CPU tensors share memory with NumPy arrays!</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Converting to Python Scalars</h2>
+                    <pre class="fragment"><code class="python" data-line-numbers># Single element tensor to scalar
+a = torch.tensor([3.5])
+
+# Method 1: item()
+scalar1 = a.item()
+print(scalar1)  # 3.5
+
+# Method 2: Python built-ins
+scalar2 = float(a)
+print(scalar2)  # 3.5
+
+scalar3 = int(a)
+print(scalar3)  # 3</code></pre>
+                    <div class="fragment">
+                        <p>Only works for tensors with exactly one element!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Framework Comparison</h2>
+                    <table style="font-size: 0.8em;">
+                        <thead>
+                            <tr>
+                                <th>Framework</th>
+                                <th>Tensor Class</th>
+                                <th>NumPy Sharing</th>
+                            </tr>
+                        </thead>
+                        <tbody class="fragment">
+                            <tr>
+                                <td>PyTorch</td>
+                                <td>Tensor</td>
+                                <td>Shares memory (CPU)</td>
+                            </tr>
+                            <tr>
+                                <td>TensorFlow</td>
+                                <td>Tensor</td>
+                                <td>Copies data</td>
+                            </tr>
+                            <tr>
+                                <td>MXNet</td>
+                                <td>ndarray</td>
+                                <td>Copies data</td>
+                            </tr>
+                            <tr>
+                                <td>JAX</td>
+                                <td>Array</td>
+                                <td>Copies data</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- Quiz for Conversion Section -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "What happens when you modify a NumPy array created from a PyTorch CPU tensor?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "The original PyTorch tensor is also modified",
+                                "correct": true,
+                                "explanation": "Correct! PyTorch CPU tensors and NumPy arrays share the same memory, so modifications to one affect the other."
+                            },
+                            {
+                                "text": "Only the NumPy array changes",
+                                "correct": false,
+                                "explanation": "PyTorch CPU tensors share memory with NumPy arrays, so changes to one affect both."
+                            },
+                            {
+                                "text": "An error occurs",
+                                "correct": false,
+                                "explanation": "No error occurs. The operation is valid and affects both the NumPy array and PyTorch tensor due to shared memory."
+                            },
+                            {
+                                "text": "A new tensor is created",
+                                "correct": false,
+                                "explanation": "No new tensor is created. The NumPy array and PyTorch tensor share the same underlying memory."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section 7: Data Processing with pandas -->
+            <section>
+                <section data-sources='[{"text": "Dive into Deep Learning - Chapter 2.2", "url": "https://d2l.ai/chapter_preliminaries/pandas.html"}]'>
+                    <h2 class="truncate-title">Data Processing</h2>
+                    <p>Preparing real-world data for deep learning</p>
+                    <div class="fragment">
+                        <p>Raw data is rarely ready for machine learning</p>
+                        <ul>
+                            <li>Missing values</li>
+                            <li>Inconsistent formats</li>
+                            <li>Categorical variables</li>
+                            <li>Different scales</li>
+                        </ul>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>80% of data science is cleaning and preparing data!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">pandas: Python Data Analysis Library</h2>
+                    <p>The standard tool for data manipulation in Python</p>
+                    <div class="fragment">
+                        <p><strong>Key Data Structures:</strong></p>
+                        <ul>
+                            <li><span class="tooltip">DataFrame<span class="tooltiptext">A 2D labeled data structure with columns of potentially different types, like a spreadsheet or SQL table.</span></span> - 2D table with labeled axes</li>
+                            <li><span class="tooltip">Series<span class="tooltiptext">A 1D labeled array capable of holding any data type. Each column in a DataFrame is a Series.</span></span> - 1D labeled array</li>
+                        </ul>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="python" data-line-numbers>import pandas as pd
+import numpy as np
+import torch</code></pre>
+                    </div>
+                </section>
+
+                <!-- Quiz for Data Processing Introduction -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Why is data preprocessing crucial for deep learning?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "Neural networks cannot handle missing values or non-numeric data directly",
+                                "correct": true,
+                                "explanation": "Correct! Neural networks require numerical inputs without missing values. Preprocessing transforms raw data into a suitable format."
+                            },
+                            {
+                                "text": "It makes the code run faster",
+                                "correct": false,
+                                "explanation": "While clean data can improve efficiency, the main reason is that neural networks require numerical, complete data to function."
+                            },
+                            {
+                                "text": "It is only needed for image data",
+                                "correct": false,
+                                "explanation": "Data preprocessing is needed for all types of data: tabular, text, images, audio, etc."
+                            },
+                            {
+                                "text": "It is optional for modern deep learning frameworks",
+                                "correct": false,
+                                "explanation": "Preprocessing is essential. Frameworks cannot automatically handle missing values or convert all data types appropriately."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Data Loading Section -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Reading Data from CSV</h2>
+                    <pre class="fragment"><code class="python" data-line-numbers># Create a sample CSV file
+import os
+os.makedirs('data', exist_ok=True)
+data_file = 'data/house_tiny.csv'
+
+with open(data_file, 'w') as f:
+    f.write('''NumRooms,RoofType,Price
+NA,NA,127500
+2,NA,106000
+4,Slate,178100
+NA,NA,140000''')</code></pre>
+                    <pre class="fragment"><code class="python" data-line-numbers># Read the CSV file
+data = pd.read_csv(data_file)
+print(data)</code></pre>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Inspecting Data</h2>
+                    <pre class="fragment"><code class="python" data-line-numbers># First few rows
+print(data.head())
+# Data types and non-null counts
+print(data.info())
+# Statistical summary
+print(data.describe())
+# Check for missing values
+print(data.isna().sum())</code></pre>
+                    <div class="fragment">
+                        <pre><code class="plaintext">   NumRooms RoofType    Price
+0       NaN      NaN   127500
+1       2.0      NaN   106000
+2       4.0    Slate   178100
+3       NaN      NaN   140000</code></pre>
+                    </div>
+                </section>
+
+                <!-- Quiz for Data Loading -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "What does pd.read_csv() return when reading a CSV file?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "A pandas DataFrame",
+                                "correct": true,
+                                "explanation": "Correct! pd.read_csv() returns a DataFrame, which is a 2D labeled data structure perfect for tabular data."
+                            },
+                            {
+                                "text": "A NumPy array",
+                                "correct": false,
+                                "explanation": "pd.read_csv() returns a pandas DataFrame, not a NumPy array. You can convert it to NumPy using .to_numpy()."
+                            },
+                            {
+                                "text": "A Python list",
+                                "correct": false,
+                                "explanation": "pd.read_csv() returns a structured pandas DataFrame with labeled rows and columns, not a simple list."
+                            },
+                            {
+                                "text": "A PyTorch tensor",
+                                "correct": false,
+                                "explanation": "pd.read_csv() returns a pandas DataFrame. You need to explicitly convert it to a tensor using torch.tensor()."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Missing Data Handling Section -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Handling Missing Data</h2>
+                    <p>Strategies for dealing with NaN values</p>
+                    <div class="fragment">
+                        <p><strong>Common Approaches:</strong></p>
+                        <ul>
+                            <li><strong>Deletion:</strong> Remove rows/columns with missing values</li>
+                            <li><strong>Imputation:</strong> Fill with estimated values</li>
+                            <li><strong>Indicator:</strong> Create binary flag for missingness</li>
+                        </ul>
+                    </div>
+                    <div class="fragment mt-md">
+                        <p>It is good to try to know whether data is missing at random or whether we are dealing with structured missingness</p>
+                        <ul>
+                            <li>How can data be missing in a systematic way?</li>
+                        </ul>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Choice depends on data characteristics and problem requirements</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Separating Features and Target</h2>
+                    <pre class="fragment"><code class="python" data-line-numbers># Separate input features and target variable
+inputs, targets = data.iloc[:, 0:2], data.iloc[:, 2]
+
+print("Input features:")
+print(inputs)
+print("\nTarget values:")
+print(targets)</code></pre>
+                    <pre class="fragment"><code class="plaintext">Input features:
+   NumRooms RoofType
+0       NaN      NaN
+1       2.0      NaN...
+Target values:
+0    127500
+1    106000...
+</code></pre>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Numerical Imputation</h2>
+                    <pre class="fragment"><code class="python" data-line-numbers># Fill NaN with mean for numerical columns
+numeric_cols = inputs.select_dtypes(include=[np.number]).columns
+inputs[numeric_cols] = inputs[numeric_cols].fillna(
+    inputs[numeric_cols].mean()
+)
+
+print(inputs)</code></pre>
+                    <pre class="fragment"><code class="plaintext">   NumRooms RoofType
+0       3.0      NaN
+1       2.0      NaN
+2       4.0    Slate
+3       3.0      NaN</code></pre>
+                    <div class="fragment">
+                        <p>Mean of [NaN, 2, 4, NaN] = 3.0</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Categorical Imputation</h2>
+                    <pre class="fragment"><code class="python" data-line-numbers  style="font-size: 0.8em;"># Convert categorical columns to dummy variables
+# dummy_na=True creates indicator for NaN
+inputs = pd.get_dummies(inputs, dummy_na=True)
+print(inputs)</code></pre>
+                    <pre class="fragment"><code class="plaintext" style="font-size: 0.8em;">   NumRooms  RoofType_Slate  RoofType_nan
+0       3.0               0             1
+1       2.0               0             1
+2       4.0               1             0
+3       3.0               0             1</code></pre>
+                    <div class="fragment emphasis-box" style="font-size: 0.8em;">
+                        <p>One-hot encoding converts categories to binary columns</p>
+                    </div>
+                </section>
+
+                <!-- Quiz for Missing Data -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "What does pd.get_dummies(df, dummy_na=True) do?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "Creates binary columns for each category, including a column for NaN values",
+                                "correct": true,
+                                "explanation": "Correct! It performs one-hot encoding and when dummy_na=True, it also creates an indicator column for missing values."
+                            },
+                            {
+                                "text": "Fills NaN values with the mode",
+                                "correct": false,
+                                "explanation": "get_dummies() creates binary columns for categories. It does not fill NaN with mode; instead it can create an indicator column for NaN."
+                            },
+                            {
+                                "text": "Removes all NaN values from the dataset",
+                                "correct": false,
+                                "explanation": "get_dummies() does not remove NaN values. With dummy_na=True, it creates a binary indicator column for missing values."
+                            },
+                            {
+                                "text": "Converts numerical columns to categorical",
+                                "correct": false,
+                                "explanation": "get_dummies() converts categorical columns to binary dummy variables, not the other way around."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Data Transformation Section -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Data Selection and Filtering</h2>
+                    <p>Accessing specific parts of your data</p>
+                    <div class="fragment">
+                        <p><strong>Selection Methods:</strong></p>
+                        <ul>
+                            <li><code>.iloc[]</code> - Integer position based</li>
+                            <li><code>.loc[]</code> - Label based</li>
+                            <li><code>[]</code> - Column selection</li>
+                            <li>Boolean indexing - Conditional filtering</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Selection Examples</h2>
+                    <pre class="fragment"><code class="python" data-line-numbers># Create sample DataFrame
+df = pd.DataFrame({
+    'A': [1, 2, 3, 4],
+    'B': [5, 6, 7, 8],
+    'C': [9, 10, 11, 12]
+})
+
+# Select by position
+print(df.iloc[0:2, 1:3])  # First 2 rows, columns 1-2
+
+# Select by label
+print(df.loc[:, ['A', 'C']])  # All rows, columns A and C
+
+# Boolean indexing
+print(df[df['A'] > 2])  # Rows where column A > 2</code></pre>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Feature Engineering</h2>
+                    <p>Creating new features from existing data</p>
+                    <pre class="fragment"><code class="python" data-line-numbers># Create new features
+df['D'] = df['A'] + df['B']  # Sum of two columns
+df['E'] = df['C'].apply(lambda x: x**2)  # Square values
+df['F'] = (df['A'] > 2).astype(int)  # Binary feature
+
+print(df.head())</code></pre>
+                    <div class="fragment mt-md">
+                        <p>Certain transformations are common, e.g., a <strong>log transform</strong> for very skewed values</p>
+                    </div>
+                    <div class="fragment emphasis-box">
+                        <p>Good features can dramatically improve model performance!</p>
+                    </div>
+                </section>
+
+                <!-- Quiz for Data Transformation -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "What is the difference between .iloc[] and .loc[] in pandas?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": ".iloc[] uses integer positions, .loc[] uses labels/names",
+                                "correct": true,
+                                "explanation": "Correct! .iloc[] is position-based (0, 1, 2...) while .loc[] uses actual row/column labels."
+                            },
+                            {
+                                "text": ".iloc[] is faster than .loc[]",
+                                "correct": false,
+                                "explanation": "The main difference is not speed but indexing method: .iloc[] uses positions, .loc[] uses labels."
+                            },
+                            {
+                                "text": ".iloc[] only works with rows, .loc[] only with columns",
+                                "correct": false,
+                                "explanation": "Both .iloc[] and .loc[] can select both rows and columns, they just use different indexing methods."
+                            },
+                            {
+                                "text": "They are identical, just different names",
+                                "correct": false,
+                                "explanation": "They are different: .iloc[] uses integer positions while .loc[] uses labels/index values."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Converting to Tensors Section -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Converting to Tensors</h2>
+                    <p>Preparing data for deep learning frameworks</p>
+                    <div class="fragment">
+                        <p>Neural networks require numerical tensors as input</p>
+                        <pre><code class="python" data-line-numbers># Convert DataFrame to NumPy array
+numpy_array = inputs.to_numpy(dtype=float)
+
+# Convert to PyTorch tensor
+X = torch.tensor(numpy_array, dtype=torch.float32)
+y = torch.tensor(targets.to_numpy(dtype=float), 
+                 dtype=torch.float32)</code></pre>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Complete Workflow Example</h2>
+                    <pre class="fragment"><code class="python" data-line-numbers># 1. Load data
+data = pd.read_csv('data/house_tiny.csv')
+
+# 2. Split features and target
+inputs, targets = data.iloc[:, :-1], data.iloc[:, -1]
+
+# 3. Handle missing values
+numeric_cols = inputs.select_dtypes(include=[np.number]).columns
+inputs[numeric_cols] = inputs[numeric_cols].fillna(
+    inputs[numeric_cols].mean()
+)
+inputs = pd.get_dummies(inputs, dummy_na=True)
+
+# 4. Convert to tensors
+X = torch.tensor(inputs.to_numpy(dtype=float), dtype=torch.float32)
+y = torch.tensor(targets.to_numpy(dtype=float), dtype=torch.float32)
+
+print(f"Features shape: {X.shape}")
+print(f"Target shape: {y.shape}")</code></pre>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Data Processing Pipeline</h2>
+                    <div id="data-pipeline-viz" style="width: 100%; height: 400px;"></div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Each step transforms data closer to ML-ready format</p>
+                    </div>
+                </section>
+
+                <!-- Quiz for Tensor Conversion -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Why do we convert pandas DataFrames to tensors for deep learning?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "Neural networks operate on numerical tensors with GPU acceleration support",
+                                "correct": true,
+                                "explanation": "Correct! Deep learning frameworks use tensors for efficient numerical computation and GPU acceleration."
+                            },
+                            {
+                                "text": "Tensors take up less memory than DataFrames",
+                                "correct": false,
+                                "explanation": "Memory usage depends on data type and structure. The main reason is computational efficiency and GPU support."
+                            },
+                            {
+                                "text": "DataFrames cannot store numerical data",
+                                "correct": false,
+                                "explanation": "DataFrames can store numerical data. We convert to tensors for computational efficiency and framework compatibility."
+                            },
+                            {
+                                "text": "It is just a convention, not necessary",
+                                "correct": false,
+                                "explanation": "It is necessary. Neural network operations are defined on tensors, not DataFrames."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section 8: Linear Algebra Fundamentals -->
+            <section>
+                <section data-sources='[{"text": "Dive into Deep Learning - Chapter 2.3", "url": "https://d2l.ai/chapter_preliminaries/linear-algebra.html"}]'>
+                    <h2 class="truncate-title">Linear Algebra for Deep Learning</h2>
+                    <p>Mathematical foundations for neural networks</p>
+                    <div class="fragment">
+                        <p><strong>Learning Objectives:</strong></p>
+                        <ul>
+                            <li>Understand scalars, vectors, matrices, and tensors</li>
+                            <li>Master fundamental operations (addition, multiplication)</li>
+                            <li>Learn reduction operations and norms</li>
+                            <li>Connect linear algebra to deep learning</li>
+                        </ul>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Linear algebra is the language of deep learning!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Scalars</h2>
+                    <div class="fragment">
+                        <p>A <span class="tooltip">scalar<span class="tooltiptext">A single numerical value, as opposed to a vector or matrix. In deep learning, scalars often represent single measurements like loss or accuracy.</span></span> is a single number</p>
+                        <ul>
+                            <li>Denoted by lowercase letters: x, y, z</li>
+                            <li>Can be integers or real numbers</li>
+                            <li>Examples: temperature, price, count</li>
+                        </ul>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="python" data-line-numbers>import torch
+# Create scalars
+x = torch.tensor(3.0)
+y = torch.tensor(2.0)
+# Scalar operations
+print(x + y)  # tensor(5.)
+print(x * y)  # tensor(6.)
+print(x / y)  # tensor(1.5)
+print(x ** y) # tensor(9.)</code></pre>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Vectors</h2>
+                    <div class="fragment">
+                        <p>A <span class="tooltip">vector<span class="tooltiptext">An ordered array of scalars. In deep learning, vectors often represent features, weights, or activations for a single example.</span></span> is an ordered list of scalar values</p>
+                        <p style="font-size:0.5em">$$\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_n \end{bmatrix}$$</p>
+                    </div>
+                    <div class="fragment">
+                        <pre><code class="python" data-line-numbers># Create vectors
+x = torch.arange(3, dtype=torch.float32)
+print(x)  # tensor([0., 1., 2.])
+
+# Access elements
+print(x[0])  # tensor(0.)
+print(len(x))  # 3
+print(x.shape)  # torch.Size([3])</code></pre>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Vector Operations</h2>
+                    <p>Element-wise and special operations</p>
+                    <pre class="fragment"><code class="python" data-line-numbers style="font-size: 0.8em; line-height: 1.2;">u = torch.tensor([3.0, -4.0])
+v = torch.tensor([2.0, 1.0])
+
+# Element-wise operations
+print(u + v)  # tensor([5., -3.])
+print(u - v)  # tensor([1., -5.])
+print(u * v)  # tensor([6., -4.])  # Hadamard product
+
+# Scalar multiplication
+alpha = 2
+print(alpha * u)  # tensor([6., -8.])</code></pre>
+                    <div class="fragment emphasis-box">
+                        <p>Most vector operations are element-wise by default!</p>
+                    </div>
+                </section>
+
+                <!-- Quiz for Linear Algebra Fundamentals -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "What is the result of element-wise multiplication of vectors [2, 3] and [4, 5]?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "[8, 15]",
+                                "correct": true,
+                                "explanation": "Correct! Element-wise multiplication multiplies corresponding elements: 2×4=8 and 3×5=15."
+                            },
+                            {
+                                "text": "23 (dot product)",
+                                "correct": false,
+                                "explanation": "This would be the dot product (2×4 + 3×5 = 23), but element-wise multiplication returns a vector, not a scalar."
+                            },
+                            {
+                                "text": "[6, 8]",
+                                "correct": false,
+                                "explanation": "This looks like addition (2+4=6, 3+5=8), not element-wise multiplication."
+                            },
+                            {
+                                "text": "Cannot multiply vectors element-wise",
+                                "correct": false,
+                                "explanation": "Element-wise multiplication (Hadamard product) is a valid operation for vectors of the same size."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section 9: Matrices -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Matrices</h2>
+                    <p>2D arrays of scalars</p>
+                    <div class="fragment">
+                        <p>A <span class="tooltip">matrix<span class="tooltiptext">A 2D array of numbers arranged in rows and columns. In deep learning, matrices often represent weights, batches of vectors, or transformations.</span></span> is a 2D array with m rows and n columns</p>
+                        <p>$$\mathbf{A} = \begin{bmatrix} 
+                        a_{11} & a_{12} & \cdots & a_{1n} \\
+                        a_{21} & a_{22} & \cdots & a_{2n} \\
+                        \vdots & \vdots & \ddots & \vdots \\
+                        a_{m1} & a_{m2} & \cdots & a_{mn}
+                        \end{bmatrix}$$</p>
+                    </div>
+                    <div class="fragment">
+                        <p>Shape: <span style="color: #10099F;">m × n</span> (rows × columns)</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Creating Matrices</h2>
+                    <pre class="fragment"><code class="python" data-line-numbers># Create a 3x4 matrix
+A = torch.arange(12, dtype=torch.float32).reshape(3, 4)
+print(A)</code></pre>
+                    <pre class="fragment"><code class="plaintext">tensor([[ 0.,  1.,  2.,  3.],
+        [ 4.,  5.,  6.,  7.],
+        [ 8.,  9., 10., 11.]])</code></pre>
+                    <div class="fragment">
+                        <pre><code class="python" data-line-numbers># Access elements
+print(A[2, 3])  # tensor(11.) - row 2, column 3
+print(A[-1])    # Last row
+print(A[:, 1])  # Second column</code></pre>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Matrix Transpose</h2>
+                    <div class="fragment">
+                        <p>$$\mathbf{A}^T_{ij} = \mathbf{A}_{ji}$$</p>
+                    </div>
+                    <pre class="fragment"><code class="python" data-line-numbers>A = torch.tensor([[1, 2, 3],
+                  [4, 5, 6]])
+print(f"A shape: {A.shape}")  # torch.Size([2, 3])
+
+# Transpose
+A_T = A.T
+print(A_T)
+print(f"A^T shape: {A_T.shape}")  # torch.Size([3, 2])</code></pre>
+                    <pre class="fragment"><code class="plaintext">tensor([[1, 4],
+        [2, 5],
+        [3, 6]])</code></pre>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Symmetric Matrices</h2>
+                    <p>Matrices equal to their transpose</p>
+                    <div class="fragment">
+                        <p>A matrix is <span class="tooltip">symmetric<span class="tooltiptext">A square matrix that is equal to its transpose: A = A^T. Symmetric matrices have special properties useful in optimization.</span></span> if $$\mathbf{A} = \mathbf{A}^T$$</p>
+                    </div>
+                    <pre class="fragment"><code class="python" data-line-numbers># Create a symmetric matrix
+A = torch.tensor([[1, 2, 3],
+                  [2, 4, 5],
+                  [3, 5, 6]])
+
+print(A == A.T)  # Check symmetry</code></pre>
+                    <pre class="fragment"><code class="plaintext">tensor([[True, True, True],
+        [True, True, True],
+        [True, True, True]])</code></pre>
+                </section>
+
+                <!-- Quiz for Matrices -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "What is the shape of the transpose of a 5×3 matrix?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "3×5",
+                                "correct": true,
+                                "explanation": "Correct! Transposing swaps rows and columns, so a 5×3 matrix becomes 3×5."
+                            },
+                            {
+                                "text": "5×3",
+                                "correct": false,
+                                "explanation": "The transpose changes the shape by swapping dimensions. A 5×3 matrix becomes 3×5."
+                            },
+                            {
+                                "text": "15×1",
+                                "correct": false,
+                                "explanation": "Transpose swaps rows and columns, it does not flatten the matrix into a vector."
+                            },
+                            {
+                                "text": "1×15",
+                                "correct": false,
+                                "explanation": "Transpose swaps the two dimensions, not flatten the matrix. The result is 3×5."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section 10: Advanced Operations -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Matrix-Vector Products</h2>
+                    <p>Linear transformations</p>
+                    <div class="fragment">
+                        <p>Matrix-vector multiplication: $$\mathbf{y} = \mathbf{A}\mathbf{x}$$</p>
+                        <p>where <span style="color: #10099F;">A</span> is m×n and <span style="color: #2DD2C0;">x</span> is n×1</p>
+                    </div>
+                    <div class="fragment">
+                        <p>$$y_i = \sum_{j=1}^{n} a_{ij} x_j$$</p>
+                    </div>
+                    <pre class="fragment"><code class="python" data-line-numbers>A = torch.tensor([[1, 2, 3],
+                  [4, 5, 6]])  # 2x3
+x = torch.tensor([1, 2, 3])   # 3x1
+
+y = A @ x  # Matrix-vector product
+print(y)   # tensor([14, 32])</code></pre>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Matrix-Matrix Multiplication</h2>
+                    <p>Composing linear transformations</p>
+                    <div class="fragment">
+                        <p>$$\mathbf{C} = \mathbf{A}\mathbf{B}$$</p>
+                        <p>where A is <span style="color: #10099F;">m×k</span> and B is <span style="color: #2DD2C0;">k×n</span></p>
+                        <p>Result C is <span style="color: #FC8484;">m×n</span></p>
+                    </div>
+                    <pre class="fragment"><code class="python" data-line-numbers>A = torch.ones(3, 4)
+B = torch.ones(4, 5)
+
+C = A @ B  # or torch.mm(A, B)
+print(C.shape)  # torch.Size([3, 5])
+print(C[0, 0])  # tensor(4.) - sum of 4 ones</code></pre>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Hadamard Product</h2>
+                    <p>Element-wise matrix multiplication</p>
+                    <div class="fragment">
+                        <p>The <span class="tooltip">Hadamard product<span class="tooltiptext">Element-wise multiplication of matrices, denoted ⊙. Different from matrix multiplication, preserves shape.</span></span> $$\mathbf{A} \odot \mathbf{B}$$</p>
+                    </div>
+                    <pre class="fragment"><code class="python" data-line-numbers>A = torch.tensor([[1, 2],
+                  [3, 4]])
+B = torch.tensor([[10, 20],
+                  [30, 40]])
+
+# Hadamard (element-wise) product
+C = A * B  # Note: * not @
+print(C)</code></pre>
+                    <pre class="fragment"><code class="plaintext">tensor([[10, 40],
+        [90, 160]])</code></pre>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Dot Products</h2>
+                    <p>Inner product of vectors</p>
+                    <div class="fragment">
+                        <p>$$\mathbf{x}^T\mathbf{y} = \sum_{i=1}^{n} x_i y_i$$</p>
+                    </div>
+                    <pre class="fragment"><code class="python" data-line-numbers>x = torch.tensor([1.0, 2, 3])
+y = torch.tensor([4.0, 5, 6])
+
+# Different ways to compute dot product
+dot1 = torch.dot(x, y)
+dot2 = (x * y).sum()
+dot3 = x @ y
+
+print(dot1)  # tensor(32.)
+# 1*4 + 2*5 + 3*6 = 4 + 10 + 18 = 32</code></pre>
+                    <div class="fragment emphasis-box">
+                        <p>Dot product measures similarity between vectors!</p>
+                    </div>
+                </section>
+
+                <!-- Quiz for Advanced Operations -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "For matrix multiplication A @ B where A is 3×4, what must be the shape of B?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "4×n (where n can be any positive integer)",
+                                "correct": true,
+                                "explanation": "Correct! For matrix multiplication, the number of columns in A must equal the number of rows in B. B must have 4 rows."
+                            },
+                            {
+                                "text": "3×4",
+                                "correct": false,
+                                "explanation": "For A @ B, B must have 4 rows (matching As columns), not 3 rows."
+                            },
+                            {
+                                "text": "Any shape",
+                                "correct": false,
+                                "explanation": "Matrix multiplication has strict shape requirements: columns of A must equal rows of B."
+                            },
+                            {
+                                "text": "n×3",
+                                "correct": false,
+                                "explanation": "B needs 4 rows to match As 4 columns, not 3."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section 11: Reduction Operations -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Reduction Operations</h2>
+                    <p>Aggregating tensor elements</p>
+                    <div class="fragment">
+                        <p><span class="tooltip">Reductions<span class="tooltiptext">Operations that aggregate multiple values into fewer values, like sum, mean, max. Essential for loss computation and statistics.</span></span> compute summary statistics</p>
+                        <ul>
+                            <li>Sum: Total of all elements</li>
+                            <li>Mean: Average value</li>
+                            <li>Max/Min: Extreme values</li>
+                            <li>Prod: Product of elements</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Sum and Mean</h2>
+                    <pre class="fragment"><code class="python" data-line-numbers>A = torch.arange(12, dtype=torch.float32).reshape(3, 4)
+print(A)</code></pre>
+                    <pre class="fragment"><code class="plaintext">tensor([[ 0.,  1.,  2.,  3.],
+        [ 4.,  5.,  6.,  7.],
+        [ 8.,  9., 10., 11.]])</code></pre>
+                    <pre class="fragment"><code class="python" data-line-numbers># Reduce all elements
+print(A.sum())   # tensor(66.)
+print(A.mean())  # tensor(5.5)
+
+# Reduce along specific axis
+print(A.sum(axis=0))   # Sum columns
+# tensor([12., 15., 18., 21.])
+print(A.mean(axis=1))  # Mean of rows
+# tensor([1.5, 5.5, 9.5])</code></pre>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Keeping Dimensions</h2>
+                    <p>Preserve tensor shape after reduction</p>
+                    <pre class="fragment"><code class="python" data-line-numbers>A = torch.arange(12, dtype=torch.float32).reshape(3, 4)
+
+# Without keepdim
+sum_cols = A.sum(axis=0)
+print(sum_cols.shape)  # torch.Size([4])
+
+# With keepdim
+sum_cols_keep = A.sum(axis=0, keepdim=True)
+print(sum_cols_keep.shape)  # torch.Size([1, 4])
+print(sum_cols_keep)</code></pre>
+                    <pre class="fragment"><code class="plaintext">tensor([[12., 15., 18., 21.]])</code></pre>
+                    <div class="fragment emphasis-box">
+                        <p>keepdim=True enables broadcasting with original tensor!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Cumulative Operations</h2>
+                    <p>Running totals and products</p>
+                    <pre class="fragment"><code class="python" data-line-numbers>x = torch.arange(1, 6, dtype=torch.float32)
+print(x)  # tensor([1., 2., 3., 4., 5.])
+
+# Cumulative sum
+cumsum = x.cumsum(axis=0)
+print(cumsum)  # tensor([1., 3., 6., 10., 15.])
+
+# Cumulative product
+cumprod = x.cumprod(axis=0)
+print(cumprod)  # tensor([1., 2., 6., 24., 120.])</code></pre>
+                    <div class="fragment">
+                        <p>Useful for computing running statistics!</p>
+                    </div>
+                </section>
+
+                <!-- Quiz for Reduction Operations -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "What is the shape of A.sum(axis=1, keepdim=True) for a 4×5 matrix A?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "(4, 1)",
+                                "correct": true,
+                                "explanation": "Correct! Summing along axis=1 (columns) gives one value per row. With keepdim=True, the shape is (4, 1)."
+                            },
+                            {
+                                "text": "(4,)",
+                                "correct": false,
+                                "explanation": "This would be the shape without keepdim=True. The keepdim parameter preserves the number of dimensions."
+                            },
+                            {
+                                "text": "(1, 5)",
+                                "correct": false,
+                                "explanation": "This would be the result of summing along axis=0 (rows) with keepdim=True."
+                            },
+                            {
+                                "text": "(5,)",
+                                "correct": false,
+                                "explanation": "axis=1 sums across columns, giving one value per row (4 values), not 5."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section 12: Norms -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Vector Norms</h2>
+                    <p>Measuring vector magnitude</p>
+                    <div class="fragment">
+                        <p>A <span class="tooltip">norm<span class="tooltiptext">A function that assigns a non-negative length or size to vectors. Used to measure distances and regularize models.</span></span> measures the "size" of a vector</p>
+                        <ul>
+                            <li>Always non-negative</li>
+                            <li>Zero only for zero vector</li>
+                            <li>Scales with scalar multiplication</li>
+                            <li>Satisfies triangle inequality</li>
+                        </ul>
+                    </div>
+                    <div class="fragment emphasis-box">
+                        <p>Norms help measure distances and regularize models!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">L2 Norm (Euclidean)</h2>
+                    <p>Standard distance measure</p>
+                    <div class="fragment">
+                        <p>$$\|\mathbf{x}\|_2 = \sqrt{\sum_{i=1}^{n} x_i^2}$$</p>
+                    </div>
+                    <pre class="fragment"><code class="python" data-line-numbers>x = torch.tensor([3.0, 4.0])
+
+# L2 norm
+l2_norm = torch.norm(x)
+print(l2_norm)  # tensor(5.)
+
+# Manual calculation
+l2_manual = torch.sqrt((x**2).sum())
+print(l2_manual)  # tensor(5.)
+
+# sqrt(3² + 4²) = sqrt(9 + 16) = sqrt(25) = 5</code></pre>
+                    <div class="fragment">
+                        <p>Pythagorean theorem in n dimensions!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">L1 Norm (Manhattan)</h2>
+                    <p>Sum of absolute values</p>
+                    <div class="fragment">
+                        <p>$$\|\mathbf{x}\|_1 = \sum_{i=1}^{n} |x_i|$$</p>
+                    </div>
+                    <pre class="fragment"><code class="python" data-line-numbers>x = torch.tensor([3.0, -4.0])
+
+# L1 norm
+l1_norm = torch.abs(x).sum()
+print(l1_norm)  # tensor(7.)
+
+# Using norm function
+l1_norm2 = torch.norm(x, p=1)
+print(l1_norm2)  # tensor(7.)
+
+# |3| + |-4| = 3 + 4 = 7</code></pre>
+                    <div class="fragment emphasis-box">
+                        <p>L1 norm encourages sparsity in optimization!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Frobenius Norm</h2>
+                    <p>L2 norm for matrices</p>
+                    <div class="fragment">
+                        <p>$$\|\mathbf{A}\|_F = \sqrt{\sum_{i,j} a_{ij}^2}$$</p>
+                    </div>
+                    <pre class="fragment"><code class="python" data-line-numbers>A = torch.tensor([[1.0, 2.0],
+                  [3.0, 4.0]])
+
+# Frobenius norm
+frob_norm = torch.norm(A)
+print(frob_norm)  # tensor(5.4772)
+
+# Manual calculation
+frob_manual = torch.sqrt((A**2).sum())
+print(frob_manual)  # tensor(5.4772)
+
+# sqrt(1² + 2² + 3² + 4²) = sqrt(30) ≈ 5.477</code></pre>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Norm Comparison</h2>
+                    <div id="norm-comparison-viz" style="width: 100%; height: 400px;"></div>
+                    <div class="fragment">
+                        <p>Different norms create different "unit balls"</p>
+                    </div>
+                </section>
+
+                <!-- Quiz for Norms -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "For vector [0, 3, -4], what are the L1 and L2 norms?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "L1 = 7, L2 = 5",
+                                "correct": true,
+                                "explanation": "Correct! L1 = |0| + |3| + |-4| = 7, L2 = sqrt(0² + 3² + 16) = sqrt(25) = 5"
+                            },
+                            {
+                                "text": "L1 = 5, L2 = 7",
+                                "correct": false,
+                                "explanation": "You have them reversed. L1 sums absolute values (7), L2 is the Euclidean distance (5)."
+                            },
+                            {
+                                "text": "L1 = -1, L2 = 5",
+                                "correct": false,
+                                "explanation": "L1 norm uses absolute values, so it cannot be negative. L1 = 7, L2 = 5."
+                            },
+                            {
+                                "text": "L1 = 7, L2 = 7",
+                                "correct": false,
+                                "explanation": "L2 norm is sqrt(sum of squares) = sqrt(25) = 5, not 7."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section 13: Practical Applications -->
+            <section>
+                <section data-sources='[{"text": "Deep Learning Book - Ian Goodfellow", "url": "https://www.deeplearningbook.org/contents/linear_algebra.html"}]'>
+                    <h2 class="truncate-title">Linear Algebra in Deep Learning</h2>
+                    <p>Connecting math to neural networks</p>
+                    <div class="fragment">
+                        <p><strong>Key Applications:</strong></p>
+                        <ul>
+                            <li><strong>Forward pass:</strong> Matrix multiplications</li>
+                            <li><strong>Weights:</strong> Matrices connecting layers</li>
+                            <li><strong>Activations:</strong> Vectors at each layer</li>
+                            <li><strong>Loss:</strong> Scalar objective to minimize</li>
+                            <li><strong>Gradients:</strong> Same shape as parameters</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Neural Network as Linear Algebra</h2>
+                    <p>A simple network forward pass</p>
+                    <pre class="fragment"><code class="python" data-line-numbers># Input: batch of 32 samples, 784 features each
+X = torch.randn(32, 784)
+
+# Layer 1: Linear transformation + bias
+W1 = torch.randn(784, 128)
+b1 = torch.randn(128)
+Z1 = X @ W1 + b1
+A1 = torch.relu(Z1)  # Activation
+
+# Layer 2: Output layer
+W2 = torch.randn(128, 10)
+b2 = torch.randn(10)
+Z2 = A1 @ W2 + b2
+output = torch.softmax(Z2, dim=1)</code></pre>
+                    <div class="fragment emphasis-box">
+                        <p>Deep learning = Linear algebra + Non-linearities!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Batch Processing</h2>
+                    <p>Efficient computation with matrices</p>
+                    <div class="fragment">
+                        <p>Process multiple examples simultaneously:</p>
+                        <ul>
+                            <li>Each row = one example</li>
+                            <li>Matrix ops process entire batch</li>
+                            <li>GPU acceleration for large matrices</li>
+                        </ul>
+                    </div>
+                    <pre class="fragment"><code class="python" data-line-numbers># Single example (slow)
+for x in batch:
+    y = model(x)  # Vector operations
+
+# Batch processing (fast)
+Y = model(X)  # Matrix operations
+# X shape: (batch_size, features)
+# Y shape: (batch_size, outputs)</code></pre>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Eigendecomposition Preview</h2>
+                    <p>Understanding transformations</p>
+                    <div class="fragment">
+                        <p>Some vectors only get scaled by a matrix:</p>
+                        <p>$$\mathbf{A}\mathbf{v} = \lambda\mathbf{v}$$</p>
+                        <ul>
+                            <li><span style="color: #10099F;">v</span>: eigenvector</li>
+                            <li><span style="color: #FC8484;">λ</span>: eigenvalue</li>
+                        </ul>
+                    </div>
+                    <div class="fragment emphasis-box">
+                        <p>Critical for understanding PCA, optimization, and network dynamics!</p>
+                    </div>
+                </section>
+
+                <!-- Final Comprehensive Quiz -->
+                <section>
+                    <h2 class="truncate-title">Final Test</h2>
+                    <div data-mcq='{
+                        "question": "In a neural network with input size 100, hidden size 50, and output size 10, what is the shape of the weight matrix connecting input to hidden layer?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "100×50",
+                                "correct": true,
+                                "explanation": "Correct! The weight matrix has shape (input_size × hidden_size) = (100×50) to transform from 100 to 50 dimensions."
+                            },
+                            {
+                                "text": "50×100",
+                                "correct": false,
+                                "explanation": "This is transposed. We need to map from 100 input features to 50 hidden units, so the shape is 100×50."
+                            },
+                            {
+                                "text": "50×10",
+                                "correct": false,
+                                "explanation": "This would be the shape of weights from hidden to output layer, not input to hidden."
+                            },
+                            {
+                                "text": "100×10",
+                                "correct": false,
+                                "explanation": "This would skip the hidden layer entirely. The first layer maps 100→50, so shape is 100×50."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section 14: Probability and Statistics -->
+            <section>
+                <section class="title-slide" data-sources='[{"text": "Dive into Deep Learning - Chapter 2.6", "url": "https://d2l.ai/chapter_preliminaries/probability.html"}]'>
+                    <h1 class="truncate-title">Probability and Statistics</h1>
+                    <p>Chapter 2.6: Reasoning Under Uncertainty</p>
+                    <p>Foundations for Machine Learning</p>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Learning Objectives</h2>
+                    <ul>
+                        <li class="fragment">Understand <span class="tooltip">probability<span class="tooltiptext">A mathematical framework for quantifying uncertainty and making predictions about random events.</span></span> and its role in ML</li>
+                        <li class="fragment">Master concepts of random variables and distributions</li>
+                        <li class="fragment">Apply <span class="tooltip">Bayes' theorem<span class="tooltiptext">A fundamental rule for updating beliefs based on new evidence: P(A|B) = P(B|A)P(A)/P(B)</span></span> to real problems</li>
+                        <li class="fragment">Calculate expectations and variance</li>
+                        <li class="fragment">Distinguish <span class="tooltip">aleatoric<span class="tooltiptext">Uncertainty that is inherent to the problem due to genuine randomness, which cannot be reduced with more data.</span></span> and <span class="tooltip">epistemic<span class="tooltiptext">Uncertainty about model parameters that can potentially be reduced by collecting more data.</span></span> uncertainty</li>
+                        <li class="fragment">Connect probability to deep learning applications</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Why Probability in Machine Learning?</h2>
+                    <div class="fragment">
+                        <p><strong>Machine learning is all about uncertainty!</strong></p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <ul>
+                            <li><strong>Supervised Learning:</strong> Predict unknown targets from features</li>
+                            <li><strong>Unsupervised Learning:</strong> Determine if data is anomalous</li>
+                            <li><strong>Reinforcement Learning:</strong> Reason about environment changes</li>
+                        </ul>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Probability provides the mathematical language for reasoning under uncertainty</p>
+                    </div>
+                </section>
+
+                <!-- Subsection 1: Coin Tossing Example -->
+                <section>
+                    <h2 class="truncate-title">A Simple Example: Tossing Coins</h2>
+                    <p>Understanding probability through experiments</p>
+                    <div class="fragment">
+                        <p>For a fair coin:</p>
+                        <ul>
+                            <li>P(Heads) = 0.5</li>
+                            <li>P(Tails) = 0.5</li>
+                        </ul>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>Key Distinction:</strong></p>
+                        <ul>
+                            <li><span style="color: #10099F;">Probability</span>: Theoretical property (0.5)</li>
+                            <li><span style="color: #2DD2C0;">Statistics</span>: Empirical observation (n_heads/n)</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Simulating Coin Tosses</h2>
+                    <p>From theory to practice</p>
+                    <pre class="fragment"><code class="python" data-line-numbers>import torch
+from torch.distributions.multinomial import Multinomial
+
+# Fair coin probabilities
+fair_probs = torch.tensor([0.5, 0.5])
+
+# Simulate 100 tosses
+counts = Multinomial(100, fair_probs).sample()
+print(counts)  # e.g., tensor([48., 52.])
+
+# Calculate frequencies
+frequencies = counts / 100
+print(frequencies)  # e.g., tensor([0.48, 0.52])</code></pre>
+                    <div class="fragment emphasis-box">
+                        <p>Observed frequencies converge to true probabilities!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Law of Large Numbers</h2>
+                    <p>Convergence to true probability</p>
+                    <div class="fragment">
+                        <img src="images/probability-convergence.jpg" alt="Probability convergence" style="width: 70%; margin: 20px auto; display: block;">
+                    </div>
+                    <div class="fragment">
+                        <p>As n → ∞, estimates → true probabilities</p>
+                        <p class="fragment">Error decreases at rate 1/√n (<span class="tooltip">Central Limit Theorem<span class="tooltiptext">A fundamental theorem stating that the distribution of sample means approaches a normal distribution as sample size increases.</span></span>)</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Interactive Coin Toss Simulator</h2>
+                    <div id="coin-toss-simulator" style="width: 100%; height: 450px;"></div>
+                </section>
+
+                <!-- Quiz for Basic Probability -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "After 10,000 fair coin tosses, you observe 4,950 heads. What does this tell us?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "The observed frequency (0.495) is close to the true probability (0.5)",
+                                "correct": true,
+                                "explanation": "Correct! This demonstrates the law of large numbers - empirical frequencies converge to theoretical probabilities."
+                            },
+                            {
+                                "text": "The coin is definitely unfair",
+                                "correct": false,
+                                "explanation": "A deviation of 50 heads in 10,000 tosses (0.5%) is normal variation, not evidence of unfairness."
+                            },
+                            {
+                                "text": "We need exactly 5,000 heads for a fair coin",
+                                "correct": false,
+                                "explanation": "Perfect equality is extremely unlikely. Random variation means we expect deviations from the exact theoretical value."
+                            },
+                            {
+                                "text": "The probability has changed to 0.495",
+                                "correct": false,
+                                "explanation": "The underlying probability remains 0.5. The 0.495 is an empirical frequency, not the true probability."
+                            }
+                        ]
+                    }'></div>
+                </section>
+
+                <!-- Subsection 2: Formal Treatment -->
+                <section>
+                    <h2 class="truncate-title">Formal Probability Theory</h2>
+                    <p>Mathematical foundations</p>
+                    <div class="fragment">
+                        <p><strong>Key Concepts:</strong></p>
+                        <ul>
+                            <li><span class="tooltip">Sample Space<span class="tooltiptext">The set S of all possible outcomes of a random experiment.</span></span> (S): All possible outcomes</li>
+                            <li><span class="tooltip">Event<span class="tooltiptext">A subset of the sample space representing outcomes of interest.</span></span> (A): Subset of sample space</li>
+                            <li><span class="tooltip">Probability Function<span class="tooltiptext">A function P that maps events to real numbers between 0 and 1.</span></span>: P: A → [0,1]</li>
+                        </ul>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>Example:</strong> Rolling a die</p>
+                        <ul>
+                            <li>S = {1, 2, 3, 4, 5, 6}</li>
+                            <li>Event "odd number" = {1, 3, 5}</li>
+                            <li>P(odd) = 3/6 = 0.5</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Probability Axioms (Kolmogorov)</h2>
+                    <div class="fragment">
+                        <p><strong>Three Fundamental Axioms:</strong></p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p>1. <span style="color: #10099F;">Non-negativity:</span> P(A) ≥ 0</p>
+                    </div>
+                    <div class="fragment">
+                        <p>2. <span style="color: #2DD2C0;">Normalization:</span> P(S) = 1</p>
+                    </div>
+                    <div class="fragment">
+                        <p>3. <span style="color: #FC8484;">Additivity:</span> For disjoint events A₁, A₂, ...</p>
+                        <p>$$P\left(\bigcup_{i=1}^{\infty} A_i\right) = \sum_{i=1}^{\infty} P(A_i)$$</p>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>All probability theory follows from these three axioms!</p>
+                    </div>
+                </section>
+
+                <!-- Subsection 3: Random Variables -->
+                <section>
+                    <h2 class="truncate-title">Random Variables</h2>
+                    <p>Mapping outcomes to values</p>
+                    <div class="fragment">
+                        <p>A <span class="tooltip">random variable<span class="tooltiptext">A function that maps outcomes from a sample space to numerical values.</span></span> X maps sample space to values</p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>Types:</strong></p>
+                        <ul>
+                            <li><strong>Discrete:</strong> Countable values (dice, coins)</li>
+                            <li><strong>Continuous:</strong> Uncountable values (height, weight)</li>
+                        </ul>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>Notation:</strong></p>
+                        <ul>
+                            <li>P(X = x): Probability that X takes value x</li>
+                            <li>P(X): Distribution of X</li>
+                            <li>P(a ≤ X ≤ b): Probability X is in range [a,b]</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Probability Distributions</h2>
+                    <div id="distribution-viz" style="width: 100%; height: 450px;"></div>
+                </section>
+
+                <!-- Subsection 4: Multiple Random Variables -->
+                <section>
+                    <h2 class="truncate-title">Multiple Random Variables</h2>
+                    <p>Joint and conditional probabilities</p>
+                    <div class="fragment">
+                        <p><strong>Joint Probability:</strong></p>
+                        <p>P(A = a, B = b) - probability of both events</p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>Key Property:</strong></p>
+                        <p>$$P(A=a, B=b) \leq P(A=a) \text{ and } P(A=a, B=b) \leq P(B=b)$$</p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>Marginalization:</strong></p>
+                        <p>$$P(A=a) = \sum_b P(A=a, B=b)$$</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Conditional Probability</h2>
+                    <p>Probability given additional information</p>
+                    <div class="fragment">
+                        <p><strong>Definition:</strong></p>
+                        <p style="font-size: 1.2em;">$$P(B=b \mid A=a) = \frac{P(A=a, B=b)}{P(A=a)}$$</p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>Interpretation:</strong></p>
+                        <p>Probability of B=b, given that we know A=a occurred</p>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Conditioning restricts the sample space and renormalizes probabilities</p>
+                    </div>
+                </section>
+
+                <section data-sources='[{"text": "Bayes (1763) - An Essay towards solving a Problem in the Doctrine of Chances", "url": "https://en.wikipedia.org/wiki/Bayes%27_theorem"}]'>
+                    <h2 class="truncate-title">Bayes' Theorem</h2>
+                    <p>Reversing conditional probabilities</p>
+                    <div class="fragment">
+                        <p style="font-size: 1.3em; color: #FC8484;">$$P(A \mid B) = \frac{P(B \mid A) P(A)}{P(B)}$$</p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>Components:</strong></p>
+                        <ul>
+                            <li><span style="color: #10099F;">P(A)</span>: Prior probability</li>
+                            <li><span style="color: #2DD2C0;">P(B|A)</span>: Likelihood</li>
+                            <li><span style="color: #FC8484;">P(A|B)</span>: Posterior probability</li>
+                            <li>P(B): Evidence (normalizing constant)</li>
+                        </ul>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>"Posterior = Prior × Likelihood / Evidence"</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Independence</h2>
+                    <p>When events don't affect each other</p>
+                    <div class="fragment">
+                        <p><strong>Definition:</strong> A and B are independent (A ⊥ B) if:</p>
+                        <p>$$P(A \mid B) = P(A)$$</p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>Equivalent condition:</strong></p>
+                        <p>$$P(A, B) = P(A) \cdot P(B)$$</p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>Conditional Independence:</strong></p>
+                        <p>A ⊥ B | C if P(A, B | C) = P(A | C) · P(B | C)</p>
+                    </div>
+                </section>
+
+                <!-- Quiz for Conditional Probability -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "If P(Rain) = 0.3 and P(Umbrella|Rain) = 0.9, P(Umbrella|No Rain) = 0.1, what is P(Umbrella)?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "0.34",
+                                "correct": true,
+                                "explanation": "Correct! P(Umbrella) = P(U|R)P(R) + P(U|¬R)P(¬R) = 0.9×0.3 + 0.1×0.7 = 0.27 + 0.07 = 0.34"
+                            },
+                            {
+                                "text": "0.5",
+                                "correct": false,
+                                "explanation": "You need to use the law of total probability. The answer is 0.34."
+                            },
+                            {
+                                "text": "0.9",
+                                "correct": false,
+                                "explanation": "This is P(Umbrella|Rain), not P(Umbrella). You need to marginalize: 0.34."
+                            },
+                            {
+                                "text": "0.27",
+                                "correct": false,
+                                "explanation": "This is only P(U and R). You also need P(U and ¬R). Total is 0.34."
+                            }
+                        ]
+                    }'></div>
+                </section>
+
+                <!-- Subsection 5: Medical Testing Example -->
+                <section>
+                    <h2 class="truncate-title">Example: Medical Testing</h2>
+                    <p>Applying Bayes' theorem to HIV testing</p>
+                    <div class="fragment">
+                        <p><strong>Test characteristics:</strong></p>
+                        <ul>
+                            <li>Sensitivity: P(Positive | HIV) = 1.0</li>
+                            <li>False positive rate: P(Positive | Healthy) = 0.01</li>
+                            <li>Disease prevalence: P(HIV) = 0.0015</li>
+                        </ul>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>Question:</strong> If test is positive, what's P(HIV)?</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Calculating with Bayes' Theorem</h2>
+                    <div class="fragment">
+                        <p><strong>Step 1:</strong> Calculate P(Positive)</p>
+                        <p style="font-size: 0.9em;">$$P(Pos) = P(Pos|HIV)P(HIV) + P(Pos|Healthy)P(Healthy)$$</p>
+                        <p style="font-size: 0.9em;">$$= 1.0 \times 0.0015 + 0.01 \times 0.9985 = 0.011485$$</p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>Step 2:</strong> Apply Bayes' theorem</p>
+                        <p style="font-size: 0.9em;">$$P(HIV|Pos) = \frac{P(Pos|HIV)P(HIV)}{P(Pos)}$$</p>
+                        <p style="font-size: 0.9em;">$$= \frac{1.0 \times 0.0015}{0.011485} = 0.1306$$</p>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Only 13.06% chance of HIV despite positive test!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Second Test Analysis</h2>
+                    <p>Improving confidence with multiple tests</p>
+                    <div class="fragment">
+                        <p><strong>Second test (less accurate):</strong></p>
+                        <ul>
+                            <li>P(Pos₂ | HIV) = 0.98</li>
+                            <li>P(Pos₂ | Healthy) = 0.03</li>
+                        </ul>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>Both tests positive:</strong></p>
+                        <p>P(HIV | Pos₁, Pos₂) = <span style="color: #FC8484; font-weight: bold;">0.8307</span></p>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Second test dramatically increases confidence to 83.07%!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Interactive Bayes Calculator</h2>
+                    <p>Explore how prior and test accuracy affect posterior</p>
+                    <div id="bayes-calculator" style="width: 100%; margin: 20px auto;"></div>
+                </section>
+
+                <!-- Subsection 6: Expectations -->
+                <section>
+                    <h2 class="truncate-title">Expectations</h2>
+                    <p>Average values of random variables</p>
+                    <div class="fragment">
+                        <p><strong>Definition:</strong></p>
+                        <p>$$E[X] = \sum_{x} x \cdot P(X = x)$$</p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>Investment Example:</strong></p>
+                        <ul>
+                            <li>50% chance: 0× return (total loss)</li>
+                            <li>40% chance: 2× return</li>
+                            <li>10% chance: 10× return</li>
+                        </ul>
+                        <p class="fragment">E[Return] = 0.5×0 + 0.4×2 + 0.1×10 = 1.8×</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Variance and Standard Deviation</h2>
+                    <p>Measuring spread and risk</p>
+                    <div class="fragment">
+                        <p><strong>Variance:</strong></p>
+                        <p>$$\text{Var}[X] = E[(X - E[X])^2] = E[X^2] - E[X]^2$$</p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>Standard Deviation:</strong></p>
+                        <p>$$\sigma = \sqrt{\text{Var}[X]}$$</p>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Variance quantifies uncertainty and risk in predictions</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Properties of Expectation</h2>
+                    <div class="fragment">
+                        <p><strong>Linearity:</strong></p>
+                        <p>E[aX + bY] = aE[X] + bE[Y]</p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>Function of Random Variable:</strong></p>
+                        <p>$$E[f(X)] = \sum_x f(x) \cdot P(X = x)$$</p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>For vectors:</strong></p>
+                        <p>Covariance matrix: Σ = E[(X - μ)(X - μ)ᵀ]</p>
+                    </div>
+                </section>
+
+                <!-- Quiz for Expectations -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "A die is weighted so P(6) = 0.5 and other faces have equal probability. What is E[X]?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "4.25",
+                                "correct": true,
+                                "explanation": "Correct! P(1-5) = 0.1 each. E[X] = 0.1×(1+2+3+4+5) + 0.5×6 = 1.5 + 3 = 4.25"
+                            },
+                            {
+                                "text": "3.5",
+                                "correct": false,
+                                "explanation": "This would be for a fair die. With P(6)=0.5, the expectation shifts to 4.25."
+                            },
+                            {
+                                "text": "6",
+                                "correct": false,
+                                "explanation": "The expectation is not the most likely value. It is the weighted average: 4.25."
+                            },
+                            {
+                                "text": "3",
+                                "correct": false,
+                                "explanation": "You need to weight each outcome by its probability. The answer is 4.25."
+                            }
+                        ]
+                    }'></div>
+                </section>
+
+                <!-- Subsection 7: Discussion -->
+                <section data-sources='[{"text": "Der Kiureghian & Ditlevsen (2009) - Aleatory or epistemic? Does it matter?", "url": "https://doi.org/10.1016/j.strusafe.2008.06.020"}]'>
+                    <h2 class="truncate-title">Types of Uncertainty</h2>
+                    <p>Aleatoric vs Epistemic</p>
+                    <div class="fragment">
+                        <p><strong><span style="color: #10099F;">Aleatoric Uncertainty:</span></strong></p>
+                        <ul>
+                            <li>Inherent randomness in the problem</li>
+                            <li>Cannot be reduced with more data</li>
+                            <li>Example: Coin toss outcomes</li>
+                        </ul>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong><span style="color: #2DD2C0;">Epistemic Uncertainty:</span></strong></p>
+                        <ul>
+                            <li>Uncertainty about model parameters</li>
+                            <li>Can be reduced with more data</li>
+                            <li>Example: Estimating coin fairness</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Convergence and Sample Complexity</h2>
+                    <p>How fast do we learn?</p>
+                    <div class="fragment">
+                        <p><strong>Rate of convergence:</strong> <span style="color: #FC8484;">1/√n</span></p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>Implications:</strong></p>
+                        <ul>
+                            <li>10 → 1000 samples: 10× reduction in uncertainty</li>
+                            <li>1000 → 2000 samples: Only 1.41× reduction</li>
+                        </ul>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Diminishing returns: Easy gains initially, then harder improvements</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Key Takeaways</h2>
+                    <div class="fragment">
+                        <p><strong>1. Foundation of ML:</strong> Probability quantifies uncertainty</p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>2. Bayes' Theorem:</strong> Update beliefs with evidence</p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>3. Expectations:</strong> Summarize distributions</p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>4. Convergence:</strong> More data → Better estimates</p>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>These concepts underpin all of machine learning!</p>
+                    </div>
+                </section>
+
+                <!-- Final Quiz -->
+                <section>
+                    <h2 class="truncate-title">Final Test</h2>
+                    <div data-mcq='{
+                        "question": "Why is probability theory essential for deep learning?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "It provides a framework for reasoning about uncertainty in predictions and model parameters",
+                                "correct": true,
+                                "explanation": "Correct! Probability theory allows us to quantify uncertainty, update beliefs with data, and make principled predictions."
+                            },
+                            {
+                                "text": "It makes neural networks deterministic",
+                                "correct": false,
+                                "explanation": "Actually the opposite - probability helps us handle the inherent uncertainty and randomness in ML systems."
+                            },
+                            {
+                                "text": "It is only needed for Bayesian methods",
+                                "correct": false,
+                                "explanation": "All ML methods use probability, from loss functions to evaluation metrics to understanding generalization."
+                            },
+                            {
+                                "text": "It eliminates the need for large datasets",
+                                "correct": false,
+                                "explanation": "Probability theory tells us we need more data to reduce epistemic uncertainty. It does not eliminate this need."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section 15: Calculus Introduction -->
+            <section>
+                <section class="title-slide" data-sources='[{"text": "Dive into Deep Learning - Chapter 2.4", "url": "https://d2l.ai/chapter_preliminaries/calculus.html"}]'>
+                    <h1 class="truncate-title">Calculus for Deep Learning</h1>
+                    <p>Chapter 2.4: Fundamentals of Optimization</p>
+                    <p>Understanding rates of change and gradients</p>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Why Calculus for Deep Learning?</h2>
+                    <div class="fragment">
+                        <p>Calculus is the <strong>mathematical foundation</strong> of optimization</p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <ul>
+                            <li><strong>Derivatives:</strong> How functions change</li>
+                            <li><strong>Gradients:</strong> Direction of steepest ascent</li>
+                            <li><strong>Chain rule:</strong> Backpropagation algorithm</li>
+                            <li><strong>Optimization:</strong> Minimize loss functions</li>
+                        </ul>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Every parameter update in deep learning uses calculus!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Archimedes' Method</h2>
+                    <p>Finding the area of a circle through limits</p>
+                    <div class="fragment">
+                        <img src="images/polygon-circle.jpg" alt="Archimedes' method" style="width: 60%; margin: 20px auto; display: block;">
+                    </div>
+                    <div class="fragment">
+                        <p>As n → ∞, polygon area → πr²</p>
+                        <p class="fragment">This <span class="tooltip">limiting procedure<span class="tooltiptext">A mathematical technique where we examine what happens to a quantity as a parameter approaches a specific value, often infinity or zero.</span></span> is at the heart of calculus</p>
+                    </div>
+                </section>
+
+                <!-- Quiz for Introduction -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Why is calculus essential for deep learning?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "It enables us to compute gradients for parameter updates",
+                                "correct": true,
+                                "explanation": "Correct! Calculus provides the mathematical tools to compute gradients, which tell us how to update parameters to minimize the loss function."
+                            },
+                            {
+                                "text": "It makes neural networks run faster",
+                                "correct": false,
+                                "explanation": "Calculus doesnt directly affect computational speed. Its importance lies in enabling gradient-based optimization."
+                            },
+                            {
+                                "text": "It is only needed for theoretical understanding",
+                                "correct": false,
+                                "explanation": "Calculus is practically applied in every training step through gradient computation and backpropagation."
+                            },
+                            {
+                                "text": "It helps visualize neural networks",
+                                "correct": false,
+                                "explanation": "While helpful for understanding, the main role of calculus is in optimization through gradient computation."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section 16: Derivatives and Differentiation -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Derivatives and Differentiation</h2>
+                    <p>Understanding rates of change</p>
+                    <div class="fragment">
+                        <p>A <span class="tooltip">derivative<span class="tooltiptext">The rate of change of a function with respect to its input. It tells us how much the output changes when we make a small change to the input.</span></span> measures how a function changes</p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>Formal Definition:</strong></p>
+                        <p>$$f'(x) = \lim_{h \rightarrow 0} \frac{f(x+h) - f(x)}{h}$$</p>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>The derivative tells us the slope at any point!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Numerical Example</h2>
+                    <p>Let's compute a derivative numerically</p>
+                    <div class="fragment">
+                        <p>For f(x) = 3x² - 4x at x = 1:</p>
+                    </div>
+                    <pre class="fragment"><code class="python" data-line-numbers style="font-size: 0.8em;">def f(x):
+    return 3 * x**2 - 4 * x
+
+# Numerical approximation
+x = 1
+for h in [0.1, 0.01, 0.001, 0.0001]:
+    derivative = (f(x + h) - f(x)) / h
+    print(f"h={h}: f'(1) ≈ {derivative:.5f}")</code></pre>
+                    <pre class="fragment"><code class="plaintext" style="font-size: 0.8em;">h=0.1:    f'(1) ≈ 2.30000
+h=0.01:   f'(1) ≈ 2.03000
+h=0.001:  f'(1) ≈ 2.00300
+h=0.0001: f'(1) ≈ 2.00030</code></pre>
+                    <div class="fragment">
+                        <p>As h → 0, f'(1) → 2</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Common Derivative Rules</h2>
+                    <p>Essential formulas for deep learning</p>
+                    <div class="fragment" style="font-size: 0.9em;">
+                        <table style="margin: 0 auto;">
+                            <thead>
+                                <tr>
+                                    <th>Function</th>
+                                    <th>Derivative</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>$$C$$ (constant)</td>
+                                    <td>$$0$$</td>
+                                </tr>
+                                <tr>
+                                    <td>$$x^n$$</td>
+                                    <td>$$nx^{n-1}$$</td>
+                                </tr>
+                                <tr>
+                                    <td>$$e^x$$</td>
+                                    <td>$$e^x$$</td>
+                                </tr>
+                                <tr>
+                                    <td>$$\ln(x)$$</td>
+                                    <td>$$\frac{1}{x}$$</td>
+                                </tr>
+                                <tr>
+                                    <td>$$\sin(x)$$</td>
+                                    <td>$$\cos(x)$$</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Composition Rules</h2>
+                    <p>Combining derivatives</p>
+                    <div class="fragment" style="font-size: 0.85em;">
+                        <p><strong>Sum Rule:</strong></p>
+                        <p>$$\frac{d}{dx}[f(x) + g(x)] = f'(x) + g'(x)$$</p>
+                    </div>
+                    <div class="fragment" style="font-size: 0.85em;">
+                        <p><strong>Product Rule:</strong></p>
+                        <p>$$\frac{d}{dx}[f(x) \cdot g(x)] = f(x) \cdot g'(x) + g(x) \cdot f'(x)$$</p>
+                    </div>
+                    <div class="fragment" style="font-size: 0.85em;">
+                        <p><strong>Chain Rule:</strong></p>
+                        <p>$$\frac{d}{dx}[f(g(x))] = f'(g(x)) \cdot g'(x)$$</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Derivative Visualization</h2>
+                    <div id="derivative-viz" style="width: 100%; height: 450px;"></div>
+                </section>
+
+                <!-- Quiz for Derivatives -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "What is the derivative of f(x) = x³ - 3x² + 2x?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "3x² - 6x + 2",
+                                "correct": true,
+                                "explanation": "Correct! Using the power rule: d/dx(x³) = 3x², d/dx(3x²) = 6x, d/dx(2x) = 2"
+                            },
+                            {
+                                "text": "x² - 2x + 2",
+                                "correct": false,
+                                "explanation": "Remember to multiply by the original power. The derivative of x³ is 3x², not x²."
+                            },
+                            {
+                                "text": "3x² - 3x + 2",
+                                "correct": false,
+                                "explanation": "The derivative of 3x² is 6x, not 3x. Remember: d/dx(ax^n) = n·a·x^(n-1)"
+                            },
+                            {
+                                "text": "x³ - x² + x",
+                                "correct": false,
+                                "explanation": "This looks like you reduced the powers by 1 without multiplying by the original power."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section 17: Visualization of Derivatives -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Visualizing Derivatives</h2>
+                    <p>Tangent lines and slopes</p>
+                    <div class="fragment">
+                        <p>The derivative at a point equals the <span class="tooltip">slope of the tangent line<span class="tooltiptext">A line that touches a curve at exactly one point and has the same slope as the curve at that point.</span></span></p>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <img src="images/tangent-line.jpg" alt="Tangent line visualization" style="width: 70%; margin: 20px auto; display: block;">
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Interactive Tangent Line</h2>
+                    <p>Move your mouse to see how the derivative changes</p>
+                    <div id="interactive-tangent" style="width: 100%; height: 450px; display: flex; justify-content: center;"></div>
+                    <div class="fragment emphasis-box mt-sm">
+                        <p>Notice how the slope changes as you move along the curve!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Critical Points</h2>
+                    <p>Where derivatives equal zero</p>
+                    <div class="fragment">
+                        <p>When f'(x) = 0:</p>
+                        <ul>
+                            <li><strong>Local minimum:</strong> Valley point</li>
+                            <li><strong>Local maximum:</strong> Peak point</li>
+                            <li><strong>Inflection point:</strong> Change in curvature</li>
+                        </ul>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Finding where f'(x) = 0 is key to optimization!</p>
+                    </div>
+                </section>
+
+                <!-- Quiz for Visualization -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "What does it mean when f′(x) = 0 at some point?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "The tangent line is horizontal at that point",
+                                "correct": true,
+                                "explanation": "Correct! When the derivative is zero, the slope is zero, meaning the tangent line is horizontal. This often indicates a local maximum, minimum, or inflection point."
+                            },
+                            {
+                                "text": "The function value is zero",
+                                "correct": false,
+                                "explanation": "f′(x) = 0 means the derivative is zero, not the function itself. The function value f(x) could be any number."
+                            },
+                            {
+                                "text": "The function is undefined",
+                                "correct": false,
+                                "explanation": "A zero derivative doesnt mean the function is undefined. It means the rate of change is zero at that point."
+                            },
+                            {
+                                "text": "The tangent line is vertical",
+                                "correct": false,
+                                "explanation": "A vertical tangent would mean the derivative is undefined (infinite slope), not zero."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section 18: Partial Derivatives and Gradients -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Partial Derivatives</h2>
+                    <p>Derivatives for multivariate functions</p>
+                    <div class="fragment">
+                        <p>For f(x, y), we can take derivatives with respect to each variable:</p>
+                    </div>
+                    <div class="fragment" style="font-size: 0.9em;">
+                        <p>$$\frac{\partial f}{\partial x} = \lim_{h \to 0} \frac{f(x+h, y) - f(x, y)}{h}$$</p>
+                    </div>
+                    <div class="fragment" style="font-size: 0.9em;">
+                        <p>$$\frac{\partial f}{\partial y} = \lim_{h \to 0} \frac{f(x, y+h) - f(x, y)}{h}$$</p>
+                    </div>
+                    <div class="fragment emphasis-box">
+                        <p>Treat other variables as constants!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Example: Partial Derivatives</h2>
+                    <p>Let f(x, y) = 3x²y + 5e^y</p>
+                    <div class="fragment">
+                        <p><strong>Partial with respect to x:</strong></p>
+                        <p>$$\frac{\partial f}{\partial x} = 6xy$$</p>
+                        <p style="font-size: 0.8em;">(treat y as constant)</p>
+                    </div>
+                    <div class="fragment">
+                        <p><strong>Partial with respect to y:</strong></p>
+                        <p>$$\frac{\partial f}{\partial y} = 3x² + 5e^y$$</p>
+                        <p style="font-size: 0.8em;">(treat x as constant)</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">The Gradient Vector</h2>
+                    <p>Combining all partial derivatives</p>
+                    <div class="fragment">
+                        <p>The <span class="tooltip">gradient<span class="tooltiptext">A vector containing all partial derivatives of a function. It points in the direction of steepest increase.</span></span> is a vector of partial derivatives:</p>
+                        <p>$$\nabla f = \begin{bmatrix} \frac{\partial f}{\partial x_1} \\ \frac{\partial f}{\partial x_2} \\ \vdots \\ \frac{\partial f}{\partial x_n} \end{bmatrix}$$</p>
+                    </div>
+                    <div class="fragment emphasis-box">
+                        <p>The gradient points in the direction of steepest ascent!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Gradient in Deep Learning</h2>
+                    <p>Loss function optimization</p>
+                    <div class="fragment">
+                        <p>For a loss function L(w₁, w₂, ..., wₙ):</p>
+                    </div>
+                    <div class="fragment">
+                        <p>$$\nabla_w L = \begin{bmatrix} \frac{\partial L}{\partial w_1} \\ \frac{\partial L}{\partial w_2} \\ \vdots \\ \frac{\partial L}{\partial w_n} \end{bmatrix}$$</p>
+                    </div>
+                    <div class="fragment">
+                        <p><strong>Gradient Descent Update:</strong></p>
+                        <p>$$w_{new} = w_{old} - \alpha \cdot \nabla_w L$$</p>
+                        <p style="font-size: 0.8em;">where α is the learning rate</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Partial Derivatives Visualization</h2>
+                    <div id="partial-derivatives-viz" style="width: 100%; height: 450px;"></div>
+                </section>
+
+                <!-- Quiz for Partial Derivatives -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "For f(x,y) = x²y + y³, what is ∂f/∂y?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "x² + 3y²",
+                                "correct": true,
+                                "explanation": "Correct! Treating x as constant: ∂/∂y(x²y) = x² and ∂/∂y(y³) = 3y²"
+                            },
+                            {
+                                "text": "2xy + 3y²",
+                                "correct": false,
+                                "explanation": "You differentiated x²y with respect to both x and y. When finding ∂f/∂y, treat x as constant."
+                            },
+                            {
+                                "text": "x² + y²",
+                                "correct": false,
+                                "explanation": "The derivative of y³ with respect to y is 3y², not y²."
+                            },
+                            {
+                                "text": "2x + 3y²",
+                                "correct": false,
+                                "explanation": "When differentiating x²y with respect to y, x² is treated as a constant coefficient, giving x²."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section 19: Chain Rule -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">The Chain Rule</h2>
+                    <p>Differentiating composite functions</p>
+                    <div class="fragment">
+                        <p>For nested functions y = f(g(x)):</p>
+                        <p>$$\frac{dy}{dx} = \frac{dy}{du} \cdot \frac{du}{dx}$$</p>
+                        <p style="font-size: 0.8em;">where u = g(x)</p>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>The chain rule is the foundation of backpropagation!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Chain Rule Example</h2>
+                    <p>Let y = (3x² + 2x)⁵</p>
+                    <div class="fragment">
+                        <p><strong>Step 1:</strong> Identify inner and outer functions</p>
+                        <ul>
+                            <li>Inner: u = 3x² + 2x</li>
+                            <li>Outer: y = u⁵</li>
+                        </ul>
+                    </div>
+                    <div class="fragment">
+                        <p><strong>Step 2:</strong> Find derivatives</p>
+                        <ul>
+                            <li>dy/du = 5u⁴</li>
+                            <li>du/dx = 6x + 2</li>
+                        </ul>
+                    </div>
+                    <div class="fragment">
+                        <p><strong>Step 3:</strong> Apply chain rule</p>
+                        <p>dy/dx = 5(3x² + 2x)⁴ · (6x + 2)</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Multivariate Chain Rule</h2>
+                    <p>For functions of multiple variables</p>
+                    <div class="fragment">
+                        <p>If y = f(u₁, u₂, ..., uₘ) and each uᵢ = gᵢ(x₁, x₂, ..., xₙ):</p>
+                    </div>
+                    <div class="fragment" style="font-size: 0.85em;">
+                        <p>$$\frac{\partial y}{\partial x_i} = \sum_{j=1}^{m} \frac{\partial y}{\partial u_j} \cdot \frac{\partial u_j}{\partial x_i}$$</p>
+                    </div>
+                    <div class="fragment">
+                        <p><strong>Matrix form:</strong></p>
+                        <p>$$\nabla_x y = J^T \cdot \nabla_u y$$</p>
+                        <p style="font-size: 0.8em;">where J is the Jacobian matrix</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Chain Rule Visualization</h2>
+                    <div id="chain-rule-viz" style="width: 100%; height: 350px;"></div>
+                    <div class="fragment emphasis-box mt-sm">
+                        <p>Gradients flow backwards through the computation graph!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Backpropagation</h2>
+                    <p>Chain rule in neural networks</p>
+                    <div class="fragment">
+                        <p>For a simple network: Input → Hidden → Output → Loss</p>
+                    </div>
+                    <div class="fragment" style="font-size: 0.85em;">
+                        <p>$$\frac{\partial L}{\partial W_1} = \frac{\partial L}{\partial z_2} \cdot \frac{\partial z_2}{\partial a_1} \cdot \frac{\partial a_1}{\partial z_1} \cdot \frac{\partial z_1}{\partial W_1}$$</p>
+                    </div>
+                    <div class="fragment">
+                        <ul>
+                            <li>L: Loss function</li>
+                            <li>z: Pre-activation values</li>
+                            <li>a: Activation values</li>
+                            <li>W: Weight matrices</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Quiz for Chain Rule -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Using the chain rule, what is the derivative of y = sin(x²)?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "2x · cos(x²)",
+                                "correct": true,
+                                "explanation": "Correct! dy/dx = cos(x²) · 2x. The derivative of sin(u) is cos(u), and the derivative of x² is 2x."
+                            },
+                            {
+                                "text": "cos(x²)",
+                                "correct": false,
+                                "explanation": "You forgot to multiply by the derivative of the inner function (x²). The chain rule requires both derivatives."
+                            },
+                            {
+                                "text": "2x · sin(x²)",
+                                "correct": false,
+                                "explanation": "The derivative of sin(u) is cos(u), not sin(u). You correctly applied the chain rule structure though."
+                            },
+                            {
+                                "text": "x · cos(x²)",
+                                "correct": false,
+                                "explanation": "The derivative of x² is 2x, not x. Remember to use the power rule for the inner function."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section 20: Practical Applications -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Gradient Descent in Action</h2>
+                    <p>Optimizing a simple loss function</p>
+                    <div id="gradient-descent-viz" style="width: 100%; height: 450px;"></div>
+                    <div class="fragment emphasis-box mt-sm">
+                        <p>Each step moves in the negative gradient direction!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Learning Rate Impact</h2>
+                    <p>Choosing the right step size</p>
+                    <div class="fragment">
+                        <ul>
+                            <li><strong>Too small:</strong> Slow convergence</li>
+                            <li><strong>Too large:</strong> Overshooting, divergence</li>
+                            <li><strong>Just right:</strong> Efficient convergence</li>
+                        </ul>
+                    </div>
+                    <div class="fragment">
+                        <p><strong>Update rule:</strong></p>
+                        <p>$$w_{t+1} = w_t - \alpha \cdot \nabla L(w_t)$$</p>
+                        <p style="font-size: 0.8em; color: #10099F;">α is the learning rate</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Computing Gradients in PyTorch</h2>
+                    <p>Automatic differentiation in practice</p>
+                    <pre class="fragment"><code class="python" data-line-numbers style="font-size: 0.75em; line-height: 1.3;">import torch
+
+# Define variables with gradient tracking
+x = torch.tensor([2.0], requires_grad=True)
+y = torch.tensor([3.0], requires_grad=True)
+
+# Define function: z = x² + xy + y²
+z = x**2 + x*y + y**2
+
+# Compute gradients
+z.backward()
+
+print(f"∂z/∂x = {x.grad.item()}")  # 7.0
+print(f"∂z/∂y = {y.grad.item()}")  # 8.0</code></pre>
+                    <div class="fragment emphasis-box">
+                        <p>PyTorch automatically applies the chain rule!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Neural Network Gradients</h2>
+                    <p>Backpropagation example</p>
+                    <pre class="fragment"><code class="python" data-line-numbers style="font-size: 0.7em; line-height: 1.2;">import torch
+import torch.nn as nn
+
+# Simple network
+model = nn.Sequential(
+    nn.Linear(10, 5),
+    nn.ReLU(),
+    nn.Linear(5, 1)
+)
+
+# Forward pass
+x = torch.randn(32, 10)  # Batch of 32 samples
+y_true = torch.randn(32, 1)
+y_pred = model(x)
+
+# Compute loss
+loss = nn.MSELoss()(y_pred, y_true)
+
+# Backward pass (compute gradients)
+loss.backward()
+
+# Access gradients
+for name, param in model.named_parameters():
+    print(f"{name}: gradient shape = {param.grad.shape}")</code></pre>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Key Takeaways</h2>
+                    <div class="fragment">
+                        <p><strong>1. Derivatives measure change</strong></p>
+                        <p style="font-size: 0.9em;">Essential for understanding how parameters affect loss</p>
+                    </div>
+                    <div class="fragment mt-md">
+                        <p><strong>2. Gradients point uphill</strong></p>
+                        <p style="font-size: 0.9em;">We move opposite to minimize loss</p>
+                    </div>
+                    <div class="fragment mt-md">
+                        <p><strong>3. Chain rule enables backpropagation</strong></p>
+                        <p style="font-size: 0.9em;">Gradients flow backward through networks</p>
+                    </div>
+                    <div class="fragment mt-md">
+                        <p><strong>4. Automatic differentiation</strong></p>
+                        <p style="font-size: 0.9em;">Frameworks handle the math for us</p>
+                    </div>
+                </section>
+
+                <!-- Final Comprehensive Quiz -->
+                <section>
+                    <h2 class="truncate-title">Final Test</h2>
+                    <div data-mcq='{
+                        "question": "In gradient descent, why do we subtract the gradient from parameters?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "The gradient points uphill, so we move opposite to minimize loss",
+                                "correct": true,
+                                "explanation": "Correct! The gradient points in the direction of steepest increase. To minimize the loss, we move in the opposite direction by subtracting the gradient."
+                            },
+                            {
+                                "text": "The gradient is always positive, so we need to subtract",
+                                "correct": false,
+                                "explanation": "Gradients can be positive or negative. We subtract because the gradient points toward increasing loss, not because of its sign."
+                            },
+                            {
+                                "text": "It is a convention that could be reversed",
+                                "correct": false,
+                                "explanation": "This is not just convention. The gradient mathematically points toward increasing function values, so we must move opposite to minimize."
+                            },
+                            {
+                                "text": "Subtraction is computationally faster than addition",
+                                "correct": false,
+                                "explanation": "Computational speed is identical for addition and subtraction. We subtract for mathematical reasons related to optimization."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section: Automatic Differentiation -->
+            <section>
+                <section class="title-slide" data-sources='[{"text": "Dive into Deep Learning - Chapter 2.5", "url": "https://d2l.ai/chapter_preliminaries/autograd.html"}, {"text": "Wengert, R. E. (1964). A simple automatic derivative evaluation program", "url": "https://dl.acm.org/doi/10.1145/355586.364791"}, {"text": "Speelpenning, B. (1980). Compiling fast partial derivatives", "url": "https://www.ideals.illinois.edu/handle/2142/69475"}]'>
+                    <h2 class="truncate-title">Automatic Differentiation</h2>
+                    <p>Computing gradients automatically</p>
+                    <div class="fragment mt-lg">
+                        <p>Manual derivative calculation is:</p>
+                        <ul>
+                            <li>Tedious and error-prone</li>
+                            <li>Complex for large models</li>
+                            <li>Difficult to maintain</li>
+                        </ul>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Autograd makes deep learning practical!</p>
+                    </div>
+                </section>
+
+                <section data-sources='[{"text": "Griewank, A. (1989). On automatic differentiation", "url": "https://www.math.uni-bielefeld.de/documenta/vol-ismp/19_griewank-andreas.pdf"}]'>
+                    <h2 class="truncate-title">What is Automatic Differentiation?</h2>
+                    <div class="fragment">
+                        <p><span class="tooltip">Automatic differentiation<span class="tooltiptext">A technique to evaluate derivatives of functions specified by computer programs with machine precision</span></span> (autograd):</p>
+                        <ul>
+                            <li>Computes exact derivatives (not numerical approximations)</li>
+                            <li>Builds <span class="tooltip">computational graphs<span class="tooltiptext">A directed graph where nodes represent operations and edges represent data flow</span></span> dynamically</li>
+                            <li>Applies chain rule automatically</li>
+                        </ul>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p><strong>Historical Context:</strong></p>
+                        <ul style="font-size: 0.9em;">
+                            <li>First references: 1960s (Wengert, 1964)</li>
+                            <li>Modern backpropagation: 1980s (Speelpenning, 1980)</li>
+                            <li>Framework integration: 2010s</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Computational Graphs</h2>
+                    <p>How autograd tracks computations</p>
+                    <div id="comp-graph-viz" style="width: 100%; height: 400px;"></div>
+                    <div class="fragment emphasis-box mt-sm">
+                        <p>Each operation creates a node in the graph!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Backpropagation Algorithm</h2>
+                    <p>Applying chain rule backwards through the graph</p>
+                    <div class="fragment">
+                        <ol>
+                            <li><strong>Forward pass:</strong> Compute outputs and build graph</li>
+                            <li><strong>Backward pass:</strong> Compute gradients using chain rule</li>
+                            <li><strong>Update:</strong> Use gradients to update parameters</li>
+                        </ol>
+                    </div>
+                    <div class="fragment mt-lg">
+                        <p style="font-size: 0.85em;">$$\frac{\partial L}{\partial w} = \frac{\partial L}{\partial y} \cdot \frac{\partial y}{\partial w}$$</p>
+                        <p style="font-size: 0.8em; color: #10099F;">Chain rule applied recursively</p>
+                    </div>
+                </section>
+
+                <!-- Quiz for Autograd Concepts -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "What is the main advantage of automatic differentiation over numerical differentiation?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "Exact derivatives with machine precision",
+                                "correct": true,
+                                "explanation": "Correct! Automatic differentiation computes exact derivatives (up to machine precision) by applying the chain rule, not approximations."
+                            },
+                            {
+                                "text": "Faster computation time",
+                                "correct": false,
+                                "explanation": "While autograd can be efficient, its main advantage is accuracy, not necessarily speed. Numerical methods can be faster for simple functions."
+                            },
+                            {
+                                "text": "Simpler to implement",
+                                "correct": false,
+                                "explanation": "Autograd systems are complex to implement. The advantage is for users who get automatic, accurate derivatives without manual implementation."
+                            },
+                            {
+                                "text": "Uses less memory",
+                                "correct": false,
+                                "explanation": "Autograd actually uses more memory to store the computational graph. The advantage is accuracy and automation."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section: Simple Gradient Computation -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">A Simple Function</h2>
+                    <p>Computing gradients in PyTorch</p>
+                    <div class="fragment">
+                        <p>Let's differentiate: $$y = 2\mathbf{x}^T\mathbf{x}$$</p>
+                        <p style="font-size: 0.8em;">with respect to vector $\mathbf{x}$</p>
+                    </div>
+                    <pre class="fragment"><code class="python" data-line-numbers style="font-size: 0.75em; line-height: 1.3;">import torch
+
+# Create tensor and enable gradient tracking
+x = torch.arange(4.0, requires_grad=True)
+print(x)  # tensor([0., 1., 2., 3.], requires_grad=True)
+print(x.grad)  # None (no gradient computed yet)</code></pre>
+                    <div class="fragment emphasis-box mt-sm">
+                        <p>requires_grad=True tells PyTorch to track operations!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Computing the Gradient</h2>
+                    <p>Forward pass and backward pass</p>
+                    <pre class="fragment"><code class="python" data-line-numbers style="font-size: 0.75em; line-height: 1.3;"># Forward pass: compute y
+y = 2 * torch.dot(x, x)
+print(y)  # tensor(28., grad_fn=<MulBackward0>)
+
+# Backward pass: compute gradients
+y.backward()
+
+# Access the gradient
+print(x.grad)  # tensor([0., 4., 8., 12.])</code></pre>
+                    <div class="fragment mt-md">
+                        <p><strong>Verification:</strong></p>
+                        <p style="font-size: 0.85em;">$$\frac{\partial y}{\partial \mathbf{x}} = \frac{\partial}{\partial \mathbf{x}}(2\mathbf{x}^T\mathbf{x}) = 4\mathbf{x}$$</p>
+                        <p style="font-size: 0.8em;">At x = [0,1,2,3]: gradient = [0,4,8,12] ✓</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Gradient Accumulation</h2>
+                    <p>PyTorch accumulates gradients by default</p>
+                    <pre class="fragment"><code class="python" data-line-numbers style="font-size: 0.7em; line-height: 1.2;"># Compute gradient of sum
+x.grad.zero_()  # Reset gradient to zero
+y = x.sum()
+y.backward()
+print(x.grad)  # tensor([1., 1., 1., 1.])
+
+# Without resetting - gradients accumulate!
+y = x.sum()
+y.backward()
+print(x.grad)  # tensor([2., 2., 2., 2.]) - accumulated!</code></pre>
+                    <div class="fragment emphasis-box mt-sm">
+                        <p>Always call grad.zero_() before computing new gradients!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Gradient Computation Visualization</h2>
+                    <div id="gradient-comp-viz" style="width: 100%; height: 450px;"></div>
+                    <p class="fragment" style="font-size: 0.9em;">Watch how gradients flow backward through the graph</p>
+                </section>
+
+                <!-- Quiz for Gradient Computation -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "Why do we need to call x.grad.zero_() in PyTorch?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "PyTorch accumulates gradients by default",
+                                "correct": true,
+                                "explanation": "Correct! PyTorch accumulates gradients across backward() calls. This is useful for some scenarios but requires manual reset for standard gradient descent."
+                            },
+                            {
+                                "text": "To initialize the gradient buffer",
+                                "correct": false,
+                                "explanation": "The gradient buffer is automatically initialized when requires_grad=True. We zero it to prevent accumulation."
+                            },
+                            {
+                                "text": "To save memory",
+                                "correct": false,
+                                "explanation": "Zeroing gradients does not save memory. It prevents unwanted accumulation from previous backward passes."
+                            },
+                            {
+                                "text": "It is optional for optimization",
+                                "correct": false,
+                                "explanation": "It is usually necessary unless you specifically want gradient accumulation (e.g., for large batch training)."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section: Non-Scalar Variables -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Backward for Non-Scalar Variables</h2>
+                    <p>Handling vector and matrix outputs</p>
+                    <div class="fragment">
+                        <p>When output is not scalar, we need the <span class="tooltip">Jacobian<span class="tooltiptext">A matrix of all first-order partial derivatives of a vector-valued function</span></span>:</p>
+                        <p style="font-size: 0.85em;">$$J = \begin{bmatrix}
+                        \frac{\partial y_1}{\partial x_1} & \cdots & \frac{\partial y_1}{\partial x_n} \\
+                        \vdots & \ddots & \vdots \\
+                        \frac{\partial y_m}{\partial x_1} & \cdots & \frac{\partial y_m}{\partial x_n}
+                        \end{bmatrix}$$</p>
+                    </div>
+                    <div class="fragment emphasis-box mt-md">
+                        <p>PyTorch requires scalar output or gradient argument!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Vector Gradients in Practice</h2>
+                    <p>Using the gradient argument</p>
+                    <pre class="fragment"><code class="python" data-line-numbers style="font-size: 0.7em; line-height: 1.2;">x.grad.zero_()
+y = x * x  # Element-wise square, output is vector
+
+# Method 1: Provide gradient vector
+y.backward(gradient=torch.ones(len(y)))
+print(x.grad)  # tensor([0., 2., 4., 6.])
+
+# Method 2: Sum to scalar (more common)
+x.grad.zero_()
+y = x * x
+y.sum().backward()  # Same result!
+print(x.grad)  # tensor([0., 2., 4., 6.])</code></pre>
+                    <div class="fragment mt-sm">
+                        <p style="font-size: 0.9em;">The gradient argument computes: $\mathbf{v}^T \cdot J$</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Why Sum for Loss Functions?</h2>
+                    <p>Batched gradient computation</p>
+                    <div class="fragment">
+                        <p>In deep learning, we often have:</p>
+                        <ul>
+                            <li>Loss computed per example</li>
+                            <li>Batch of N examples</li>
+                            <li>Need single gradient for parameters</li>
+                        </ul>
+                    </div>
+                    <pre class="fragment"><code class="python" data-line-numbers style="font-size: 0.7em; line-height: 1.2;"># Typical pattern in training
+batch_losses = model(batch_inputs)  # Shape: [batch_size]
+total_loss = batch_losses.mean()     # Reduce to scalar
+total_loss.backward()                # Compute gradients</code></pre>
+                </section>
+            </section>
+
+            <!-- Section: Detaching Computation -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Detaching Computation</h2>
+                    <p>Controlling gradient flow</p>
+                    <div class="fragment">
+                        <p>Sometimes we need to stop gradients:</p>
+                        <ul>
+                            <li>Freeze certain parameters</li>
+                            <li>Create non-trainable features</li>
+                            <li>Implement special algorithms</li>
+                        </ul>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>detach() breaks the computational graph!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Detach Example</h2>
+                    <p>Breaking gradient flow selectively</p>
+                    <pre class="fragment"><code class="python" data-line-numbers style="font-size: 0.65em; line-height: 1.2;">x.grad.zero_()
+y = x * x
+u = y.detach()  # u has same value as y, but no gradient
+z = u * x       # z = x³ but gradient treats u as constant
+
+z.sum().backward()
+print(x.grad == u)  # True - gradient is u, not 3x²!
+
+# Compare with normal computation
+x.grad.zero_()
+z_normal = x * x * x
+z_normal.sum().backward()
+print(x.grad)  # This would be 3x²</code></pre>
+                    <div class="fragment mt-sm">
+                        <p style="font-size: 0.85em;"><strong>With detach:</strong> $\frac{\partial z}{\partial x} = u = x^2$</p>
+                        <p style="font-size: 0.85em;"><strong>Without:</strong> $\frac{\partial z}{\partial x} = 3x^2$</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Practical Use Cases</h2>
+                    <p>When to use detach()</p>
+                    <div class="fragment">
+                        <p><strong>1. Feature extraction:</strong></p>
+                        <pre><code class="python" style="font-size: 0.65em; line-height: 1.2;">features = pretrained_model(x).detach()
+output = custom_head(features)  # Only train head</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <p><strong>2. Stop gradient in GANs:</strong></p>
+                        <pre><code class="python" style="font-size: 0.65em; line-height: 1.2;">fake = generator(noise)
+disc_fake = discriminator(fake.detach())  # Don't update G</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <p><strong>3. Reinforcement learning:</strong></p>
+                        <pre><code class="python" style="font-size: 0.65em; line-height: 1.2;">target_value = reward + gamma * next_value.detach()</code></pre>
+                    </div>
+                </section>
+
+                <!-- Detach Visualization -->
+                <section>
+                    <h2 class="truncate-title">Gradient Flow Visualization</h2>
+                    <div id="detach-viz" style="width: 100%; height: 400px;"></div>
+                    <p class="fragment" style="font-size: 0.9em;">Red edges show where gradients are blocked</p>
+                </section>
+            </section>
+
+            <!-- Section: Control Flow -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Gradients and Python Control Flow</h2>
+                    <p>Dynamic computational graphs</p>
+                    <div class="fragment">
+                        <p>Autograd handles arbitrary Python code:</p>
+                        <ul>
+                            <li>Conditionals (if/else)</li>
+                            <li>Loops (for/while)</li>
+                            <li>Function calls</li>
+                            <li>Recursion</li>
+                        </ul>
+                    </div>
+                    <div class="fragment emphasis-box mt-lg">
+                        <p>Graph is built dynamically during execution!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Control Flow Example</h2>
+                    <p>Gradients through conditions and loops</p>
+                    <pre class="fragment"><code class="python" data-line-numbers style="font-size: 0.6em; line-height: 1.15;">def f(a):
+    b = a * 2
+    while b.norm() < 1000:
+        b = b * 2
+    if b.sum() > 0:
+        c = b
+    else:
+        c = 100 * b
+    return c
+
+# Different inputs create different graphs!
+a = torch.randn(size=(), requires_grad=True)
+d = f(a)
+d.backward()
+
+# Gradient still computed correctly
+print(a.grad)  # Works despite complex control flow!</code></pre>
+                    <div class="fragment mt-sm">
+                        <p style="font-size: 0.85em;">Each execution may create a different graph!</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Dynamic vs Static Graphs</h2>
+                    <p>PyTorch's approach to autograd</p>
+                    <div class="fragment">
+                        <p><strong>Dynamic Graphs (PyTorch):</strong></p>
+                        <ul style="font-size: 0.9em;">
+                            <li>Built during forward pass</li>
+                            <li>Can change every iteration</li>
+                            <li>Natural Python control flow</li>
+                            <li>Easy debugging</li>
+                        </ul>
+                    </div>
+                    <div class="fragment">
+                        <p><strong>Use cases:</strong></p>
+                        <ul style="font-size: 0.9em;">
+                            <li>Variable-length sequences (NLP)</li>
+                            <li>Tree/graph neural networks</li>
+                            <li>Conditional computation</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Gradient Verification</h2>
+                    <p>Checking autograd correctness</p>
+                    <pre class="fragment"><code class="python" data-line-numbers style="font-size: 0.65em; line-height: 1.2;"># Function f is linear with piecewise scale
+a = torch.randn(size=(), requires_grad=True)
+d = f(a)
+d.backward()
+
+# Verify gradient matches theory
+# Since f is piecewise linear: f(a) = scale * a
+# Therefore: df/da = scale
+scale = (d / a).item()
+expected_grad = scale
+
+print(f"Computed gradient: {a.grad.item()}")
+print(f"Expected gradient: {expected_grad}")
+print(f"Match: {torch.allclose(a.grad, torch.tensor(expected_grad))}")</code></pre>
+                </section>
+
+                <!-- Quiz for Control Flow -->
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding</h2>
+                    <div data-mcq='{
+                        "question": "What happens to the computational graph when Python control flow changes the execution path?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "A different graph is built for each execution path",
+                                "correct": true,
+                                "explanation": "Correct! PyTorch builds the graph dynamically during execution, so different control flow paths create different graphs."
+                            },
+                            {
+                                "text": "The graph fails to compute gradients",
+                                "correct": false,
+                                "explanation": "PyTorch handles control flow naturally. Gradients are computed correctly regardless of the execution path."
+                            },
+                            {
+                                "text": "The same graph is reused with masked gradients",
+                                "correct": false,
+                                "explanation": "PyTorch builds a new graph for each forward pass. It does not reuse graphs with masking."
+                            },
+                            {
+                                "text": "Control flow must be removed before backpropagation",
+                                "correct": false,
+                                "explanation": "One of PyTorchs strengths is handling arbitrary Python control flow without modification."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+            <!-- Section: Practical Tips -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Automatic Differentiation Best Practices</h2>
+                    <div class="fragment">
+                        <p><strong>1. Memory Management:</strong></p>
+                        <ul style="font-size: 0.9em;">
+                            <li>Use <code>torch.no_grad()</code> for inference</li>
+                            <li>Detach intermediate results when needed</li>
+                            <li>Clear gradients with <code>zero_()</code></li>
+                        </ul>
+                    </div>
+                    <div class="fragment">
+                        <p><strong>2. Debugging:</strong></p>
+                        <ul style="font-size: 0.9em;">
+                            <li>Use <code>retain_graph=True</code> sparingly</li>
+                            <li>Check <code>grad_fn</code> attribute</li>
+                            <li>Verify gradient shapes</li>
+                        </ul>
+                    </div>
+                    <div class="fragment">
+                        <p><strong>3. Performance:</strong></p>
+                        <ul style="font-size: 0.9em;">
+                            <li>Avoid unnecessary gradient tracking</li>
+                            <li>Use in-place operations carefully</li>
+                            <li>Profile gradient computation</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Common Pitfalls</h2>
+                    <p>Avoiding autograd mistakes</p>
+                    <div class="fragment">
+                        <p><strong>❌ Forgetting to zero gradients:</strong></p>
+                        <pre><code class="python" style="font-size: 0.65em;">for epoch in range(100):
+    loss = model(x)
+    loss.backward()  # Gradients accumulate!</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <p><strong>✓ Correct approach:</strong></p>
+                        <pre><code class="python" style="font-size: 0.65em;">for epoch in range(100):
+    optimizer.zero_grad()  # Reset gradients
+    loss = model(x)
+    loss.backward()</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <p><strong>❌ Modifying tensors with gradients:</strong></p>
+                        <pre><code class="python" style="font-size: 0.65em;">x = torch.randn(3, requires_grad=True)
+x[0] = 1  # Error! Can't modify tensor with gradients</code></pre>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Higher-Order Derivatives</h2>
+                    <p>Computing gradients of gradients</p>
+                    <pre class="fragment"><code class="python" data-line-numbers style="font-size: 0.65em; line-height: 1.2;"># First derivative
+x = torch.tensor([2.0], requires_grad=True)
+y = x ** 3  # y = x³
+
+# First derivative: dy/dx = 3x²
+grad1 = torch.autograd.grad(y, x, create_graph=True)[0]
+print(f"First derivative at x=2: {grad1}")  # 12
+
+# Second derivative: d²y/dx² = 6x
+grad2 = torch.autograd.grad(grad1, x)[0]
+print(f"Second derivative at x=2: {grad2}")  # 12</code></pre>
+                    <div class="fragment emphasis-box mt-sm">
+                        <p>Use create_graph=True to compute higher-order derivatives!</p>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Summary Section -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Key Takeaways</h2>
+                    <div class="fragment">
+                        <p><strong>1. Automatic differentiation is exact</strong></p>
+                        <p style="font-size: 0.9em;">Not numerical approximation</p>
+                    </div>
+                    <div class="fragment mt-md">
+                        <p><strong>2. Computational graphs are dynamic</strong></p>
+                        <p style="font-size: 0.9em;">Built during forward pass</p>
+                    </div>
+                    <div class="fragment mt-md">
+                        <p><strong>3. Gradients accumulate by default</strong></p>
+                        <p style="font-size: 0.9em;">Remember to zero them!</p>
+                    </div>
+                    <div class="fragment mt-md">
+                        <p><strong>4. Control flow is handled naturally</strong></p>
+                        <p style="font-size: 0.9em;">Write normal Python code</p>
+                    </div>
+                </section>
+
+                <!-- Final Quiz -->
+                <section>
+                    <h2 class="truncate-title">Final Test</h2>
+                    <div data-mcq='{
+                        "question": "Why is automatic differentiation preferred over numerical differentiation in deep learning?",
+                        "type": "multiple",
+                        "options": [
+                            {
+                                "text": "Provides exact derivatives up to machine precision",
+                                "correct": true,
+                                "explanation": "Correct! Autograd computes exact derivatives using the chain rule, not finite difference approximations."
+                            },
+                            {
+                                "text": "Handles complex control flow naturally",
+                                "correct": true,
+                                "explanation": "Correct! Dynamic graphs can handle arbitrary Python control flow, which is essential for many models."
+                            },
+                            {
+                                "text": "More memory efficient than alternatives",
+                                "correct": false,
+                                "explanation": "Actually, autograd uses more memory to store the computational graph. The benefits are accuracy and automation."
+                            },
+                            {
+                                "text": "Scales better to high dimensions",
+                                "correct": true,
+                                "explanation": "Correct! Computing gradients via backprop is O(n) while numerical methods are O(n²) for n parameters."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+        </div>
+    </div>
+    
+    <!-- Reveal.js Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/math/math.js"></script>
+    
+    <!-- Shared Scripts -->
+    <script src="../shared/js/title-handler.js"></script>
+    <script src="../shared/js/tooltip-modal.js"></script>
+    <script src="../shared/js/source-modal-v2.js"></script>
+    <script src="../shared/js/multiple-choice.js"></script>
+    
+    <!-- D3.js for visualizations -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script src="js/tensor-animations.js"></script>
+    <script src="js/broadcasting-viz.js"></script>
+    <script src="js/code-runner.js"></script>
+    <script src="js/data-processing-viz.js"></script>
+    <script src="js/linear-algebra-viz.js"></script>
+    <script src="js/calculus-viz.js"></script>
+    <script src="js/autograd-viz.js"></script>
+    <script src="js/probability-viz.js"></script>
+    
+    <script>
+        // Initialize Reveal.js
+        Reveal.initialize({
+            hash: true,
+            controls: true,
+            progress: true,
+            center: true,
+            transition: 'slide',
+            math: {
+                mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js',
+                config: 'TeX-AMS_SVG-full',
+                TeX: {
+                    Macros: {
+                        R: '\\mathbb{R}',
+                        set: ['\\left\\{#1\\right\\}', 1]
+                    }
+                }
+            },
+            plugins: [ RevealMath, RevealHighlight, RevealNotes, RevealMarkdown ]
+        });
+    </script>
+</body>
+</html>
