@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Towards the Multilayer Perceptron - Introduction to Deep Learning</title>
+
+    <!-- Reveal.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+    <link rel="stylesheet" href="../shared/css/reveal-theme.css">
+    <link rel="stylesheet" href="../shared/css/common.css">
+    <link rel="stylesheet" href="css/linear-custom.css">
+    <link rel="stylesheet" href="css/classification-custom.css">
+    <link rel="stylesheet" href="css/mlp-custom.css">
+    <link rel="stylesheet" href="css/towards-mlp-custom.css">
+    <link rel="stylesheet" href="../shared/css/quiz.css">
+
+    <!-- Code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.css">
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- Title Slide -->
+            <section class="title-slide">
+                <img src="../shared/images/uoi_logo_blue.png" alt="University of Iceland Logo" class="ui-logo">
+                <h1 class="truncate-title">Towards the Multilayer Perceptron</h1>
+                <p>A Quick Cover of the Basics</p>
+                <p>Chapters 3, 4 &amp; 5 — Based on "Dive into Deep Learning" by Zhang et al.</p>
+                <p class="mt-lg">
+                    <small>Instructor: Guðmundur Einarsson</small><br>
+                    <small>University of Iceland</small>
+                </p>
+                <p class="mt-lg"><small><em>Based on slides from Hafsteinn Einarsson</em></small></p>
+            </section>
+
+            <!-- Learning Objectives -->
+            <section>
+                <h2 class="truncate-title">Learning Objectives</h2>
+                <ul style="font-size: 0.9em;">
+                    <li class="fragment">Warm up with Quiz 2's written question — a live preview of backpropagation</li>
+                    <li class="fragment">Build the linear model and softmax regression, and see why linear models are stuck with straight-line boundaries</li>
+                    <li class="fragment">Fix it with the Multilayer Perceptron: hidden layers, activations, forward/backward propagation</li>
+                    <li class="fragment">Fight overfitting: weight decay, dropout, early stopping</li>
+                </ul>
+                <div class="fragment emphasis-box mt-md" style="font-size: 0.9em;">
+                    <p>Three chapters of "Dive into Deep Learning" (Ch. 3, 4 &amp; 5) in one session — dense on purpose, meant to be revisited in your own reading afterward.</p>
+                </div>
+            </section>
+
+<!-- ================================================================
+     PART 0: Quiz 2 Warm-Up (written question review)
+     ================================================================ -->
+<section>
+    <section>
+        <h2 class="truncate-title">Warm-Up: Quiz 2, the Written Question</h2>
+        <p style="font-size:0.75em">This was the written question on your last quiz, worth 40 of 80 points. By the end of today you'll be able to derive every step of it from scratch.</p>
+        <div class="fragment mt-sm">
+            <p style="font-size:0.85em"><strong>A tiny two-layer computation</strong> (a miniature "neural network" built entirely from scalars):</p>
+            <div class="math-block" style="font-size:0.85em">
+                $$z_1 = w_1 x + b_1 \qquad a_1 = z_1^2 \qquad z_2 = w_2 a_1 + b_2 \qquad L = (z_2-y)^2$$
+            </div>
+            <p class="small">Layer 1 (linear) &rarr; activation (squaring) &rarr; layer 2 (linear/output) &rarr; squared-error loss</p>
+        </div>
+        <div class="fragment mt-sm emphasis-box">
+            <p style="font-size:0.8em">Given $w_1=1,\ b_1=0,\ x=2,\ w_2=1,\ b_2=0,\ y=5$: compute the forward pass, derive the gradients via the chain rule, and take one gradient-descent step.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Solution, Part 1: The Forward Pass</h2>
+        <p style="font-size:0.9em">Plug in the given numbers and compute left to right, caching every intermediate value:</p>
+        <div class="two-column mt-md">
+            <div class="column">
+                <p>$$z_1 = w_1 x + b_1 = 1\times 2 + 0 = \color{#10099F}{2}$$</p>
+                <p>$$a_1 = z_1^2 = 2^2 = \color{#2DD2C0}{4}$$</p>
+            </div>
+            <div class="column">
+                <p>$$z_2 = w_2 a_1 + b_2 = 1\times 4 + 0 = \color{#FC8484}{4}$$</p>
+                <p>$$L = (z_2-y)^2 = (4-5)^2 = \color{#FFA05F}{1}$$</p>
+            </div>
+        </div>
+        <div class="fragment emphasis-box mt-md">
+            <p style="font-size:0.8em">This is exactly what a real network's forward pass does: apply each layer in order, and <strong>cache</strong> $z_1, a_1, z_2$ — we'll reuse them going backward.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Solution, Parts 2 &amp; 3: Backward via the Chain Rule</h2>
+        <p style="font-size:0.8em">Starting from the loss, work backward — each step reuses the one before it:</p>
+        <div class="two-column mt-sm" style="font-size:0.75em">
+            <div class="column">
+                <p>$$\frac{\partial L}{\partial z_2} = 2(z_2-y) = 2(4-5) = \color{#FC8484}{-2}$$</p>
+                <p>$$\frac{\partial L}{\partial a_1} = \frac{\partial L}{\partial z_2}\cdot w_2 = -2\times 1 = \color{#2DD2C0}{-2}$$</p>
+                <p>$$\frac{\partial L}{\partial z_1} = \frac{\partial L}{\partial a_1}\cdot 2z_1 = -2\times 4 = \color{#10099F}{-8}$$</p>
+            </div>
+            <div class="column">
+                <p>$$\frac{\partial L}{\partial w_2} = \frac{\partial L}{\partial z_2}\cdot a_1 = -2\times 4 = \mathbf{-8}$$</p>
+                <p>$$\frac{\partial L}{\partial w_1} = \frac{\partial L}{\partial z_1}\cdot x = -8\times 2 = \mathbf{-16}$$</p>
+            </div>
+        </div>
+        <div class="fragment emphasis-box mt-sm" style="font-size:0.75em">
+            <p>Every gradient is a product of a "carried" upstream gradient and one local derivative — that's the chain rule, applied mechanically, one layer at a time.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Solution, Parts 4 &amp; 5: Update &amp; the Big Picture</h2>
+        <div class="fragment">
+            <p style="font-size:0.85em"><strong>One gradient-descent step</strong> ($\alpha=0.01$):</p>
+            <p>$$w_1 \leftarrow 1 - 0.01\times(-16) = \mathbf{1.16} \qquad w_2 \leftarrow 1 - 0.01\times(-8) = \mathbf{1.08}$$</p>
+            <p class="small">Both weights increase — the output (4) was below the target (5), so nudging positive weights up helps.</p>
+        </div>
+        <div class="fragment mt-sm emphasis-box">
+            <p style="font-size:0.75em"><strong>This is backpropagation:</strong> a forward pass that caches intermediate values, followed by a backward pass that reuses them, via the chain rule, to get every parameter's gradient efficiently — no separate calculation from scratch for each one.</p>
+        </div>
+        <div class="fragment mt-xs" style="font-size:0.75em">
+            <p>Everything in today's lecture builds toward being able to do this for a real network, of any depth. Let's start from the beginning.</p>
+        </div>
+    </section>
+</section>
+
+<!-- ================================================================
+     PART 1: From Data to a Linear Model (Chapter 3 — Linear Neural
+     Networks for Regression)
+     ================================================================ -->
+
+<!-- Opening slide -->
+<section>
+    <h2 class="truncate-title">Part 1: From Data to a Linear Model</h2>
+    <p>Chapter 3 — Linear Neural Networks for Regression</p>
+    <div class="fragment mt-lg">
+        <p>We start with linear models because they let us master the <strong>full training recipe</strong> — parametrization, loss, and gradient-based optimization — without the complexity of deep networks getting in the way.</p>
+    </div>
+    <div class="fragment emphasis-box mt-lg">
+        <p>Everything we learn here — the loss, the optimizer, the update rule — carries over unchanged to the deepest networks we'll build later.</p>
+    </div>
+</section>
+
+<!-- ============================ BEAT A: THE LINEAR MODEL ============================ -->
+<section>
+    <section data-sources='[{"text": "Dive into Deep Learning - Section 3.1.1", "url": "https://d2l.ai/chapter_linear-regression/linear-regression.html#basics"}]'>
+        <h2 class="truncate-title">The Regression Problem</h2>
+        <p>Predicting a numerical value from input features — e.g. predicting house <strong>price</strong> from <strong>area</strong> and <strong>age</strong>.</p>
+        <div class="fragment mt-lg">
+            <p><strong>Linear model:</strong> assume the target is a weighted sum of features plus a bias:</p>
+            $$\hat{y} = \mathbf{w}^\top \mathbf{x} + b \qquad \hat{\mathbf{y}} = \mathbf{X}\mathbf{w} + b$$
+        </div>
+        <div class="fragment two-column mt-md" style="font-size: 0.8em;">
+            <div class="column">
+                <ul>
+                    <li><strong>Weights $\mathbf{w}$:</strong> influence of each feature</li>
+                    <li><strong>Bias $b$:</strong> baseline value when $\mathbf{x}=\mathbf{0}$</li>
+                </ul>
+            </div>
+            <div class="column">
+                <ul>
+                    <li><strong>Label $y$:</strong> the target value</li>
+                    <li>$X \in \mathbb{R}^{n\times d}$: design matrix, one row per example</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Interactive Linear Regression Demo</h2>
+        <div id="linear-regression-demo" class="demo-container">
+            <svg id="regression-svg"></svg>
+            <div class="demo-controls mt-md">
+                <button id="add-points">Add Random Points</button>
+                <button id="clear-points">Clear</button>
+                <button id="fit-line">Fit Line</button>
+                <label class="ml-md">
+                    Show residuals: <input type="checkbox" id="show-residuals">
+                </label>
+            </div>
+            <div id="equation-display" class="mt-md"></div>
+        </div>
+    </section>
+
+    <section data-sources='[{"text": "Dive into Deep Learning - Section 3.1.1.2", "url": "https://d2l.ai/chapter_linear-regression/linear-regression.html#loss-function"}]'>
+        <h2 class="truncate-title">Measuring Fit: Squared Error Loss</h2>
+        <p style="font-size:0.9em">A <strong>loss function</strong> quantifies prediction error — smaller is better, and a perfect prediction gives loss 0.</p>
+        <div class="fragment mt-md two-column">
+            <div class="column">
+                <p><strong>For a single example:</strong></p>
+                <p>$$l^{(i)}(\mathbf{w}, b) = \frac{1}{2}(\hat{y}^{(i)} - y^{(i)})^2$$</p>
+            </div>
+            <div class="column">
+                <p><strong>Averaged over the dataset:</strong></p>
+                <p>$$L(\mathbf{w}, b) = \frac{1}{n}\sum_{i=1}^n l^{(i)}(\mathbf{w}, b)$$</p>
+            </div>
+        </div>
+        <div class="fragment emphasis-box mt-xs" style="font-size: 0.75em;">
+            <p>Squaring makes the loss differentiable and convex (one global minimum), and penalizes large errors far more than small ones — but is sensitive to outliers.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "In the model ŷ = w₁x₁ + w₂x₂ + b, what does the bias term b represent?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "The error in our prediction",
+                    "correct": false,
+                    "explanation": "The bias is not the error; it is a learnable parameter that shifts the prediction."
+                },
+                {
+                    "text": "The average of all features",
+                    "correct": false,
+                    "explanation": "The bias is independent of feature values."
+                },
+                {
+                    "text": "The predicted value when all features are zero",
+                    "correct": true,
+                    "explanation": "Correct! The bias determines the baseline prediction when x = 0."
+                },
+                {
+                    "text": "The learning rate",
+                    "correct": false,
+                    "explanation": "The learning rate is a hyperparameter for optimization, not part of the model."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT B: OPTIMIZATION ============================ -->
+<section>
+    <section data-sources='[{"text": "Dive into Deep Learning - Section 3.1.1.3", "url": "https://d2l.ai/chapter_linear-regression/linear-regression.html#analytic-solution"}]'>
+        <h2 class="truncate-title">Two Ways to Minimize the Loss</h2>
+        <div class="two-column">
+            <div class="column fragment">
+                <h4>Analytic (Normal Equation)</h4>
+                <p style="font-size: 0.7em;">$$\mathbf{w}^* = (X^\top X)^{-1} X^\top \mathbf{y}$$</p>
+                <ul style="font-size: 0.75em;">
+                    <li>Exact, closed-form solution</li>
+                    <li>Costs $O(d^3)$; needs $X^\top X$ invertible</li>
+                    <li>Only works for linear regression</li>
+                </ul>
+            </div>
+            <div class="column fragment">
+                <h4>Gradient Descent</h4>
+                <p style="font-size: 0.7em;">$$(\mathbf{w}, b) \leftarrow (\mathbf{w}, b) - \eta \nabla_{(\mathbf{w},b)} L$$</p>
+                <ul style="font-size: 0.75em;">
+                    <li>Iterative, approximate solution</li>
+                    <li>Works for any differentiable loss</li>
+                    <li>The one recipe that scales to deep learning</li>
+                </ul>
+            </div>
+        </div>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.8em;">
+            <p>$\eta$ is the <span class="tooltip">learning rate<span class="tooltiptext">A hyperparameter that controls the step size. Too small: slow convergence. Too large: may overshoot the minimum.</span></span>. We'll use gradient descent from here on — it's the one recipe that scales all the way to deep networks.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Minibatch SGD</h2>
+        <p style="font-size: 0.85em;">In practice we average the gradient over a small <strong>minibatch</strong> $\mathcal{B}$ rather than one example or the whole dataset:</p>
+        <div class="three-column mt-md" style="font-size: 0.8em;">
+            <div class="column fragment"><h4>Batch GD</h4><p>All data &middot; stable &middot; slow per step</p></div>
+            <div class="column fragment"><h4>SGD</h4><p>1 example &middot; noisy &middot; fast per step</p></div>
+            <div class="column fragment"><h4>Minibatch &check;</h4><p>32&ndash;256 examples &middot; best balance &middot; GPU-friendly</p></div>
+        </div>
+        <div class="fragment mt-lg">
+            $$\mathbf{w} \leftarrow \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)}\underbrace{(\mathbf{w}^\top\mathbf{x}^{(i)} + b - y^{(i)})}_{\text{error } e^{(i)}} \qquad b \leftarrow b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} e^{(i)}$$
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Gradient Descent Animation</h2>
+        <div id="gradient-descent-demo" class="demo-container gradient-descent-layout">
+            <div class="viz-row">
+                <div id="loss-landscape" class="viz-panel"></div>
+                <div id="loss-history" class="viz-panel"></div>
+            </div>
+            <div class="controls-bar">
+                <label>LR:
+                    <input type="range" id="learning-rate" min="0.001" max="0.5" step="0.001" value="0.1">
+                    <span id="lr-value">0.1</span>
+                </label>
+                <label>Batch:
+                    <select id="batch-size">
+                        <option value="1">1</option>
+                        <option value="32" selected>32</option>
+                        <option value="128">128</option>
+                        <option value="full">Full</option>
+                    </select>
+                </label>
+                <button id="start-gd">Start</button>
+                <button id="reset-gd">Reset</button>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "What happens if the learning rate is too large in gradient descent?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "Convergence becomes slower",
+                    "correct": false,
+                    "explanation": "A large learning rate does not slow convergence; it can cause instability."
+                },
+                {
+                    "text": "The algorithm may overshoot the minimum and diverge",
+                    "correct": true,
+                    "explanation": "Correct! Large steps can jump over the minimum, causing the loss to increase or oscillate."
+                },
+                {
+                    "text": "The gradient becomes zero",
+                    "correct": false,
+                    "explanation": "The learning rate does not affect gradient computation, only how we use the gradient."
+                },
+                {
+                    "text": "Memory usage increases",
+                    "correct": false,
+                    "explanation": "Learning rate does not affect memory consumption."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ======================= BEAT C: PROBABILISTIC VIEW ======================= -->
+<section>
+    <section data-sources='[{"text": "Dive into Deep Learning - Section 3.1.3", "url": "https://d2l.ai/chapter_linear-regression/linear-regression.html#the-normal-distribution-and-squared-loss"}]'>
+        <h2 class="truncate-title">Why Squared Loss? A Probabilistic View</h2>
+        <p style="font-size: 0.85em;">Assume observations have Gaussian noise: $y = \mathbf{w}^\top\mathbf{x} + b + \epsilon,\ \epsilon \sim \mathcal{N}(0, \sigma^2)$</p>
+        <div class="fragment mt-md">
+            <p style="font-size: 0.8em;"><strong>Maximum likelihood estimation</strong> picks parameters that make the observed data most probable. Taking the negative log-likelihood of $n$ i.i.d. Gaussian observations and dropping the terms that don't depend on $\mathbf{w},b$:</p>
+        </div>
+        <div class="fragment mt-md emphasis-box">
+            $$\operatorname*{argmin}_{\mathbf{w},b} \left[-\log P(\mathbf{y}\mid\mathbf{X})\right] = \operatorname*{argmin}_{\mathbf{w},b} \sum_{i=1}^n(y^{(i)} - \mathbf{w}^\top\mathbf{x}^{(i)} - b)^2$$
+            <p style="font-size: 0.8em;">Minimizing squared loss <strong>is</strong> maximum likelihood estimation under Gaussian noise — not arbitrary, but principled.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">The Normal Distribution</h2>
+        <div id="normal-distribution-viz" class="demo-container"></div>
+        <div class="demo-controls mt-md">
+            <label>Mean (&mu;):
+                <input type="range" id="normal-mean" min="-3" max="3" step="0.1" value="0">
+                <span id="mean-value">0</span>
+            </label>
+            <label class="ml-md">Std Dev (&sigma;):
+                <input type="range" id="normal-std" min="0.5" max="3" step="0.1" value="1">
+                <span id="std-value">1</span>
+            </label>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "Why does assuming Gaussian noise lead to squared loss?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "Because Gaussian distribution has mean and variance",
+                    "correct": false,
+                    "explanation": "Having mean and variance does not directly lead to squared loss."
+                },
+                {
+                    "text": "Because the negative log of the Gaussian PDF contains a squared term",
+                    "correct": true,
+                    "explanation": "Correct! The Gaussian PDF has exp(-(x-μ)²/2σ²), and taking the negative log gives us the squared error term."
+                },
+                {
+                    "text": "Because noise is always Gaussian in real data",
+                    "correct": false,
+                    "explanation": "Noise is not always Gaussian; this is an assumption we make."
+                },
+                {
+                    "text": "Because squared loss is easier to compute",
+                    "correct": false,
+                    "explanation": "While squared loss is computationally convenient, this is not why it emerges from the Gaussian assumption."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ==================== BEAT D: NEURAL NETWORK PERSPECTIVE ==================== -->
+<section>
+    <section data-sources='[{"text": "Dive into Deep Learning - Section 3.1.4", "url": "https://d2l.ai/chapter_linear-regression/linear-regression.html#linear-regression-as-a-neural-network"}]'>
+        <h2 class="truncate-title">Linear Regression as a Neural Network</h2>
+        <p style="font-size:0.85em">The simplest possible network architecture — zero hidden layers:</p>
+        <div id="linear-network-viz" class="demo-container mt-sm" style="min-height: 300px;"></div>
+        <div class="fragment emphasis-box mt-sm" style="font-size: 0.75em;">
+            <p>Input layer (features) &rarr; weighted connections &rarr; single output neuron $\hat y$. No hidden layers = linear model — the trivial case we'll build on.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "What makes linear regression a (trivial) neural network, and what is missing to make it more powerful?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "It has input neurons connected directly to an output neuron with weights, but no hidden layers or nonlinearity",
+                    "correct": true,
+                    "explanation": "Correct! Linear regression is a single-layer network with no hidden layers and no nonlinear activation — adding both is exactly what turns it into a Multilayer Perceptron."
+                },
+                {
+                    "text": "It uses gradient descent for optimization",
+                    "correct": false,
+                    "explanation": "Many non-neural methods also use gradient descent — this isn&#39;t what defines a neural network."
+                },
+                {
+                    "text": "It processes data in batches",
+                    "correct": false,
+                    "explanation": "Batch processing is an optimization technique, not what defines a neural network."
+                },
+                {
+                    "text": "It minimizes a loss function",
+                    "correct": false,
+                    "explanation": "Many machine learning methods minimize loss functions, not just neural networks."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ==================== BEAT E: GENERALIZATION & REGULARIZATION ==================== -->
+<section>
+    <section data-sources='[{"text": "Dive into Deep Learning - Chapter 3.6", "url": "https://d2l.ai/chapter_linear-regression/generalization.html"}]'>
+        <h2 class="truncate-title">Generalization: Training vs. Test Error</h2>
+        <p style="font-size: 0.85em;">How do we know a model learned patterns rather than memorized data? We split into a <strong>training</strong> set (fit the model) and a held-out <strong>test</strong> set (estimate true performance) — assumed <span class="tooltip">i.i.d.<span class="tooltiptext">Independent and Identically Distributed: both drawn from the same underlying distribution P(X,Y).</span></span></p>
+        <div class="fragment mt-md" style="text-align: center;">
+            <img src="images/capacity-vs-error.jpg" alt="Model complexity vs error" style="max-width: 42%;">
+        </div>
+        <div class="fragment two-column mt-sm" style="font-size: 0.75em;">
+            <div class="column"><h4>Underfitting</h4><p>High train &amp; test error, small gap &rarr; increase model capacity</p></div>
+            <div class="column"><h4>Overfitting</h4><p>Low train, high test error, large gap &rarr; regularize or get more data</p></div>
+        </div>
+    </section>
+
+    <section data-sources='[{"text": "Dive into Deep Learning - Section 3.7", "url": "https://d2l.ai/chapter_linear-regression/weight-decay.html"}]'>
+        <h2 class="truncate-title">Weight Decay: Penalizing Large Weights</h2>
+        <p style="font-size: 0.85em;">Among all functions, $f=0$ is simplest — we measure complexity by $\|\mathbf{w}\|$ and add an $\ell_2$ penalty to the loss:</p>
+        <div class="fragment mt-md">
+            $$L(\mathbf{w}, b) + \frac{\lambda}{2} \|\mathbf{w}\|^2 \quad\Longrightarrow\quad \mathbf{w} \leftarrow (1-\eta\lambda)\, \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} e^{(i)}$$
+        </div>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.8em;">
+            <p>The $(1-\eta\lambda)$ factor <strong>decays</strong> the weights toward zero at every step — hence "weight decay". Larger $\lambda$ &rarr; stronger penalty &rarr; simpler function.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Weight Decay in Action</h2>
+        <div class="two-column">
+            <div class="column">
+                <h4>Without Regularization ($\lambda=0$)</h4>
+                <img src="../shared/images/weight-decay-no-reg.jpg" alt="Training without regularization" style="max-width: 100%; height: auto;">
+                <p class="small">Training loss drops, validation loss stays flat &mdash; classic overfitting.</p>
+            </div>
+            <div class="column">
+                <h4>With Weight Decay ($\lambda=3$)</h4>
+                <img src="../shared/images/weight-decay-with-reg.jpg" alt="Training with weight decay" style="max-width: 100%; height: auto;">
+                <p class="small">Training loss is a bit higher, but validation loss now drops too.</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "Why does training loss increase but validation loss decrease when weight decay is applied to an overfit model?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "The model is broken and not learning properly",
+                    "correct": false,
+                    "explanation": "This is expected, healthy behavior for regularization — not a sign of a broken model."
+                },
+                {
+                    "text": "The penalty prevents the model from fitting training noise, trading a little training fit for better generalization",
+                    "correct": true,
+                    "explanation": "Correct! By shrinking the weights, the model can no longer perfectly memorize training-set noise, so training loss rises slightly — but it generalizes better, so validation loss falls."
+                },
+                {
+                    "text": "The learning rate was decreased",
+                    "correct": false,
+                    "explanation": "Weight decay is a separate mechanism from the learning rate; λ controls the regularization strength, not the step size."
+                },
+                {
+                    "text": "The validation set was changed",
+                    "correct": false,
+                    "explanation": "The validation set is unchanged — the improvement comes from the regularized objective, not different data."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================================================
+     PART 2: Linear Neural Networks for Classification (Chapter 4)
+     ============================================================ -->
+
+<!-- Beat F: Motivation -->
+<section>
+    <section data-sources='[{"text": "Dive into Deep Learning - Chapter 4", "url": "https://d2l.ai/chapter_linear-classification/index.html"}]'>
+        <h2 class="truncate-title">From Regression to Classification</h2>
+        <div class="two-column">
+            <div class="column">
+                <h4>Regression: "How much?"</h4>
+                <ul>
+                    <li class="fragment">Continuous output, e.g. price: $234,567</li>
+                    <li class="fragment">Minimize squared error</li>
+                </ul>
+            </div>
+            <div class="column">
+                <h4>Classification: "Which category?"</h4>
+                <ul>
+                    <li class="fragment">Discrete categories, e.g. cat / dog / bird</li>
+                    <li class="fragment">Cross-entropy loss (today's topic)</li>
+                </ul>
+            </div>
+        </div>
+        <div class="fragment emphasis-box mt-lg">
+            <p>From predicting quantities to assigning categories — often with a probability attached.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Hard vs. Soft Assignments</h2>
+        <div class="two-column">
+            <div class="column">
+                <h4>Hard Assignment</h4>
+                <ul>
+                    <li class="fragment">"This IS spam"</li>
+                    <li class="fragment">No uncertainty expressed</li>
+                </ul>
+            </div>
+            <div class="column">
+                <h4>Soft Assignment</h4>
+                <ul>
+                    <li class="fragment">"85% likely spam"</li>
+                    <li class="fragment">Captures confidence/uncertainty</li>
+                </ul>
+            </div>
+        </div>
+        <div class="fragment emphasis-box mt-lg" style="font-size: 0.85em;">
+            <p>We usually build models that output soft probabilities, then threshold for a hard decision — this gives adjustable decision thresholds and a confidence measure for free.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">One-Hot Encoding</h2>
+        <p style="font-size: 0.85em;">Integer labels (cat=1, dog=2, chicken=3) falsely imply an ordering. One-hot vectors avoid it:</p>
+        <div class="fragment">
+            <table style="margin: 15px auto; font-size: 0.85em;">
+                <thead>
+                    <tr><th>Category</th><th>One-Hot Vector</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>&#128049; Cat</td><td style="font-family: monospace;">(1, 0, 0)</td></tr>
+                    <tr><td>&#128020; Chicken</td><td style="font-family: monospace;">(0, 1, 0)</td></tr>
+                    <tr><td>&#128021; Dog</td><td style="font-family: monospace;">(0, 0, 1)</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.8em;">
+            <p>Vectors are orthogonal — no implicit similarity between categories — with exactly one component equal to 1, and dimension equal to the number of categories.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "Why might we prefer soft assignments (probabilities) over hard assignments in classification?",
+            "type": "multiple",
+            "options": [
+                {
+                    "text": "They provide confidence information",
+                    "correct": true,
+                    "explanation": "Correct! Soft assignments tell us how confident the model is about its prediction."
+                },
+                {
+                    "text": "They allow for adjustable decision thresholds",
+                    "correct": true,
+                    "explanation": "Correct! We can adjust the threshold based on the cost of false positives vs false negatives."
+                },
+                {
+                    "text": "They are always more accurate",
+                    "correct": false,
+                    "explanation": "Not necessarily. Accuracy depends on the problem and how we use the probabilities, not on soft vs hard assignment alone."
+                },
+                {
+                    "text": "They capture model uncertainty",
+                    "correct": true,
+                    "explanation": "Correct! A 51% vs 99% prediction tells us very different things about model confidence, even if both are classified the same way."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- Beat G: Softmax Model -->
+<section>
+    <section>
+        <h2 class="truncate-title">A Linear Model for Classification</h2>
+        <p style="font-size: 0.8em;">To estimate a probability for every class, we need one <strong>output</strong> (affine function) per class. For a toy example with 4 features and 3 classes (cat/chicken/dog): $\mathbf{o} = \mathbf{W}\mathbf{x} + \mathbf{b}$, with $\mathbf{W}\in\mathbb{R}^{3\times4}$.</p>
+        <div class="fragment mt-md emphasis-box">
+            <p style="font-size: 0.85em;">Every output depends on every input — a <span class="tooltip">fully connected layer<span class="tooltiptext">Every input is connected to every output with its own weight.</span></span>. Softmax regression = single-layer neural network with one output per class, exactly like linear regression but with $q$ outputs instead of one.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">The Softmax Operation</h2>
+        <p style="font-size: 0.7em;">Raw outputs (logits) $o_j$ can be negative or huge — not valid probabilities. Softmax fixes that:</p>
+        <div class="interactive-demo" id="softmax-demo">
+            <div id="softmax-visualization"></div>
+            <div class="controls-fixed" style="margin-top: 4px; padding: 6px;">
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9em;">
+                    Temperature T:
+                    <input type="range" id="temperature" min="0.1" max="5" step="0.1" value="1" style="width: 150px; cursor: pointer;">
+                    <span id="temp-value" style="font-family: monospace; min-width: 40px; color: #10099F; font-weight: bold;">1.0</span>
+                </label>
+            </div>
+        </div>
+        <div class="math-block mt-sm" style="font-size: 0.65em;">
+            $$\hat{y}_j = \frac{\exp(o_j/T)}{\sum_{k=1}^q \exp(o_k/T)}$$
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "Why do we use the exponential function in softmax rather than, say, normalizing the raw logits directly?",
+            "type": "multiple",
+            "options": [
+                {
+                    "text": "It ensures all outputs are positive",
+                    "correct": true,
+                    "explanation": "Correct! exp(x) is always positive for any real x, even negative logits."
+                },
+                {
+                    "text": "It preserves the relative ordering of inputs",
+                    "correct": true,
+                    "explanation": "Correct! exp() is monotonic, so the largest logit still gets the largest probability (argmax is preserved)."
+                },
+                {
+                    "text": "It makes computation faster than a linear normalization",
+                    "correct": false,
+                    "explanation": "The exponential is actually more expensive to compute than plain division; speed is not the motivation."
+                },
+                {
+                    "text": "Combined with cross-entropy loss, it gives simple gradients",
+                    "correct": true,
+                    "explanation": "Correct! As we&#39;ll see, softmax + cross-entropy together give the remarkably clean gradient ŷ − y."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- Beat H: Cross-Entropy from MLE -->
+<section>
+    <section>
+        <h2 class="truncate-title">From Maximum Likelihood to Cross-Entropy</h2>
+        <p style="font-size: 0.75em;">MLE maximizes $P(\mathbf{Y}\mid\mathbf{X}) = \prod_{i=1}^n P(\mathbf{y}^{(i)}\mid\mathbf{x}^{(i)})$, i.e. minimizes the negative log-likelihood. For one-hot labels, $P(\mathbf{y}\mid\mathbf{x}) = \prod_{j=1}^q \hat{y}_j^{y_j}$, so:</p>
+        <div class="fragment mt-sm emphasis-box">
+            $$-\log P(\mathbf{y}\mid\mathbf{x}) = -\sum_{j=1}^q y_j \log \hat{y}_j = -\log \hat{y}_c$$
+            <p style="font-size: 0.7em;">($c$ = true class; every other term vanishes since $y_j=0$)</p>
+        </div>
+        <div class="fragment mt-sm" style="font-size: 0.75em;">
+            <p>This is the <strong>cross-entropy</strong> between the true (one-hot) label distribution and our prediction $\hat{\mathbf{y}}$ — the "surprise" of the truth under our model. Minimizing negative log-likelihood <em>is</em> minimizing cross-entropy.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Interactive Entropy Calculator</h2>
+        <div class="interactive-demo" id="entropy-demo">
+            <div id="entropy-visualization"></div>
+            <div class="controls-fixed" style="margin-top: 10px;">
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85em;">
+                    Distribution type:
+                    <select id="dist-type" style="padding: 4px 8px; border: 2px solid #EEEEEE; border-radius: 4px; cursor: pointer;">
+                        <option value="uniform">Uniform</option>
+                        <option value="peaked">Peaked</option>
+                        <option value="binary">Binary</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </label>
+                <span id="entropy-value" style="font-size: 0.9em; color: #10099F; font-weight: bold;">H = 2.30 nats</span>
+            </div>
+        </div>
+        <div class="fragment emphasis-box mt-lg" style="font-size: 0.8em;">
+            <p>Maximum entropy = uniform distribution (max uncertainty). Cross-entropy loss is high whenever the model is uncertain — or confidently wrong.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Cross-Entropy Loss &amp; Its Gradient</h2>
+        <div class="math-block" style="font-size: 0.8em;">
+            $$L(\mathbf{y}, \hat{\mathbf{y}}) = -\sum_{j=1}^q y_j \log \hat{y}_j = -\log \hat{y}_c$$
+        </div>
+        <div class="fragment mt-md two-column" style="font-size: 0.75em;">
+            <div class="column">
+                <h4>Sanity checks</h4>
+                <ul>
+                    <li>Perfect prediction: $L=0$</li>
+                    <li>Random guess, 3 classes: $L\approx1.10$</li>
+                    <li>Confidently wrong: $L\to\infty$</li>
+                </ul>
+            </div>
+            <div class="column">
+                <h4>Gradient (remarkably clean)</h4>
+                <p>$$\frac{\partial L}{\partial o_j} = \hat{y}_j - y_j$$</p>
+                <p>Predicted minus actual — same form as linear regression!</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "What is the gradient of cross-entropy loss with respect to logit o_j when using softmax?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "∂L/∂o_j = y_j",
+                    "correct": false,
+                    "explanation": "This is just the label, missing the prediction component entirely."
+                },
+                {
+                    "text": "∂L/∂o_j = ŷ_j − y_j",
+                    "correct": true,
+                    "explanation": "Correct! The gradient is simply the difference between the predicted probability and the true (one-hot) label — a very clean expression to backpropagate."
+                },
+                {
+                    "text": "∂L/∂o_j = −log(ŷ_j)",
+                    "correct": false,
+                    "explanation": "This is the loss value itself (when j is the true class), not its gradient with respect to the logit."
+                },
+                {
+                    "text": "∂L/∂o_j = exp(o_j)",
+                    "correct": false,
+                    "explanation": "This is just the exponential of the logit, an intermediate quantity inside softmax, not the gradient of the loss."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- Beat I: Payoff demo (straight-line boundary) -->
+<section>
+    <h2 class="truncate-title">Interactive Classification Demo</h2>
+    <p style="font-size: 0.65em;">A 2D toy version of softmax regression (real data like Fashion-MNIST: 784 pixels, 10 classes). Add points, train, and watch the boundary form:</p>
+    <div class="interactive-demo" id="classification-boundary-demo">
+        <div id="boundary-visualization"></div>
+        <div class="controls-fixed" style="margin-top: 6px; padding: 6px;">
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 0.75em; position: relative; z-index: 103;">
+                Add Class:
+                <select id="class-selector" style="padding: 4px 8px; border: 2px solid #EEEEEE; border-radius: 4px; font-size: 0.75em; cursor: pointer; position: relative; z-index: 103;">
+                    <option value="0">Class 1 (Green)</option>
+                    <option value="1">Class 2 (Blue)</option>
+                </select>
+            </label>
+            <button id="cb-add-points" style="background: #10099F; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.75em; position: relative; z-index: 103;">Add Random Points</button>
+            <button id="train-model" style="background: #10099F; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.75em; position: relative; z-index: 103;">Train Model</button>
+            <button id="reset-demo" style="background: #10099F; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.75em; position: relative; z-index: 103;">Reset</button>
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 0.75em; position: relative; z-index: 103;">
+                Learning Rate:
+                <input type="range" id="cb-lr-slider" min="0.01" max="1" step="0.01" value="0.1" style="width: 100px; cursor: pointer;">
+                <span id="cb-lr-value" style="font-family: monospace; min-width: 35px; color: #10099F; font-weight: bold; font-size: 0.9em;">0.1</span>
+            </label>
+        </div>
+    </div>
+    <div class="fragment emphasis-box mt-xs" style="font-size: 0.65em;">
+        <p><strong>Notice:</strong> however you arrange the points, the boundary is always a <em>straight line</em> — softmax regression is still a linear model, and cannot represent a curved boundary. That's exactly what motivates <strong>hidden layers</strong>, next.</p>
+    </div>
+</section>
+
+<!-- =========================================================
+     PART 3: Multilayer Perceptrons (Chapter 5)
+     ========================================================= -->
+
+<!-- Section: Opening — From Linear to Deep Networks -->
+<section>
+    <section data-sources='[{"text": "Dive into Deep Learning - Chapter 5", "url": "https://d2l.ai/chapter_multilayer-perceptrons/index.html"}]'>
+        <h2 class="truncate-title">From Linear to Deep Networks</h2>
+        <div class="emphasis-box">
+            <p>We just saw that softmax regression can only draw <strong>straight-line</strong> decision boundaries — no matter how we tune the weights.</p>
+        </div>
+        <div class="fragment mt-lg">
+            <p>The fix: stack more layers of neurons, with <strong>nonlinear activations</strong> between them. This is the <strong>Multilayer Perceptron (MLP)</strong> — the simplest deep network, and our destination for the rest of the lecture.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">What Makes a Network "Deep"?</h2>
+        <div class="fragment">
+            <img src="images/mlp.svg" alt="MLP Architecture" style="width: 38%; margin: 15px auto; display: block;">
+        </div>
+        <div class="fragment">
+            <ul style="font-size: 0.9em;">
+                <li>Multiple layers of neurons, each fully connected to the next</li>
+                <li><strong>Hidden layers</strong> sit between input and output</li>
+                <li>Nonlinear activation functions between layers</li>
+            </ul>
+        </div>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.75em;">
+            <p>This MLP has 4 inputs, 5 hidden units, 3 outputs = 2 computational layers.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "What distinguishes a multilayer perceptron from the linear models we studied earlier?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "MLPs have more parameters",
+                    "correct": false,
+                    "explanation": "While MLPs often have more parameters, this alone does not make them fundamentally different."
+                },
+                {
+                    "text": "MLPs use nonlinear activation functions between layers",
+                    "correct": true,
+                    "explanation": "Correct! Nonlinear activations allow MLPs to learn complex, non-linear decision boundaries and functions that linear models cannot represent, no matter how the weights are tuned."
+                },
+                {
+                    "text": "MLPs always have exactly three layers",
+                    "correct": false,
+                    "explanation": "MLPs can have any number of layers greater than two (input and output)."
+                },
+                {
+                    "text": "MLPs can only be used for classification",
+                    "correct": false,
+                    "explanation": "MLPs can be used for both classification and regression tasks, just like the linear models before them."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- Section: Hidden Layers -->
+<section>
+    <section>
+        <h2 class="truncate-title">Why Do We Need Hidden Layers?</h2>
+        <p style="font-size: 0.85em;">Linear models assume <span class="tooltip">monotonicity<span class="tooltiptext">Any increase in input always causes the same direction of change in output.</span></span> and can only carve up space with straight lines.</p>
+        <div class="fragment mt-md emphasis-box">
+            <p style="font-size: 0.85em;"><strong>Example:</strong> health risk vs. body temperature is <em>U-shaped</em> — both too high and too low are bad. No single weight can capture "risk increases in both directions." The same limitation shows up in images: whether one pixel should raise "dog" likelihood depends entirely on its neighbors, not the pixel alone.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">The Problem: Stacking Linear Layers Buys Nothing</h2>
+        <p style="font-size: 0.8em;">Add a hidden layer, without activation: $\mathbf{H}=\mathbf{X}\mathbf{W}^{(1)}+\mathbf{b}^{(1)}$, $\mathbf{O}=\mathbf{H}\mathbf{W}^{(2)}+\mathbf{b}^{(2)}$. Substituting:</p>
+        <div class="fragment mt-md">
+            $$\mathbf{O} = (\mathbf{X}\mathbf{W}^{(1)} + \mathbf{b}^{(1)})\mathbf{W}^{(2)} + \mathbf{b}^{(2)} = \mathbf{X}\underbrace{\mathbf{W}^{(1)}\mathbf{W}^{(2)}}_{\mathbf{W}} + \underbrace{\mathbf{b}^{(1)} \mathbf{W}^{(2)} + \mathbf{b}^{(2)}}_{\mathbf{b}}$$
+        </div>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.8em;">
+            <p>&#9888;&#65039; An affine function of an affine function is still affine! Depth without nonlinearity is just one big linear model in disguise — the same straight-line boundaries we were trying to escape.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">The Fix: Nonlinear Activations</h2>
+        <div class="fragment">
+            $$\mathbf{H} = \sigma(\mathbf{X} \mathbf{W}^{(1)} + \mathbf{b}^{(1)}) \qquad \mathbf{O} = \mathbf{H}\mathbf{W}^{(2)} + \mathbf{b}^{(2)}$$
+        </div>
+        <div class="fragment mt-md">
+            <p style="font-size: 0.85em;">A popular choice: <strong>ReLU</strong>, $\sigma(x) = \max(0,x)$ — simple, effective gradient flow, widely successful in practice.</p>
+        </div>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.85em;">
+            <p>Now the network can no longer collapse to a linear model — it can bend decision boundaries into curves. We can chain many such layers: early ones learn edges/colors, later ones learn shapes, textures, and objects.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "Why do hidden layers without activation functions fail to increase model expressiveness?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "They make the network too complex to train",
+                    "correct": false,
+                    "explanation": "Without activations, the network actually remains as simple as a linear model."
+                },
+                {
+                    "text": "Multiple linear transformations can be collapsed into a single linear transformation",
+                    "correct": true,
+                    "explanation": "Correct! The composition of affine functions is still affine, so the entire network reduces to a single linear map, W = W(1)W(2), with the same straight-line decision boundaries as softmax regression."
+                },
+                {
+                    "text": "They cause the gradients to vanish",
+                    "correct": false,
+                    "explanation": "Gradient vanishing is a different problem that can occur with certain activation functions."
+                },
+                {
+                    "text": "They require too many parameters",
+                    "correct": false,
+                    "explanation": "The parameter count is independent of whether we use activation functions."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- Section: Universal Approximation -->
+<section>
+    <section data-sources='[{"text": "Cybenko, 1989 - Approximation by Superpositions", "url": "https://link.springer.com/article/10.1007/BF02551274"}]'>
+        <h2 class="truncate-title">Universal Approximation Theorem</h2>
+        <div class="fragment emphasis-box" style="font-size: 0.85em;">
+            <p><strong>Cybenko, 1989:</strong> a feedforward network with a single hidden layer, given enough neurons, can approximate any continuous function on a compact subset of &#8477;&#8319; to arbitrary accuracy.</p>
+        </div>
+        <div class="fragment mt-md two-column" style="font-size: 0.75em;">
+            <div class="column">
+                <h4>What it says &#10003;</h4>
+                <ul><li>Existence of a solution</li><li>Universal expressiveness</li></ul>
+            </div>
+            <div class="column">
+                <h4>What it doesn't say &#10007;</h4>
+                <ul><li>How to find the weights</li><li>How many neurons, or how to train</li></ul>
+            </div>
+        </div>
+        <div class="fragment emphasis-box mt-sm" style="font-size: 0.7em;">
+            <p>Like a programming language: C can express any computable program, but writing the right program is the hard part. Going <strong>deep</strong> rather than wide is a far more efficient way to gain expressiveness — modern networks have 100+ layers, not millions of neurons in one.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "According to the universal approximation theorem, what is true about neural networks?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "They can solve any problem perfectly",
+                    "correct": false,
+                    "explanation": "The theorem only guarantees approximation capability, not that we can find or train such a network."
+                },
+                {
+                    "text": "A single hidden layer network can theoretically approximate any continuous function",
+                    "correct": true,
+                    "explanation": "Correct! The theorem proves existence of weights that can approximate any continuous function, though finding them is another matter."
+                },
+                {
+                    "text": "Deeper networks are always better than shallow ones",
+                    "correct": false,
+                    "explanation": "While often more efficient, deeper networks are not universally superior for all tasks."
+                },
+                {
+                    "text": "We need infinite neurons for universal approximation",
+                    "correct": false,
+                    "explanation": "The theorem states a finite (though possibly very large) number of neurons suffices."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- Section: Activation Functions -->
+<section>
+    <section>
+        <h2 class="truncate-title">Activation Functions: Adding Nonlinearity</h2>
+        <p>A good activation function is <strong>nonlinear</strong> (enables complex patterns), <strong>differentiable</strong> (enables gradient-based optimization), and cheap to compute. Let's explore the three most common choices.</p>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Activation Function Explorer</h2>
+        <div class="activation-demo" id="activation-explorer">
+            <div class="demo-controls mt-md" style="margin-bottom: 10px;">
+                <div class="fn-toggle" role="tablist">
+                    <button class="fn-btn active" data-fn="relu">ReLU</button>
+                    <button class="fn-btn" data-fn="sigmoid">Sigmoid</button>
+                    <button class="fn-btn" data-fn="tanh">Tanh</button>
+                </div>
+                <label>Input x:
+                    <input type="range" id="act-input" min="-5" max="5" step="0.1" value="0">
+                    <span id="act-value" style="font-family: monospace; font-size: 0.85em;"></span>
+                </label>
+            </div>
+            <div class="two-column">
+                <div class="column"><div id="act-plot" style="width: 100%; height: 230px;"></div></div>
+                <div class="column"><div id="act-deriv-plot" style="width: 100%; height: 230px;"></div></div>
+            </div>
+            <div id="act-properties" class="mt-md" style="font-size: 0.75em; text-align: center;"></div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Comparing Activation Functions</h2>
+        <div class="comparison-table">
+            <table style="font-size: 0.8em;">
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>ReLU</th>
+                        <th>Sigmoid</th>
+                        <th>Tanh</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="fragment">
+                        <td><strong>Range</strong></td>
+                        <td>[0, &infin;)</td>
+                        <td>(0, 1)</td>
+                        <td>(-1, 1)</td>
+                    </tr>
+                    <tr class="fragment">
+                        <td><strong>Zero-centered</strong></td>
+                        <td>No</td>
+                        <td>No</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr class="fragment">
+                        <td><strong>Gradient vanishing</strong></td>
+                        <td>No (for x&gt;0)</td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr class="fragment">
+                        <td><strong>Compute cost</strong></td>
+                        <td>Lowest</td>
+                        <td>Moderate</td>
+                        <td>Moderate</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.75em;">
+            <p>ReLU's simplicity and resistance to vanishing gradients made deep learning's resurgence possible. Newer smooth variants like <strong>GELU</strong> and <strong>Swish</strong> (used in BERT/GPT) often edge out ReLU in very deep networks, at a small extra compute cost.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "Which activation function property is most important for training very deep networks?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "Having a bounded output range",
+                    "correct": false,
+                    "explanation": "Bounded outputs, as in sigmoid and tanh, can actually cause gradient vanishing in deep networks."
+                },
+                {
+                    "text": "Being zero-centered",
+                    "correct": false,
+                    "explanation": "While helpful for optimization dynamics, this is not the most critical property for deep networks."
+                },
+                {
+                    "text": "Avoiding gradient vanishing for active neurons",
+                    "correct": true,
+                    "explanation": "Correct! When we later derive backpropagation, you&#39;ll see gradients get multiplied layer by layer. ReLU keeps that product from shrinking to zero for active neurons, which is exactly why it enabled much deeper networks than sigmoid/tanh ever could."
+                },
+                {
+                    "text": "Having continuous derivatives everywhere",
+                    "correct": false,
+                    "explanation": "ReLU is not differentiable at 0, yet it works excellently in practice."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- Section: Forward Propagation -->
+<section>
+    <section data-sources='[{"text": "Dive into Deep Learning - Backpropagation", "url": "https://d2l.ai/chapter_multilayer-perceptrons/backprop.html"}]'>
+        <h2 class="truncate-title">Forward Propagation</h2>
+        <p style="font-size: 0.85em;">A one-hidden-layer MLP, input $\mathbf{x}\in\mathbb{R}^d$ (bias omitted for simplicity):</p>
+        <div class="fragment mt-lg emphasis-box">
+            $$\mathbf{z} = \mathbf{W}^{(1)} \mathbf{x} \qquad \mathbf{h} = \phi(\mathbf{z}) \qquad \mathbf{o} = \mathbf{W}^{(2)} \mathbf{h}$$
+        </div>
+        <div class="fragment mt-md" style="font-size: 0.8em;">
+            <p>Each step is applied in order, left to right — and we <strong>cache</strong> $\mathbf{z}$ and $\mathbf{h}$ along the way, exactly like the mini example we warmed up with. (In practice we'd also add a weight-decay penalty on $\mathbf{W}^{(1)}, \mathbf{W}^{(2)}$ to the loss, as in Part 1.)</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Computational Graph</h2>
+        <p style="font-size: 0.85em;">Visualizing the dependencies: squares are variables, circles are operations, arrows show data flow.</p>
+        <div id="computational-graph-container" style="width: 100%; height: 420px; position: relative;"></div>
+    </section>
+
+    <section data-sources='[{"text": "Dive into Deep Learning - Figure 5.7.1", "url": "https://d2l.ai/chapter_multilayer-perceptrons/backprop.html#computational-graph-of-forward-propagation"}]'>
+        <h2 class="truncate-title">Interactive Forward Propagation</h2>
+        <div class="forward-prop-full-demo">
+            <div id="forward-prop-full-viz" style="width: 100%; height: 350px;"></div>
+            <div class="demo-controls mt-md" style="display: flex; align-items: center; justify-content: center; gap: 15px; padding: 10px; background: #f9f9f9; border-radius: 5px; z-index: 100; position: relative;">
+                <button id="fp-full-start" style="background: #10099F; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">Start Forward Pass</button>
+                <button id="fp-full-step" style="background: #2DD2C0; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">Step Through</button>
+                <button id="fp-full-reset" style="background: #FC8484; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">Reset</button>
+                <label style="display: flex; align-items: center; gap: 8px;">
+                    Speed:
+                    <input type="range" id="fp-full-speed" min="0.5" max="3" step="0.5" value="1" style="width: 100px;">
+                    <span id="fp-full-speed-value" style="font-family: monospace;">1x</span>
+                </label>
+            </div>
+            <div class="mt-md" style="background: #f5f5f5; padding: 10px; border-radius: 5px;">
+                <p id="fp-full-status" style="font-family: monospace; margin: 0;">Ready to start forward propagation...</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "What is the primary purpose of storing intermediate variables (like h and z) during forward propagation?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "To make the computation faster",
+                    "correct": false,
+                    "explanation": "Storing values actually uses more memory; the purpose is not speed but enabling backpropagation."
+                },
+                {
+                    "text": "To avoid recomputing them during backpropagation",
+                    "correct": true,
+                    "explanation": "Correct! We store intermediate values like h and z during the forward pass so we can reuse them to compute gradients efficiently during backpropagation, as you&#39;ll see next."
+                },
+                {
+                    "text": "To reduce the number of parameters",
+                    "correct": false,
+                    "explanation": "Storing intermediate variables does not affect the number of model parameters."
+                },
+                {
+                    "text": "To improve model accuracy",
+                    "correct": false,
+                    "explanation": "Storing intermediate values is a computational necessity, not a technique for improving accuracy."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- Section: Backpropagation (centerpiece) -->
+<section>
+    <section>
+        <h2 class="truncate-title">Backpropagation: Computing Gradients</h2>
+        <p style="font-size: 0.85em;"><strong>Backpropagation</strong> computes the gradient of the loss with respect to every parameter by traversing the network in reverse, applying the chain rule at each step.</p>
+        <div class="fragment mt-lg emphasis-box">
+            <p>Before automatic differentiation, every new architecture meant re-deriving these gradients by hand. Backprop + autodiff is what made deep learning practical.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">The Chain Rule, Step by Step</h2>
+        <p style="font-size: 0.75em;">Working backward from the loss, reusing each step's result in the next:</p>
+        <div class="fragment mt-xs">
+            <p style="font-size: 0.8em;">$$\frac{\partial L}{\partial \mathbf{h}} = {\mathbf{W}^{(2)}}^\top \frac{\partial L}{\partial \mathbf{o}} \qquad\text{(back through layer 2)}$$</p>
+        </div>
+        <div class="fragment mt-xs">
+            <p style="font-size: 0.8em;">$$\frac{\partial L}{\partial \mathbf{z}} = \frac{\partial L}{\partial \mathbf{h}} \odot \phi'(\mathbf{z}) \qquad\text{(back through the activation)}$$</p>
+        </div>
+        <div class="fragment mt-xs emphasis-box">
+            <p style="font-size: 0.8em;">$$\frac{\partial L}{\partial \mathbf{W}^{(2)}} = \frac{\partial L}{\partial \mathbf{o}}\,\mathbf{h}^\top \qquad \frac{\partial L}{\partial \mathbf{W}^{(1)}} = \frac{\partial L}{\partial \mathbf{z}}\,\mathbf{x}^\top$$</p>
+        </div>
+        <div class="fragment mt-xs" style="font-size: 0.7em;">
+            <p>Output &rarr; hidden &rarr; activation &rarr; weights. Every step reuses values already computed going forward.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Interactive Backpropagation Visualization</h2>
+        <div class="backprop-demo">
+            <div id="backprop-viz" style="width: 100%; height: 350px;"></div>
+            <div class="demo-controls mt-md" style="display: flex; align-items: center; justify-content: center; gap: 15px; padding: 10px; background: #f9f9f9; border-radius: 5px; z-index: 100; position: relative;">
+                <button id="bp-start" style="background: #10099F; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">Start Backprop</button>
+                <button id="bp-step" style="background: #2DD2C0; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">Step Through</button>
+                <button id="bp-reset" style="background: #FC8484; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">Reset</button>
+                <label style="display: flex; align-items: center; gap: 8px;">
+                    Show Math:
+                    <input type="checkbox" id="bp-show-math" checked>
+                </label>
+            </div>
+            <div class="mt-md" style="background: #f5f5f5; padding: 10px; border-radius: 5px;">
+                <p id="bp-status" style="font-family: monospace; margin: 0;">Ready to start backpropagation...</p>
+                <div id="bp-equation" style="margin-top: 10px; display: none;">
+                    <!-- Equations will be shown here during animation -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Vanishing and Exploding Gradients</h2>
+        <p style="font-size: 0.8em;">A deep network is a composition $f_L\circ\cdots\circ f_1$. The chain rule makes an early layer's gradient a <em>product</em> of many matrices — each one can shrink or amplify it.</p>
+        <div class="fragment mt-md two-column" style="font-size: 0.75em;">
+            <div class="column">
+                <h5>Sigmoid/Tanh</h5>
+                <p>Max derivative 0.25 (sigmoid). Stack $n$ layers: $0.25^n \to 0$ — deep layers stop learning.</p>
+            </div>
+            <div class="column">
+                <h5>Poor Initialization</h5>
+                <p>Weights too large &rarr; exploding. Too small &rarr; vanishing.</p>
+            </div>
+        </div>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.8em;">
+            <p>Fix: ReLU (no saturation for $x>0$) + careful initialization — coming up next.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "Why does backpropagation traverse the network in reverse order (output to input)?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "It is computationally faster this way",
+                    "correct": false,
+                    "explanation": "The reverse order is not about speed but about the mathematical requirement of the chain rule."
+                },
+                {
+                    "text": "The chain rule requires composing local gradients from the loss backward toward the parameters",
+                    "correct": true,
+                    "explanation": "Correct! The chain rule computes gradients by multiplying local gradients, which naturally flows from the loss (output) back to the parameters (input direction)."
+                },
+                {
+                    "text": "To save memory",
+                    "correct": false,
+                    "explanation": "Backpropagation actually requires storing intermediate values from the forward pass, using more memory, not less."
+                },
+                {
+                    "text": "To avoid numerical instability",
+                    "correct": false,
+                    "explanation": "While numerical stability is an important concern (see vanishing/exploding gradients), it is not the reason for the reverse traversal itself."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- Section: Initialization -->
+<section>
+    <section>
+        <h2 class="truncate-title">Breaking the Symmetry</h2>
+        <p>If all weights start identical (e.g. all zero), every hidden unit computes the same function and gets the same gradient forever — the network acts like a single unit.</p>
+        <div class="fragment mt-md emphasis-box">
+            <p style="font-size: 0.85em;"><strong>Fix:</strong> random initialization breaks the symmetry so each unit learns something different — but the <em>scale</em> of the randomness matters too.</p>
+        </div>
+    </section>
+
+    <section data-sources='[{"text": "Understanding the difficulty of training deep feedforward neural networks - Glorot & Bengio", "url": "http://proceedings.mlr.press/v9/glorot10a.html"}]'>
+        <h2 class="truncate-title">Xavier/Glorot Initialization</h2>
+        <p style="font-size: 0.65em;">Goal: keep activation and gradient variance stable across layers, both forward ($n_{\text{in}}\sigma^2=1$) and backward ($n_{\text{out}}\sigma^2=1$). Xavier compromises between both:</p>
+        <div class="fragment mt-xs emphasis-box" style="padding: 0.6em;">
+            $$\sigma = \sqrt{\frac{2}{n_{\text{in}} + n_{\text{out}}}}, \qquad W \sim \mathcal{N}(0, \sigma^2)$$
+        </div>
+        <div class="fragment mt-xs" style="font-size: 0.65em;">
+            <table style="margin: 0 auto;">
+                <thead><tr><th>Variant</th><th>Formula</th><th>Best for</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>He/Kaiming</strong></td><td>$\sigma=\sqrt{2/n_{\text{in}}}$</td><td>ReLU</td></tr>
+                    <tr><td><strong>LeCun</strong></td><td>$\sigma=\sqrt{1/n_{\text{in}}}$</td><td>SELU</td></tr>
+                </tbody>
+            </table>
+            <p class="mt-xs">PyTorch's <code>nn.Linear</code> defaults to a Kaiming-style init — often the difference between a network that trains and one that doesn't.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "Why does Xavier initialization use sqrt(2/(n_in + n_out)) instead of just sqrt(1/n_in)?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "It makes the math simpler",
+                    "correct": false,
+                    "explanation": "Using just n_in would actually be simpler mathematically."
+                },
+                {
+                    "text": "To balance variance preservation in both the forward and backward passes",
+                    "correct": true,
+                    "explanation": "Correct! The forward pass needs n_in*sigma^2 = 1 while the backward pass needs n_out*sigma^2 = 1. Xavier compromises between both requirements."
+                },
+                {
+                    "text": "Because n_out is always larger than n_in",
+                    "correct": false,
+                    "explanation": "n_out can be smaller, equal to, or larger than n_in depending on the layer."
+                },
+                {
+                    "text": "To prevent the weights from being too large",
+                    "correct": false,
+                    "explanation": "While this does make weights smaller, the real reason is variance preservation through the network, not simply shrinking weights."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- Section: Early Stopping -->
+<section>
+    <section>
+        <h2 class="truncate-title">Early Stopping</h2>
+        <div class="emphasis-box">
+            <p><strong>Key discovery:</strong> neural networks tend to fit clean patterns before they fit noise.</p>
+        </div>
+        <div class="mt-lg">
+            <p class="fragment">So: stop training once validation error stops improving — before the model starts memorizing noise.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Interactive Early Stopping Demonstration</h2>
+        <div id="early-stopping-container">
+            <div class="demo-controls" style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 8px; padding: 6px 10px; background: #f9f9f9; border-radius: 5px;">
+                <label style="display: flex; align-items: center; gap: 8px;">
+                    Patience:
+                    <input type="range" id="patience-slider" min="1" max="20" value="5" style="width: 120px;">
+                    <span id="patience-value" style="font-family: monospace; width: 30px;">5</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px;">
+                    Noise Level:
+                    <input type="range" id="noise-slider" min="0" max="50" value="20" style="width: 120px;">
+                    <span id="noise-value" style="font-family: monospace; width: 35px;">20%</span>
+                </label>
+                <button id="start-training" style="background: #10099F; color: white; border: none; padding: 8px 16px; border-radius: 5px;">Start Training</button>
+                <button id="reset-training" style="background: #FC8484; color: white; border: none; padding: 8px 16px; border-radius: 5px;">Reset</button>
+            </div>
+            <div id="early-stopping-viz" style="width: 100%; height: 320px;"></div>
+            <div id="training-status" style="text-align: center; margin-top: 6px; font-weight: bold;"></div>
+        </div>
+        <div class="fragment mt-sm emphasis-box" style="font-size: 0.7em;">
+            <p><strong>Patience:</strong> track the best validation error so far; stop if it hasn't improved for <em>patience</em> epochs. Typical: 5&ndash;20.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "Why does early stopping help prevent overfitting?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "It makes the model train faster",
+                    "correct": false,
+                    "explanation": "Faster training is a side benefit, not the reason it helps generalization."
+                },
+                {
+                    "text": "Networks tend to fit clean, general patterns before they fit noise, so stopping early avoids the noise-fitting phase",
+                    "correct": true,
+                    "explanation": "Correct! Validation error typically improves while the model learns generalizable structure, then worsens once it starts memorizing training-set noise — stopping at the turning point captures the model before that happens."
+                },
+                {
+                    "text": "It reduces the number of parameters in the model",
+                    "correct": false,
+                    "explanation": "Early stopping doesn&#39;t change the architecture or parameter count, only how long training runs."
+                },
+                {
+                    "text": "It automatically increases the learning rate",
+                    "correct": false,
+                    "explanation": "Early stopping is unrelated to the learning rate; it only decides when to stop training."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- Section: Dropout -->
+<section>
+    <section data-sources='[{"text": "Dropout: A Simple Way to Prevent Neural Networks from Overfitting - Srivastava et al. 2014", "url": "https://jmlr.org/papers/v15/srivastava14a.html"}, {"text": "Improving neural networks by preventing co-adaptation of feature detectors - Hinton et al. 2012", "url": "https://arxiv.org/abs/1207.0580"}]'>
+        <h2 class="truncate-title">Dropout: A Powerful Regularization Technique</h2>
+        <p style="font-size: 0.85em;">Randomly "dropping out" neurons during training breaks co-adaptation and prevents overfitting — injecting noise into hidden layers, not just the input.</p>
+        <div class="fragment mt-md">
+            <p style="font-size: 0.8em;">With dropout probability $p$, each activation $h$ becomes:</p>
+            $$h' = \begin{cases} 0 & \text{with probability } p \\ h/(1-p) & \text{otherwise} \end{cases}$$
+        </div>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.75em;">
+            <p>Unbiased ($E[h']=h$) and training-only — disabled at test time. In PyTorch: <code>nn.Dropout(p)</code>.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Interactive Dropout Demonstration</h2>
+        <div class="dropout-container">
+            <div class="demo-controls" style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px; padding: 10px; background: #f9f9f9; border-radius: 5px; z-index: 100;">
+                <label style="display: flex; align-items: center; gap: 8px;">
+                    Dropout Rate:
+                    <input type="range" id="dropout-rate" min="0" max="100" value="50" style="width: 150px;">
+                    <span id="dropout-value" style="font-family: monospace; min-width: 40px;">0.5</span>
+                </label>
+                <button id="apply-dropout" style="background: #10099F; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">Apply Dropout</button>
+                <button id="reset-dropout" style="background: #2DD2C0; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">Reset</button>
+            </div>
+            <div id="dropout-viz" style="width: 100%; height: 400px;"></div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "Why is the dropout operation divided by (1-p) during training?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "To make the computation faster",
+                    "correct": false,
+                    "explanation": "The division actually adds computational overhead, not reduces it."
+                },
+                {
+                    "text": "To keep the expected value of activations unchanged",
+                    "correct": true,
+                    "explanation": "Correct! Dividing by (1-p) ensures E[h prime] = h, making the operation unbiased and allowing the same weights to work at test time without any rescaling."
+                },
+                {
+                    "text": "To increase the learning rate",
+                    "correct": false,
+                    "explanation": "Dropout rescaling is about maintaining activation magnitudes, not adjusting learning dynamics."
+                },
+                {
+                    "text": "To reduce memory usage",
+                    "correct": false,
+                    "explanation": "The rescaling operation does not affect memory usage."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+<!-- ========================= LECTURE SUMMARY ========================= -->
+            <section>
+                <section>
+                    <h2 class="truncate-title">Putting It All Together</h2>
+                    <p style="font-size:0.9em">From a single line to a full neural network</p>
+                    <div class="fragment mt-md" style="overflow-x: auto;">
+                        <table style="margin: 0 auto; font-size: 0.65em;">
+                            <thead>
+                                <tr><th>Model</th><th>Prediction</th><th>Loss</th><th>Decision boundary / fit</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Linear Regression</td>
+                                    <td>$\hat{y}=\mathbf{w}^\top\mathbf{x}+b$</td>
+                                    <td>Squared error</td>
+                                    <td>Straight line</td>
+                                </tr>
+                                <tr>
+                                    <td>Softmax Regression</td>
+                                    <td>$\hat{\mathbf{y}}=\mathrm{softmax}(\mathbf{Wx}+\mathbf{b})$</td>
+                                    <td>Cross-entropy</td>
+                                    <td>Straight line (hyperplane)</td>
+                                </tr>
+                                <tr>
+                                    <td>Multilayer Perceptron</td>
+                                    <td>$\mathbf{W}^{(2)}\phi(\mathbf{W}^{(1)}\mathbf{x}+\mathbf{b}^{(1)})+\mathbf{b}^{(2)}$</td>
+                                    <td>Cross-entropy / squared error</td>
+                                    <td>Curved / arbitrary</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="fragment emphasis-box mt-md">
+                        <p style="font-size:0.9em">Everything still to come this semester — CNNs, RNNs, Transformers — is this same recipe (layers + nonlinearity + gradient descent) at a larger scale.</p>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Key Takeaways</h2>
+                    <ul style="font-size:0.9em">
+                        <li class="fragment">Linear models minimize a loss via gradient descent — the same recipe scales to arbitrarily deep networks</li>
+                        <li class="fragment">Softmax + cross-entropy give a remarkably clean gradient ($\hat{y}-y$) and generalize the linear recipe to classification</li>
+                        <li class="fragment">Stacking linear layers without nonlinearity buys nothing — activations are what make depth meaningful</li>
+                        <li class="fragment">Backpropagation is just the chain rule, applied systematically — and automated by modern frameworks</li>
+                        <li class="fragment">Overfitting is manageable: weight decay, dropout, and early stopping all trade training fit for generalization</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="truncate-title">Test Your Understanding: The Big Picture</h2>
+                    <div data-mcq='{
+                        "question": "What single architectural change turns softmax regression into a multilayer perceptron?",
+                        "type": "single",
+                        "options": [
+                            {
+                                "text": "Using a different loss function",
+                                "correct": false,
+                                "explanation": "Softmax regression and MLPs for classification both typically use cross-entropy loss — the loss function is not what distinguishes them."
+                            },
+                            {
+                                "text": "Adding one or more hidden layers with a nonlinear activation function between input and output",
+                                "correct": true,
+                                "explanation": "Correct! Without a nonlinear activation, stacked linear layers collapse into a single linear map (the &#39;linear collapse&#39; argument). Hidden layers plus nonlinearity are exactly what let the model draw curved decision boundaries instead of straight lines."
+                            },
+                            {
+                                "text": "Using more training data",
+                                "correct": false,
+                                "explanation": "More data can improve any model&#39;s generalization, but it doesn&#39;t change what functions the model is capable of representing."
+                            },
+                            {
+                                "text": "Switching from gradient descent to the analytic (normal-equation) solution",
+                                "correct": false,
+                                "explanation": "The analytic solution only exists for linear regression&#39;s squared loss and doesn&#39;t even apply to softmax regression or MLPs, which are trained with gradient-based methods."
+                            }
+                        ]
+                    }'></div>
+                </section>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Reveal.js Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/math/math.js"></script>
+
+    <!-- Shared Scripts -->
+    <script src="../shared/js/title-handler.js"></script>
+    <script src="../shared/js/tooltip-modal.js"></script>
+    <script src="../shared/js/source-modal-v2.js"></script>
+    <script src="../shared/js/multiple-choice.js"></script>
+
+    <!-- D3.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+
+    <!-- Part 1: Linear Regression -->
+    <script src="js/linear-regression-viz.js"></script>
+    <script src="js/gradient-descent-animation.js"></script>
+
+    <!-- Part 2: Softmax Classification -->
+    <script src="js/softmax-viz.js"></script>
+    <script src="js/entropy-calculator.js"></script>
+    <script src="js/classification-boundary.js"></script>
+
+    <!-- Part 3: Multilayer Perceptrons -->
+    <script src="js/activation-viz.js"></script>
+    <script src="js/computational-graph.js"></script>
+    <script src="js/backprop-viz.js"></script>
+    <script src="js/early-stopping-viz.js"></script>
+    <script src="js/dropout-viz.js"></script>
+
+    <script>
+        // Global animation tracking system: demos that create intervals/rAF loops
+        // register into this so we can stop them on slide change and avoid
+        // accumulating dangling animations (e.g. the neural-net signal pulse).
+        window.activeAnimations = {
+            animationFrames: [],
+            intervals: [],
+            clearAll: function() {
+                this.animationFrames.forEach(id => cancelAnimationFrame(id));
+                this.intervals.forEach(id => clearInterval(id));
+                this.animationFrames = [];
+                this.intervals = [];
+            }
+        };
+
+        // Initialize Reveal.js
+        Reveal.initialize({
+            hash: true,
+            controls: true,
+            progress: true,
+            center: true,
+            transition: 'slide',
+            math: {
+                mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js',
+                config: 'TeX-AMS_SVG-full'
+            },
+            plugins: [ RevealMath, RevealHighlight, RevealNotes, RevealMarkdown ]
+        });
+
+        // Some demos (activation-viz, computational-graph, backprop-viz, dropout-viz) self-register
+        // their own Reveal 'ready'/'slidechanged' listeners. early-stopping-viz self-triggers on
+        // DOMContentLoaded. The remaining demos below (ported from chapters 3 & 4) rely on a
+        // central per-slide dispatcher, matching how those source decks originally wired them up.
+        function initializeCurrentSlideVisualizations() {
+            window.activeAnimations.clearAll();
+
+            if (!Reveal.getCurrentSlide) return;
+            const currentSlide = Reveal.getCurrentSlide();
+            if (!currentSlide) return;
+
+            if (currentSlide.querySelector('#linear-regression-demo') && typeof initLinearRegressionDemo !== 'undefined') {
+                initLinearRegressionDemo();
+            }
+            if (currentSlide.querySelector('#gradient-descent-demo') && typeof initGradientDescentAnimation !== 'undefined') {
+                initGradientDescentAnimation();
+            }
+            if (currentSlide.querySelector('#normal-distribution-viz') && typeof initNormalDistribution !== 'undefined') {
+                initNormalDistribution();
+            }
+            if (currentSlide.querySelector('#linear-network-viz') && typeof initLinearNetworkViz !== 'undefined') {
+                initLinearNetworkViz();
+            }
+            if (currentSlide.querySelector('#softmax-demo') && typeof initSoftmaxViz !== 'undefined') {
+                initSoftmaxViz();
+            }
+            if (currentSlide.querySelector('#entropy-demo') && typeof initEntropyCalculator !== 'undefined') {
+                initEntropyCalculator();
+            }
+            if (currentSlide.querySelector('#classification-boundary-demo') && typeof initClassificationBoundary !== 'undefined') {
+                initClassificationBoundary();
+            }
+        }
+
+        Reveal.on('ready', initializeCurrentSlideVisualizations);
+        Reveal.on('slidechanged', initializeCurrentSlideVisualizations);
+    </script>
+</body>
+</html>

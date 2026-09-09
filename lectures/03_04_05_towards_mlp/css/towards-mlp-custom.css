@@ -1,0 +1,241 @@
+/* Custom styles for "Towards the Multilayer Perceptron" (combined lecture 3+4+5) */
+
+/* ---------- Layout helpers ---------- */
+.two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2em;
+    align-items: start;
+}
+
+.two-column .column {
+    text-align: left;
+}
+
+.two-column h4, .two-column h5 {
+    color: #10099F;
+    margin-top: 0;
+}
+
+.three-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5em;
+    align-items: start;
+}
+
+.three-column .column {
+    text-align: left;
+}
+
+.three-column h4 {
+    color: #10099F;
+    margin-top: 0;
+}
+
+@media (max-width: 768px) {
+    .two-column, .three-column {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---------- Demo containers ---------- */
+.demo-container,
+.backprop-demo,
+.forward-prop-full-demo,
+#early-stopping-container,
+.dropout-container {
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    min-height: 380px;
+}
+
+.demo-container svg {
+    width: 100%;
+    height: auto;
+    background: white;
+    border-radius: 5px;
+}
+
+.interactive-demo {
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto;
+}
+
+.activation-demo {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+.activation-demo h4 {
+    color: #10099F;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+/* ---------- Controls (never use the reserved "controls" class) ---------- */
+.demo-controls,
+.viz-controls,
+.controls-fixed {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    position: relative;
+    z-index: 100;
+    font-size: 14px;
+}
+
+.demo-controls label,
+.viz-controls label,
+.controls-fixed label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #262626;
+    position: relative;
+    z-index: 101;
+}
+
+.demo-controls input[type="range"],
+.viz-controls input[type="range"],
+.controls-fixed input[type="range"] {
+    width: 150px;
+    cursor: pointer;
+    position: relative;
+    z-index: 101;
+}
+
+.demo-controls select,
+.viz-controls select,
+.controls-fixed select {
+    padding: 4px 8px;
+    border: 2px solid #EEEEEE;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    z-index: 101;
+}
+
+.demo-controls button,
+.viz-controls button,
+.controls-fixed button {
+    background: #10099F;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    position: relative;
+    z-index: 102;
+    transition: background 0.3s;
+}
+
+.demo-controls button:hover,
+.viz-controls button:hover,
+.controls-fixed button:hover {
+    background: #0a0670;
+}
+
+/* ---------- Gradient descent layout ---------- */
+.gradient-descent-layout .viz-row {
+    display: flex;
+    gap: 15px;
+}
+
+.gradient-descent-layout .viz-panel {
+    flex: 1;
+    min-height: 260px;
+}
+
+/* ---------- Math / emphasis blocks ---------- */
+.math-block {
+    text-align: center;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.emphasis-box {
+    background: rgba(16, 9, 159, 0.05);
+    border-left: 4px solid #10099F;
+    padding: 1em;
+    margin: 1em 0;
+    border-radius: 0 4px 4px 0;
+}
+
+/* ---------- Utility spacing ---------- */
+.mt-xs { margin-top: 0.25em; }
+.mt-sm { margin-top: 0.5em; }
+.mt-md { margin-top: 1em; }
+.mt-lg { margin-top: 2em; }
+.ml-md { margin-left: 1em; }
+
+/* ---------- Comparison table ---------- */
+.comparison-table table {
+    margin: 0 auto;
+}
+
+/* ---------- Timeline (activation-functions historical context, etc.) ---------- */
+.timeline p {
+    margin: 0.4em 0;
+}
+
+/* ---------- Activation function explorer toggle ---------- */
+.fn-toggle {
+    display: flex;
+    gap: 4px;
+    background: #EEEEEE;
+    border-radius: 8px;
+    padding: 3px;
+}
+
+.fn-toggle .fn-btn {
+    background: transparent;
+    color: #262626;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85em;
+    font-weight: bold;
+    transition: background 0.25s, color 0.25s;
+}
+
+.fn-toggle .fn-btn:hover {
+    background: rgba(16, 9, 159, 0.12);
+}
+
+.fn-toggle .fn-btn.active {
+    background: #10099F;
+    color: white;
+}
+
+/* ---------- Generic polish: consistent panel look for chart/demo sub-panels ---------- */
+.viz-panel, .demo-container > div[id$="-plot"], .demo-container > div[id$="-viz"] {
+    background: white;
+    border-radius: 8px;
+}
+
+.demo-controls button, .viz-controls button, .controls-fixed button {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.demo-controls input[type="range"] {
+    accent-color: #10099F;
+}

@@ -1,0 +1,443 @@
+/* Custom styles for Linear Neural Networks for Classification slides */
+
+/* Interactive demo containers */
+.interactive-demo {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 16px;
+    position: relative;
+}
+
+.interactive-demo .controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.interactive-demo .controls label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9em;
+    position: relative;
+    z-index: 101;
+}
+
+.interactive-demo .controls input[type="range"] {
+    width: 120px;
+    position: relative;
+    z-index: 102;
+    cursor: pointer;
+}
+
+.interactive-demo .controls span {
+    font-family: 'Source Code Pro', monospace;
+    font-weight: bold;
+    color: #10099F;
+    min-width: 40px;
+}
+
+.interactive-demo button {
+    background: #10099F;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background 0.3s ease;
+    position: relative;
+    z-index: 102;
+}
+
+.interactive-demo button:hover,
+.controls-fixed button:hover {
+    background: #2DD2C0;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.interactive-demo select {
+    padding: 8px 12px;
+    border: 2px solid #EEEEEE;
+    border-radius: 5px;
+    font-size: 0.9em;
+    background: white;
+    position: relative;
+    z-index: 102;
+    cursor: pointer;
+}
+
+/* Network diagram */
+.network-diagram {
+    width: 100%;
+    height: 300px;
+    background: #FAFAFA;
+    border: 2px solid #EEEEEE;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Math blocks */
+.math-block {
+    margin: 20px auto;
+    padding: 15px;
+    background: #F5F5F5;
+    border-left: 4px solid #10099F;
+    border-radius: 4px;
+    font-size: 1.1em;
+}
+
+/* Grid layouts */
+.grid-2x2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.grid-2x2 > div {
+    background: #FAFAFA;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #EEEEEE;
+}
+
+.grid-2x2 h4 {
+    color: #10099F;
+    margin-bottom: 10px;
+}
+
+/* Simple two-column grid for compact layouts */
+.two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+/* Category grid for Fashion-MNIST */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.category-grid span {
+    background: #10099F;
+    color: white;
+    padding: 8px;
+    text-align: center;
+    border-radius: 4px;
+    font-size: 0.85em;
+}
+
+/* One-hot encoding table */
+.one-hot-table {
+    margin: 20px auto;
+    border-collapse: collapse;
+    font-size: 0.9em;
+}
+
+.one-hot-table th {
+    background: #10099F;
+    color: white;
+    padding: 12px;
+    text-align: left;
+}
+
+.one-hot-table td {
+    padding: 10px 12px;
+    border: 1px solid #EEEEEE;
+    font-family: 'Source Code Pro', monospace;
+}
+
+.one-hot-table tr:nth-child(even) {
+    background: #FAFAFA;
+}
+
+/* Concept grid */
+.concept-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    margin: 20px 0;
+}
+
+.concept-grid > div {
+    text-align: center;
+}
+
+.concept-grid h4 {
+    color: #10099F;
+    margin-bottom: 10px;
+}
+
+/* Data pipeline */
+.data-pipeline {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px 24px;
+    margin: 20px 0;
+}
+
+.data-pipeline > div {
+    background: linear-gradient(to right, #F5F5F5, #FAFAFA);
+    padding: 20px;
+    border-left: 4px solid #2DD2C0;
+    border-radius: 4px;
+}
+
+.data-pipeline h4 {
+    color: #10099F;
+    margin-bottom: 10px;
+}
+
+/* Metrics grid */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.metrics-grid > div {
+    background: white;
+    padding: 20px;
+    border: 2px solid #EEEEEE;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.metrics-grid h4 {
+    color: #2DD2C0;
+    margin-bottom: 10px;
+}
+
+/* Dataset overview */
+.dataset-overview {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Visualization containers */
+#softmax-visualization,
+#loss-visualization,
+#boundary-visualization,
+#mnist-visualization {
+    width: 100%;
+    min-height: 260px;
+    background: white;
+    border: 2px solid #EEEEEE;
+    border-radius: 8px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Ensure SVGs scale within containers */
+.interactive-demo svg {
+    width: 100% !important;
+    height: auto !important;
+    position: relative;
+    z-index: 1;
+}
+
+/* Control positioning helpers */
+.controls-overlay {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(249, 249, 249, 0.98);
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.controls-fixed {
+    position: relative;
+    margin-top: 20px;
+    padding: 12px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+/* SVG styles for network visualizations */
+.neuron {
+    fill: #10099F;
+    stroke: white;
+    stroke-width: 2;
+    transition: fill 0.3s ease;
+}
+
+.neuron.input {
+    fill: #10099F;
+}
+
+.neuron.hidden {
+    fill: #2DD2C0;
+}
+
+.neuron.output {
+    fill: #FC8484;
+}
+
+.neuron:hover {
+    fill: #FAC55B;
+    cursor: pointer;
+}
+
+.connection {
+    stroke: #CCCCCC;
+    stroke-width: 1;
+    fill: none;
+    opacity: 0.6;
+}
+
+.connection.active {
+    stroke: #FFA05F;
+    stroke-width: 2;
+    opacity: 1;
+}
+
+/* Animation particles */
+.particle {
+    fill: #00FFBA;
+    r: 4;
+}
+
+/* Axis styles */
+.axis {
+    stroke: #262626;
+    stroke-width: 1;
+}
+
+.axis-label {
+    font-size: 12px;
+    fill: #262626;
+}
+
+.tick {
+    stroke: #262626;
+    stroke-width: 1;
+}
+
+.tick-label {
+    font-size: 10px;
+    fill: #262626;
+}
+
+/* Legend */
+.legend {
+    font-size: 12px;
+}
+
+.legend-item rect {
+    width: 15px;
+    height: 15px;
+}
+
+.legend-item text {
+    font-size: 12px;
+    fill: #262626;
+}
+
+/* Tooltips for visualizations */
+.viz-tooltip {
+    position: absolute;
+    background: rgba(38, 38, 38, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+/* Loading spinner */
+.loading-spinner {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: 4px solid #EEEEEE;
+    border-top-color: #10099F;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .grid-2x2,
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+    .two-column,
+    .data-pipeline {
+        grid-template-columns: 1fr;
+    }
+    
+    .category-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .concept-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .interactive-demo .controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .interactive-demo .controls label {
+        justify-content: space-between;
+    }
+}
+
+/* Compact slide variant to fit dense content */
+.compact-slide {
+    font-size: 0.9em;
+}
+
+/* Print styles */
+@media print {
+    .interactive-demo .controls {
+        display: none;
+    }
+    
+    .network-diagram,
+    #softmax-visualization,
+    #loss-visualization,
+    #boundary-visualization,
+    #mnist-visualization {
+        border: 1px solid #000;
+    }
+}

@@ -1,0 +1,453 @@
+/* Custom styles for Linear Neural Networks presentation */
+
+.demo-container {
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    min-height: 420px; /* Reserve space to prevent layout shifts */
+}
+
+.demo-container svg {
+    width: 100%;
+    height: auto;
+    background: white;
+    border-radius: 5px;
+    opacity: 0;
+    animation: fadeInVisualization 0.5s ease-in-out 0.1s forwards;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    font-size: 14px;
+}
+
+/* Remove old controls styling for gradient descent */
+.gradient-descent-layout .controls {
+    display: none;
+}
+
+.controls button {
+    background: #10099F;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.controls button:hover {
+    background: #0a0670;
+}
+
+.controls button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.controls label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.controls input[type="range"] {
+    width: 110px;
+}
+
+.controls input[type="checkbox"] {
+    cursor: pointer;
+}
+
+.controls select {
+    padding: 4px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+}
+
+#equation-display {
+    text-align: center;
+    font-size: 18px;
+    color: #333;
+    font-family: 'Source Code Pro', monospace;
+    padding: 10px;
+    background: white;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+/* Loss visualization styles */
+#loss-visualization {
+    position: relative;
+    min-height: 420px; /* Reserve space for SVG (400px) + padding */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#loss-visualization svg {
+    opacity: 0;
+    animation: fadeInVisualization 0.5s ease-in-out 0.1s forwards;
+}
+
+@keyframes fadeInVisualization {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.loss-point {
+    fill: #FC8484;
+    stroke: white;
+    stroke-width: 2;
+}
+
+.loss-line {
+    stroke: #10099F;
+    stroke-width: 3;
+    fill: none;
+}
+
+.residual-line {
+    stroke: #FC8484;
+    stroke-width: 1;
+    stroke-dasharray: 3,3;
+    opacity: 0.7;
+}
+
+/* Loss value display */
+.loss-value {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 8px 12px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    font-size: 13px;
+    font-family: 'Source Code Pro', monospace;
+    pointer-events: none;
+    border: 1px solid #ddd;
+}
+
+/* Gradient descent side-by-side layout */
+.demo-container.gradient-descent-layout {
+    padding: 8px;
+    position: relative;
+    min-height: 320px; /* Specific height for gradient descent */
+}
+
+.viz-row {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.viz-panel {
+    background: white;
+    border-radius: 5px;
+    padding: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    min-height: 238px; /* Reserve space for SVG content */
+}
+
+#loss-landscape {
+    flex: 0 0 380px;
+}
+
+#loss-history {
+    flex: 0 0 340px;
+}
+
+/* Compact controls bar at bottom */
+.controls-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 5px;
+    padding: 6px 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    font-size: 12px;
+}
+
+.controls-bar label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.controls-bar input[type="range"] {
+    width: 80px;
+    height: 20px;
+}
+
+.controls-bar select {
+    padding: 2px 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 12px;
+    background: white;
+}
+
+.controls-bar button {
+    background: #10099F;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: background 0.3s;
+}
+
+.controls-bar button:hover {
+    background: #0a0670;
+}
+
+.controls-bar #lr-value {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 11px;
+    background: #f0f0f0;
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.gradient-path {
+    stroke: #2DD2C0;
+    stroke-width: 2;
+    fill: none;
+    opacity: 0.8;
+}
+
+.gradient-point {
+    fill: #FFA05F;
+    stroke: white;
+    stroke-width: 2;
+}
+
+.contour-line {
+    fill: none;
+    stroke: #ddd;
+    stroke-width: 1;
+    opacity: 0.5;
+}
+
+/* Normal distribution visualization */
+#normal-distribution-viz {
+    background: white;
+    padding: 20px;
+}
+
+.distribution-curve {
+    fill: none;
+    stroke-width: 2;
+}
+
+.distribution-area {
+    opacity: 0.3;
+}
+
+/* Neural network visualization */
+#linear-network-viz {
+    background: white;
+    padding: 20px;
+}
+
+.neuron {
+    stroke: white;
+    stroke-width: 2;
+}
+
+.neuron.input {
+    fill: #10099F;
+}
+
+.neuron.output {
+    fill: #FC8484;
+}
+
+.connection {
+    stroke: #666;
+    stroke-width: 1;
+    opacity: 0.5;
+}
+
+.connection.active {
+    stroke: #2DD2C0;
+    stroke-width: 2;
+    opacity: 1;
+}
+
+.weight-label {
+    font-size: 12px;
+    fill: #666;
+    text-anchor: middle;
+}
+
+.neuron-label {
+    font-size: 14px;
+    fill: white;
+    text-anchor: middle;
+    dominant-baseline: middle;
+}
+
+/* Animation for data points */
+@keyframes pulsePoint {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.data-point {
+    fill: #10099F;
+    stroke: white;
+    stroke-width: 2;
+    cursor: pointer;
+    transition: fill 0.3s;
+    transform-origin: center;
+    transform-box: fill-box;
+}
+
+.data-point:hover {
+    fill: #2DD2C0;
+    animation: pulsePoint 0.5s ease-in-out;
+}
+
+.data-point.selected {
+    fill: #FC8484;
+}
+
+/* Axis styles */
+.axis {
+    stroke: #666;
+    stroke-width: 1;
+}
+
+.axis-label {
+    font-size: 14px;
+    fill: #666;
+}
+
+.tick {
+    stroke: #666;
+    stroke-width: 1;
+    opacity: 0.3;
+}
+
+.tick-label {
+    font-size: 12px;
+    fill: #666;
+}
+
+/* Two and three column layouts */
+.two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 30px;
+}
+
+.three-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.column h4 {
+    color: #10099F;
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+
+.column ul {
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .two-column,
+    .three-column {
+        grid-template-columns: 1fr;
+    }
+    
+    .controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .demo-container {
+        padding: 10px;
+    }
+}
+
+/* Utility classes */
+.mt-sm { margin-top: 5px; }
+.mt-md { margin-top: 20px; }
+.mt-lg { margin-top: 30px; }
+.mb-md { margin-bottom: 10px; }
+.ml-md { margin-left: 15px; }
+
+.small {
+    font-size: 0.85em;
+    opacity: 0.9;
+}
+
+/* Loading animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #10099F;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Interactive elements feedback */
+.interactive-hint {
+    font-size: 14px;
+    color: #666;
+    font-style: italic;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* Loss value display */
+.loss-value {
+    position: absolute;
+    background: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    font-size: 14px;
+    pointer-events: none;
+}
+
+/* Particles for neural network animation */
+.signal-particle {
+    fill: #00FFBA;
+    filter: drop-shadow(0 0 3px #00FFBA);
+}
