@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convolutional Neural Networks: From Convolutions to ResNet - Introduction to Deep Learning</title>
+
+    <!-- Reveal.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+    <link rel="stylesheet" href="../shared/css/reveal-theme.css">
+    <link rel="stylesheet" href="../shared/css/common.css">
+    <link rel="stylesheet" href="css/cnn-custom.css">
+    <link rel="stylesheet" href="css/modern-cnn-custom.css">
+    <link rel="stylesheet" href="../shared/css/quiz.css">
+
+    <!-- Code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.css">
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- Title Slide -->
+            <section class="title-slide">
+                <img src="../shared/images/uoi_logo_blue.png" alt="University of Iceland Logo" class="ui-logo">
+                <h1 class="truncate-title">Convolutional Neural Networks</h1>
+                <p>From Convolutions to ResNet</p>
+                <p>Chapters 7 &amp; 8 — Based on "Dive into Deep Learning" by Zhang et al.</p>
+                <p class="mt-lg">
+                    <small>Instructor: Guðmundur Einarsson</small><br>
+                    <small>University of Iceland</small>
+                </p>
+                <p class="mt-lg"><small><em>Based on slides from Hafsteinn Einarsson</em></small></p>
+            </section>
+
+            <!-- Learning Objectives -->
+            <section>
+                <h2 class="truncate-title">Learning Objectives</h2>
+                <ul style="font-size: 0.85em;">
+                    <li class="fragment">Derive the convolution operation itself as an MLP constrained by translation invariance and locality</li>
+                    <li class="fragment">Master the mechanics: channels, padding, stride, and pooling — and read off output shapes from any configuration</li>
+                    <li class="fragment">Trace the historical arc from LeNet through AlexNet, VGG, NiN, and GoogLeNet — each solving a limitation of the last</li>
+                    <li class="fragment">Understand the two ideas that made truly deep networks trainable: Batch Normalization and residual connections</li>
+                </ul>
+                <div class="fragment emphasis-box mt-md" style="font-size: 0.9em;">
+                    <p>Two chapters of "Dive into Deep Learning" (Ch. 7 &amp; 8) in one session — dense on purpose, meant to be revisited in your own reading afterward.</p>
+                </div>
+            </section>
+
+<!-- ================================================================
+     PART 1: From Fully Connected Layers to Convolutions (Chapter 7)
+     ================================================================ -->
+<section>
+    <h2 class="truncate-title">Part 1: From Fully Connected Layers to Convolutions</h2>
+    <p>Chapter 7 — Convolutional Neural Networks</p>
+    <div class="fragment mt-lg">
+        <p>The MLP treats every pixel as an independent feature with its own weight. For images, that throws away exactly the structure that makes them images: <strong>nearby pixels are related</strong>, and <strong>the same pattern can appear anywhere</strong>.</p>
+    </div>
+    <div class="fragment emphasis-box mt-lg">
+        <p>We'll derive convolution from first principles — not as a given formula, but as the unique consequence of two reasonable design constraints on an MLP.</p>
+    </div>
+</section>
+
+<!-- ============================ BEAT 1: THE PROBLEM ============================ -->
+<section>
+    <section data-sources='[{"text": "Dive into Deep Learning - Section 7.1", "url": "https://d2l.ai/chapter_convolutional-neural-networks/why-conv.html"}]'>
+        <h2 class="truncate-title">The Trouble with Treating Images as Vectors</h2>
+        <p style="font-size: 0.85em;">Flattening a 1000&times;1000 pixel image into a vector of 10&#8310; numbers and feeding it to a fully connected hidden layer of 1000 units requires:</p>
+        <div class="fragment mt-md emphasis-box">
+            <p style="font-size: 1.1em; text-align: center;">$$10^6 \times 1000 = 10^9 \text{ parameters, for one layer}$$</p>
+        </div>
+        <div class="fragment mt-md" style="font-size: 0.8em;">
+            <p>That's billions of parameters before we've even looked at a second layer — and flattening also throws away the fact that pixel $(i,j)$ is spatially next to pixel $(i{+}1,j)$. Shuffle all the pixels the same way in every image, and an MLP wouldn't even notice.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">LeNet to AlexNet: A 17-Year Gap</h2>
+        <div class="fragment">
+            <p style="font-size: 0.85em;">LeCun's convolutional network read digits on bank checks in 1995. Yet convolutional networks didn't take over computer vision until AlexNet in 2012.</p>
+        </div>
+        <div class="fragment emphasis-box mt-lg" style="font-size: 0.85em;">
+            <p>What changed wasn't the core idea — it was <strong>data</strong> (ImageNet's millions of labeled images) and <strong>compute</strong> (GPUs). The architecture we derive today is the same one running in every modern vision model's early layers.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "What is the main problem with feeding a flattened image directly into a fully connected layer?",
+            "type": "multiple",
+            "options": [
+                {
+                    "text": "It requires an impractically large number of parameters",
+                    "correct": true,
+                    "explanation": "Correct! A 1000×1000 image mapped to 1000 hidden units already needs about a billion weights in just one layer."
+                },
+                {
+                    "text": "It discards the 2D spatial structure of the image",
+                    "correct": true,
+                    "explanation": "Correct! Flattening treats pixel (i,j) the same as any other input feature, losing the fact that it is spatially adjacent to pixel (i+1,j)."
+                },
+                {
+                    "text": "It cannot represent color images",
+                    "correct": false,
+                    "explanation": "Color channels can still be flattened into the vector; the problem is parameter count and lost structure, not color per se."
+                },
+                {
+                    "text": "It makes the loss function non-differentiable",
+                    "correct": false,
+                    "explanation": "The loss remains perfectly differentiable — flattening is a reshaping operation, not a source of discontinuity."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT 2: DESIGN PRINCIPLES ============================ -->
+<section>
+    <section data-sources='[{"text": "Dive into Deep Learning - Section 7.1.1", "url": "https://d2l.ai/chapter_convolutional-neural-networks/why-conv.html#invariance"}]'>
+        <h2 class="truncate-title">Finding Waldo: An Invariance Challenge</h2>
+        <p style="font-size: 0.8em;">Suppose we want a detector for "is Waldo here?" that scans a crowd scene patch by patch.</p>
+        <div class="fragment mt-md text-center">
+            <img src="images/waldo-football.jpg" alt="Where's Waldo crowd scene" style="max-width: 45%; border-radius: 6px;">
+        </div>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.8em;">
+            <p>Waldo could be anywhere in the image. Whatever makes a patch "look like Waldo" shouldn't depend on <em>where</em> that patch sits — the same detector should fire wherever he appears.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Interactive: Translation Invariance</h2>
+        <div id="translation-demo" class="visualization-container">
+            <div class="demo-controls">
+                <button id="move-object" class="ui-button">Move Object</button>
+                <button id="reset-position" class="ui-button secondary">Reset</button>
+            </div>
+            <svg id="translation-svg" width="600" height="300"></svg>
+        </div>
+        <div class="fragment mt-md" style="font-size: 0.7em;">
+            <p>The same small detector slides across the whole image — one set of weights, reused at every position.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Two Design Principles for Vision</h2>
+        <div class="two-column">
+            <div class="column fragment">
+                <h4>1. Translation Invariance</h4>
+                <p style="font-size: 0.8em;">Early layers should respond to a pattern similarly regardless of where it appears in the image.</p>
+            </div>
+            <div class="column fragment">
+                <h4>2. Locality</h4>
+                <p style="font-size: 0.8em;">Early layers should focus on local regions — distant pixels shouldn't directly influence each other yet.</p>
+            </div>
+        </div>
+        <div class="fragment emphasis-box mt-lg" style="font-size: 0.8em;">
+            <p>These aren't arbitrary simplifications — they're accurate assumptions about natural images. We'll build both directly into the MLP's weight structure.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "Why is translation invariance a reasonable assumption for the early layers of an image classifier?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "Because all images in a dataset are perfectly centered",
+                    "correct": false,
+                    "explanation": "Images are rarely perfectly aligned — that is exactly why we need the detector to work regardless of position."
+                },
+                {
+                    "text": "Because a useful low-level pattern (an edge, a texture) is just as meaningful no matter where in the image it occurs",
+                    "correct": true,
+                    "explanation": "Correct! A vertical edge detector should fire on a vertical edge whether it appears in the top-left or bottom-right of the image — the underlying pattern doesn&#39;t depend on position."
+                },
+                {
+                    "text": "Because it reduces the resolution of the image",
+                    "correct": false,
+                    "explanation": "Translation invariance is about reusing weights across positions, not about resolution or downsampling."
+                },
+                {
+                    "text": "Because deeper layers also need to be translation invariant",
+                    "correct": false,
+                    "explanation": "It is primarily the early, low-level layers where this assumption clearly holds; later layers build more position- and context-dependent representations."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT 3: DERIVING CONVOLUTION ============================ -->
+<section>
+    <section data-sources='[{"text": "Dive into Deep Learning - Section 7.1.2", "url": "https://d2l.ai/chapter_convolutional-neural-networks/why-conv.html#constraining-the-mlp"}]'>
+        <h2 class="truncate-title">Constraining the MLP: Step 1, Translation Invariance</h2>
+        <p style="font-size: 0.7em;">Write a fully connected layer over 2D input $\mathsf{X}$ and output $\mathsf{H}$, re-indexed by <em>offset</em> $(a,b)$ from position $(i,j)$:</p>
+        <div class="fragment mt-md">
+            <p style="font-size: 0.75em;">$$[\mathsf{H}]_{i,j} = \sum_{a,b} [\mathsf{W}]_{i,j,a,b}\, [\mathsf{X}]_{i+a,j+b}$$</p>
+        </div>
+        <div class="fragment mt-md emphasis-box" style="font-size: 0.75em;">
+            <p>Translation invariance says: the weight for offset $(a,b)$ shouldn't depend on the absolute position $(i,j)$. Constrain $[\mathsf{W}]_{i,j,a,b} = [\mathsf{V}]_{a,b}$ — a single small filter, reused everywhere:</p>
+            <p>$$[\mathsf{H}]_{i,j} = \sum_{a,b} [\mathsf{V}]_{a,b}\, [\mathsf{X}]_{i+a,j+b}$$</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Constraining the MLP: Step 2, Locality</h2>
+        <p style="font-size: 0.75em;">Locality says: to compute $[\mathsf{H}]_{i,j}$, we shouldn't need to look far from $(i,j)$. Truncate the sum to a small window $\Delta$:</p>
+        <div class="fragment mt-md emphasis-box">
+            <p style="font-size: 0.85em;">$$[\mathsf{H}]_{i,j} = \sum_{a=-\Delta}^{\Delta} \sum_{b=-\Delta}^{\Delta} [\mathsf{V}]_{a,b}\, [\mathsf{X}]_{i+a,j+b}$$</p>
+        </div>
+        <div class="fragment mt-md" style="font-size: 0.8em;">
+            <p>This <strong>is</strong> a convolution (technically cross-correlation, next slide). We went from a $10^{12}$-parameter constraint to a $(2\Delta+1)^2$-parameter kernel — e.g. $\Delta=5$ gives a $121$-parameter filter, reused at every position.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Interactive Convolution Demo</h2>
+        <div id="convolution-demo" class="conv-visualization">
+            <div class="demo-controls">
+                <label>Kernel Size:
+                    <select id="kernel-size">
+                        <option value="3">3&times;3</option>
+                        <option value="5">5&times;5</option>
+                    </select>
+                </label>
+                <button id="step-conv" class="ui-button">Step</button>
+                <button id="animate-conv" class="ui-button">Animate</button>
+                <button id="reset-conv" class="ui-button secondary">Reset</button>
+            </div>
+            <div id="conv-container"></div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "In deriving convolution from a constrained MLP, what does restricting the weight tensor to W[i,j,a,b] = V[a,b] accomplish?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "It makes the weights independent of absolute position, enforcing translation invariance",
+                    "correct": true,
+                    "explanation": "Correct! By making the weight depend only on the offset (a,b) and not on the position (i,j), the same small filter V is reused everywhere — exactly translation invariance."
+                },
+                {
+                    "text": "It enforces locality by shrinking the receptive field",
+                    "correct": false,
+                    "explanation": "Locality comes from a separate step — truncating the sum over (a,b) to a small window Δ — not from this weight-sharing constraint."
+                },
+                {
+                    "text": "It removes the need for a bias term",
+                    "correct": false,
+                    "explanation": "A bias term is unaffected by this constraint; convolutional layers typically still include one."
+                },
+                {
+                    "text": "It converts the operation into max pooling",
+                    "correct": false,
+                    "explanation": "Pooling is a separate, non-learned downsampling operation covered later — this step just ties the weights together across positions."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT 4: CONV VS CROSS-CORRELATION ============================ -->
+<section>
+    <section data-sources='[{"text": "Dive into Deep Learning - Section 7.2", "url": "https://d2l.ai/chapter_convolutional-neural-networks/conv-layer.html"}]'>
+        <h2 class="truncate-title">Convolution vs. Cross-Correlation</h2>
+        <p style="font-size: 0.8em;">True mathematical convolution flips the kernel before sliding it; <strong>cross-correlation</strong> does not:</p>
+        <div class="fragment mt-md two-column" style="font-size: 0.75em;">
+            <div class="column">
+                <h5>Cross-correlation (what we compute)</h5>
+                <p>$$Y_{i,j} = \sum_{a=0}^{k_h-1}\sum_{b=0}^{k_w-1} K_{a,b}\, X_{i+a, j+b}$$</p>
+            </div>
+            <div class="column">
+                <h5>True convolution</h5>
+                <p>$$Y_{i,j} = \sum_{a,b} K_{-a,-b}\, X_{i+a, j+b}$$</p>
+            </div>
+        </div>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.8em;">
+            <p>Since the kernel $K$ is <em>learned</em>, whether or not we flip it makes no practical difference — the network just learns the flipped version if needed. Deep learning libraries implement cross-correlation and call it "convolution."</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Interactive Cross-Correlation Calculator</h2>
+        <div id="cross-correlation-demo" class="interactive-demo">
+            <div class="demo-controls" style="margin-bottom: 20px;">
+                <button id="step-correlation" class="ui-button">Step Forward</button>
+                <button id="animate-correlation" class="ui-button">Animate</button>
+                <button id="reset-correlation" class="ui-button secondary">Reset</button>
+            </div>
+            <div class="correlation-grids" style="display: flex; justify-content: space-around; align-items: center;">
+                <div class="input-display">
+                    <h4>Input (3&times;3)</h4>
+                    <div id="correlation-input"></div>
+                </div>
+                <div class="kernel-display">
+                    <h4>Kernel (2&times;2)</h4>
+                    <div id="correlation-kernel"></div>
+                </div>
+                <div class="output-display">
+                    <h4>Output (2&times;2)</h4>
+                    <div id="correlation-output"></div>
+                </div>
+            </div>
+            <div id="calculation-display" class="mt-md" style="text-align: center; font-family: monospace;"></div>
+        </div>
+        <div class="fragment mt-sm" style="font-size: 0.7em;">
+            <p>Output size for an $n\times n$ input and $k\times k$ kernel (no padding, stride 1): $(n-k+1)\times(n-k+1)$.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "Why do deep learning frameworks implement cross-correlation but still call it \"convolution\"?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "Cross-correlation and convolution are mathematically identical operations",
+                    "correct": false,
+                    "explanation": "They differ by a kernel flip — they are not identical, just interchangeable in this context."
+                },
+                {
+                    "text": "Because the kernel is learned, flipping it or not makes no practical difference — the network learns whichever orientation it needs",
+                    "correct": true,
+                    "explanation": "Correct! If the kernel were fixed and hand-designed, the flip would matter. But since gradient descent learns the kernel from scratch, it simply learns the (un-flipped or flipped) pattern that minimizes the loss."
+                },
+                {
+                    "text": "Convolution is too computationally expensive to implement",
+                    "correct": false,
+                    "explanation": "The flip itself is a trivial, cheap operation — computational cost is not the reason."
+                },
+                {
+                    "text": "Cross-correlation always produces a larger output than convolution",
+                    "correct": false,
+                    "explanation": "The output size is identical for both; only the kernel orientation used in the computation differs."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT 5: EDGE DETECTION ============================ -->
+<section>
+    <section data-sources='[{"text": "Dive into Deep Learning - Section 7.2.2", "url": "https://d2l.ai/chapter_convolutional-neural-networks/conv-layer.html#object-edge-detection-in-images"}]'>
+        <h2 class="truncate-title">Edge Detection: Convolution in Action</h2>
+        <p style="font-size: 0.8em;">A concrete kernel makes this tangible. The 1&times;2 kernel $K = [1, -1]$ computes a finite difference between horizontally adjacent pixels:</p>
+        <div class="fragment mt-md emphasis-box" style="font-size: 0.85em;">
+            <p>Output $\approx 0$ on flat regions (equal neighbors), and $\ne 0$ exactly where pixel intensity changes sharply — i.e. at a <strong>vertical edge</strong>.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Interactive Edge Detection Demo</h2>
+        <div id="edge-detection-interactive" class="interactive-demo">
+            <div class="demo-controls" style="margin-bottom: 20px;">
+                <button id="apply-horizontal" class="ui-button">Horizontal Edges</button>
+                <button id="apply-vertical" class="ui-button">Vertical Edges</button>
+                <button id="apply-custom" class="ui-button">Custom Pattern</button>
+                <button id="reset-edge" class="ui-button secondary">Reset</button>
+            </div>
+            <div class="edge-visualization" style="display: flex; justify-content: space-around;">
+                <div>
+                    <h4>Input Image</h4>
+                    <canvas id="edge-input-canvas" width="200" height="150"></canvas>
+                </div>
+                <div>
+                    <h4>Kernel</h4>
+                    <div id="edge-kernel-display"></div>
+                </div>
+                <div>
+                    <h4>Output</h4>
+                    <canvas id="edge-output-canvas" width="200" height="150"></canvas>
+                </div>
+            </div>
+            <div id="edge-explanation" class="mt-md" style="text-align: center;"></div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Learning the Kernel Instead of Designing It</h2>
+        <p style="font-size: 0.8em;">We hand-picked $[1,-1]$ for edges. In practice we never do this: initialize a random kernel and let gradient descent learn it from (input, desired-output) pairs — exactly the recipe from Part 1 of this course, just applied to a kernel instead of a weight matrix.</p>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.8em;">
+            <p>This is the key shift CNNs make: instead of hand-engineering features (edges, corners, textures), we let the network <strong>learn</strong> which filters are useful for the task.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "What does the kernel K = [1, -1] detect when convolved (cross-correlated) with an image?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "Horizontal edges",
+                    "correct": false,
+                    "explanation": "This kernel compares horizontally adjacent pixels, so it responds to changes across columns — i.e. vertical edges, not horizontal ones."
+                },
+                {
+                    "text": "Vertical edges — sharp horizontal changes in pixel intensity",
+                    "correct": true,
+                    "explanation": "Correct! Subtracting a pixel&#39;s right neighbor from itself gives near-zero on flat regions and a large response wherever intensity changes sharply left-to-right, which is exactly a vertical edge."
+                },
+                {
+                    "text": "The average brightness of the image",
+                    "correct": false,
+                    "explanation": "Averaging would require a kernel like [0.5, 0.5], not one with a sign flip between entries."
+                },
+                {
+                    "text": "Corners in the image",
+                    "correct": false,
+                    "explanation": "A 1×2 kernel only compares two horizontally adjacent pixels; corner detection needs a 2D kernel sensitive to changes in multiple directions."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT 6: MULTIPLE INPUT CHANNELS ============================ -->
+<section>
+    <section data-sources='[{"text": "Dive into Deep Learning - Section 7.4.1", "url": "https://d2l.ai/chapter_convolutional-neural-networks/channels.html#multiple-input-channels"}]'>
+        <h2 class="truncate-title">Beyond Grayscale: Multiple Input Channels</h2>
+        <p style="font-size: 0.8em;">A color image isn't a matrix — it's a 3rd-order tensor $\mathsf{X} \in \mathbb{R}^{c_i \times n_h \times n_w}$ (one $n_h\times n_w$ matrix per RGB channel). The kernel grows a matching dimension:</p>
+        <div class="fragment mt-md text-center">
+            <img src="images/conv-multi-in.svg" alt="Multi-input-channel convolution" style="max-width: 55%;">
+        </div>
+        <div class="fragment mt-sm emphasis-box" style="font-size: 0.75em;">
+            $$Y_{i,j} = \sum_{c=1}^{c_i} \sum_{a,b} K_{c,a,b}\, X_{c,i+a,j+b}$$
+            <p>Each input channel gets its own 2D slice of the kernel; we sum the results across channels into a single output map.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "When a convolutional kernel processes a 3-channel RGB input, how does it combine information across channels?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "It processes each channel with an identical 2D kernel and averages the three results",
+                    "correct": false,
+                    "explanation": "The kernel slices for different input channels are learned independently, not identical, and the combination is a sum, not an average."
+                },
+                {
+                    "text": "It uses one 2D kernel slice per input channel, then sums the per-channel results into a single output",
+                    "correct": true,
+                    "explanation": "Correct! The kernel becomes a 3D tensor with one 2D slice per input channel; convolving each slice with its channel and summing gives one combined output map."
+                },
+                {
+                    "text": "It picks only the red channel and ignores green and blue",
+                    "correct": false,
+                    "explanation": "All input channels contribute — that is precisely the point of extending the kernel to match the number of input channels."
+                },
+                {
+                    "text": "It concatenates the three channels into one wide image before convolving",
+                    "correct": false,
+                    "explanation": "Channels are stacked as a depth dimension processed jointly by a 3D kernel, not concatenated side-by-side spatially."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT 7: MULTIPLE OUTPUT CHANNELS + 1x1 CONV ============================ -->
+<section>
+    <section data-sources='[{"text": "Dive into Deep Learning - Section 7.4.2", "url": "https://d2l.ai/chapter_convolutional-neural-networks/channels.html#multiple-output-channels"}]'>
+        <h2 class="truncate-title">Multiple Output Channels</h2>
+        <p style="font-size: 0.8em;">One kernel produces one output channel. To learn <em>many</em> different features — edges, textures, colors — we use many independent kernels, each producing its own output channel (feature map):</p>
+        <div class="fragment mt-md emphasis-box" style="font-size: 0.8em;">
+            <p>Full kernel tensor shape: $(c_o, c_i, k_h, k_w)$ — one full $(c_i, k_h, k_w)$ kernel per desired output channel $c_o$.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Interactive: Generating Feature Maps</h2>
+        <div id="output-channels-demo" class="visualization-container">
+            <div class="demo-controls" style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px; padding: 10px; background: #f9f9f9; border-radius: 5px; z-index: 100; position: relative;">
+                <label style="display: flex; align-items: center; gap: 8px;">
+                    Output Channels:
+                    <input type="range" id="output-channels-slider" min="1" max="4" value="2" style="width: 100px;">
+                    <span id="output-channels-value" style="font-family: monospace;">2</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px;">
+                    Kernel Type:
+                    <select id="kernel-type" style="padding: 4px;">
+                        <option value="edge">Edge Detection</option>
+                        <option value="blur">Blur</option>
+                        <option value="sharpen">Sharpen</option>
+                        <option value="random">Random</option>
+                    </select>
+                </label>
+                <button id="generate-outputs" style="background: #10099F; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">Generate</button>
+            </div>
+            <svg id="output-channels-svg" width="800" height="350"></svg>
+        </div>
+    </section>
+
+    <section data-sources='[{"text": "Dive into Deep Learning - Section 7.4.3", "url": "https://d2l.ai/chapter_convolutional-neural-networks/channels.html#times-1-times-1-convolutional-layer"}]'>
+        <h2 class="truncate-title">The Surprising 1&times;1 Convolution</h2>
+        <p style="font-size: 0.8em;">A $1\times1$ kernel has no spatial extent — it can't detect edges or textures. What's left?</p>
+        <div class="fragment mt-md text-center">
+            <img src="images/conv-1x1.svg" alt="1x1 convolution as channel mixing" style="max-width: 45%;">
+        </div>
+        <div class="fragment emphasis-box mt-sm" style="font-size: 0.8em;">
+            <p>It's exactly a <strong>fully connected layer applied per pixel</strong>, mixing information across channels only. Cheap way to change channel count or add nonlinearity — we'll see it become the star of the show in Network in Network (Part 2).</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "What does a 1×1 convolution actually compute, given that its kernel has no spatial extent?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "Nothing useful — it is equivalent to the identity function",
+                    "correct": false,
+                    "explanation": "It is far from identity: it applies a learned linear combination across channels at every pixel, which can reshape or mix channel information substantially."
+                },
+                {
+                    "text": "A per-pixel fully connected layer across channels — mixing channel information without looking at neighboring pixels",
+                    "correct": true,
+                    "explanation": "Correct! With no spatial extent, all it can do is take the c_i values at one pixel location and combine them (a learned linear map) into c_o output values — exactly a fully connected layer applied independently at each pixel."
+                },
+                {
+                    "text": "Max pooling over a 1×1 window",
+                    "correct": false,
+                    "explanation": "Pooling and convolution are different operations; a 1×1 convolution still uses learned weights and (typically) a sum, not a max over a window."
+                },
+                {
+                    "text": "It always increases the spatial resolution of the feature map",
+                    "correct": false,
+                    "explanation": "A 1×1 convolution leaves spatial dimensions (height and width) completely unchanged — it only affects the channel dimension."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT 8: PADDING ============================ -->
+<section>
+    <section data-sources='[{"text": "Dive into Deep Learning - Section 7.3", "url": "https://d2l.ai/chapter_convolutional-neural-networks/padding-and-strides.html"}]'>
+        <h2 class="truncate-title">Padding: Keeping the Borders</h2>
+        <p style="font-size: 0.8em;">Every convolution shrinks the output: an $n\times n$ input with a $k\times k$ kernel gives $(n-k+1)\times(n-k+1)$. Stack many layers and the image vanishes. Worse, border pixels are used in far fewer output computations than central ones.</p>
+        <div class="fragment mt-md emphasis-box" style="font-size: 0.8em;">
+            <p><strong>Fix:</strong> pad the input with $p$ rows/columns of zeros on each side before convolving:</p>
+            $$\text{Output size} = (n_h - k_h + p_h + 1)\times(n_w - k_w + p_w + 1)$$
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Interactive Padding Calculator</h2>
+        <div class="padding-math">
+            <div id="padding-calculator" class="interactive-demo">
+                <div class="demo-controls" style="display: flex; gap: 20px; justify-content: center; align-items: center; margin-bottom: 20px;">
+                    <label>Input Size:
+                        <input type="range" id="input-size-pad" min="3" max="10" value="5">
+                        <span id="input-size-pad-value">5&times;5</span>
+                    </label>
+                    <label>Kernel Size:
+                        <input type="range" id="kernel-size-pad" min="1" max="5" value="3" step="2">
+                        <span id="kernel-size-pad-value">3&times;3</span>
+                    </label>
+                    <label>Padding:
+                        <input type="range" id="padding-amount" min="0" max="3" value="1">
+                        <span id="padding-value">1</span>
+                    </label>
+                </div>
+                <div id="padding-viz-container"></div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Same vs. Valid Padding</h2>
+        <div class="two-column" style="font-size: 0.75em;">
+            <div class="column fragment">
+                <h5><span class="tooltip">Valid padding<span class="tooltiptext">No padding added; output is smaller than input</span></span></h5>
+                <ul><li>$p=0$</li><li>Output smaller than input</li><li>Used when shrinking is desired</li></ul>
+            </div>
+            <div class="column fragment">
+                <h5><span class="tooltip">Same padding<span class="tooltiptext">Padding chosen so output size equals input size</span></span></h5>
+                <ul><li>$p = k-1$ for odd $k$</li><li>Output size = input size</li><li>Most common choice in practice</li></ul>
+            </div>
+        </div>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.75em;">
+            <p>Odd kernel sizes (3, 5, 7) are preferred: they allow symmetric padding on both sides and give each output pixel a well-defined center pixel in its window.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "You convolve a 32×32 input with a 5×5 kernel using \"same\" padding. What is the output size, and how much padding was applied?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "28×28 output, with 0 padding",
+                    "correct": false,
+                    "explanation": "That is the \"valid\" (no padding) case, not \"same\" padding — same padding is specifically designed to avoid shrinking the output."
+                },
+                {
+                    "text": "32×32 output, with padding p = 4 (2 on each side)",
+                    "correct": true,
+                    "explanation": "Correct! For an odd kernel of size k, same padding uses p = k − 1 = 4, split symmetrically as 2 pixels on each side, giving output size n − k + p + 1 = 32 − 5 + 4 + 1 = 32."
+                },
+                {
+                    "text": "36×36 output, with padding p = 5",
+                    "correct": false,
+                    "explanation": "Same padding preserves the input size exactly — it does not enlarge the output beyond the original 32×32."
+                },
+                {
+                    "text": "32×32 output, with 0 padding",
+                    "correct": false,
+                    "explanation": "Without any padding, a 5×5 kernel would shrink a 32×32 input to 28×28 — padding is required to keep the size at 32×32."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT 9: STRIDE ============================ -->
+<section>
+    <section data-sources='[{"text": "Dive into Deep Learning - Section 7.3.2", "url": "https://d2l.ai/chapter_convolutional-neural-networks/padding-and-strides.html#stride"}]'>
+        <h2 class="truncate-title">Stride: Downsampling with Convolutions</h2>
+        <p style="font-size: 0.8em;"><span class="tooltip">Stride<span class="tooltiptext">The number of pixels the kernel window moves at each step</span></span> $s$ controls how far the kernel jumps at each step, instead of moving one pixel at a time:</p>
+        <div class="fragment mt-md two-column" style="font-size: 0.75em;">
+            <div class="column"><h5>Why stride &gt; 1?</h5><ul><li>Computational efficiency</li><li>Downsamples feature maps</li><li>Captures larger-scale structure</li></ul></div>
+            <div class="column"><h5>Combined formula</h5><p>$$\left\lfloor \frac{n_h-k_h+p_h+s_h}{s_h} \right\rfloor \times \left\lfloor \frac{n_w-k_w+p_w+s_w}{s_w} \right\rfloor$$</p></div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Interactive Stride Animation</h2>
+        <div class="stride-visualization">
+            <div id="stride-demo" class="interactive-demo">
+                <div class="demo-controls" style="margin-bottom: 20px;">
+                    <label>Horizontal Stride:
+                        <input type="range" id="h-stride" min="1" max="3" value="1">
+                        <span id="h-stride-value">1</span>
+                    </label>
+                    <label>Vertical Stride:
+                        <input type="range" id="v-stride" min="1" max="3" value="1">
+                        <span id="v-stride-value">1</span>
+                    </label>
+                    <button id="animate-stride" class="ui-button">Animate</button>
+                    <button id="reset-stride" class="ui-button secondary">Reset</button>
+                </div>
+                <div id="stride-viz-container"></div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "An 8×8 input is convolved with a 3×3 kernel, padding p=0, stride s=2. What is the output size?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "6×6",
+                    "correct": false,
+                    "explanation": "6×6 would be the result with stride 1 and no padding — stride 2 downsamples further, roughly halving that."
+                },
+                {
+                    "text": "3×3",
+                    "correct": true,
+                    "explanation": "Correct! ⌊(n−k+p+s)/s⌋ = ⌊(8−3+0+2)/2⌋ = ⌊7/2⌋ = 3, giving a 3×3 output."
+                },
+                {
+                    "text": "4×4",
+                    "correct": false,
+                    "explanation": "Applying the formula ⌊(n−k+p+s)/s⌋ with n=8, k=3, p=0, s=2 gives ⌊7/2⌋=3, not 4."
+                },
+                {
+                    "text": "8×8",
+                    "correct": false,
+                    "explanation": "The output only stays the same size as the input under \"same\" padding with stride 1 — stride 2 always downsamples."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT 10: POOLING ============================ -->
+<section>
+    <section data-sources='[{"text": "Dive into Deep Learning - Section 7.5", "url": "https://d2l.ai/chapter_convolutional-neural-networks/pooling.html"}]'>
+        <h2 class="truncate-title">Pooling: Robustness through Downsampling</h2>
+        <p style="font-size: 0.8em;">Even with translation-invariant filters, a 1-pixel shift of the whole image shifts every feature map by 1 pixel too. <strong>Pooling</strong> summarizes a small window into one value, adding local robustness to exactly this kind of shift.</p>
+        <div class="fragment mt-md two-column" style="font-size: 0.75em;">
+            <div class="column"><h5>Max Pooling</h5><p>Takes the maximum value in each window — keeps the strongest activation, dominant in practice.</p></div>
+            <div class="column"><h5>Average Pooling</h5><p>Takes the mean value in each window — smoother, but dilutes strong signals.</p></div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Interactive Demo: Pooling Operations</h2>
+        <div id="pooling-demo" class="visualization-container">
+            <div class="demo-controls" style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px; padding: 10px; background: #f9f9f9; border-radius: 5px; z-index: 100; position: relative;">
+                <label style="display: flex; align-items: center; gap: 8px;">
+                    Pool Size:
+                    <input type="range" id="pool-size-slider" min="2" max="4" value="2" style="width: 100px;">
+                    <span id="pool-size-value" style="font-family: monospace;">2&times;2</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px;">
+                    Type:
+                    <select id="pool-type" style="padding: 4px;">
+                        <option value="max">Max Pooling</option>
+                        <option value="avg">Average Pooling</option>
+                    </select>
+                </label>
+                <button id="animate-pooling" style="background: #10099F; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">Animate</button>
+                <button id="reset-pooling" style="background: #2DD2C0; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">Reset</button>
+            </div>
+            <svg id="pooling-svg" width="800" height="400"></svg>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Pooling Also Downsamples — and Previews Part 2</h2>
+        <p style="font-size: 0.8em;">Like a strided convolution, pooling shrinks spatial dimensions (its own padding/stride rules apply), but with no learned parameters — cheap and effective. Applied per-channel independently, never mixing channels.</p>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.8em;">
+            <p><strong>Global Average Pooling</strong> takes this to the extreme: pool an entire $h\times w$ feature map down to a single number per channel. In Part 2 we'll see this technique eliminate fully connected layers entirely (Network in Network).</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "What is the key benefit pooling provides that a plain (unstrided) convolution does not?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "It learns new features via a trainable kernel",
+                    "correct": false,
+                    "explanation": "Pooling has no learned parameters at all — that is a defining difference from convolution, not a shared benefit."
+                },
+                {
+                    "text": "It adds local robustness to small translations, since a shift within the pooling window doesn&#39;t change the output",
+                    "correct": true,
+                    "explanation": "Correct! If the input shifts by a pixel but the maximum (or average) value in the window is unchanged, the pooled output is unaffected — giving the network some built-in shift tolerance."
+                },
+                {
+                    "text": "It increases the number of channels",
+                    "correct": false,
+                    "explanation": "Pooling operates independently per channel and never changes the channel count — only spatial dimensions."
+                },
+                {
+                    "text": "It mixes information across channels, like a 1×1 convolution",
+                    "correct": false,
+                    "explanation": "Pooling is applied separately to each channel; it never combines information across channels, unlike a 1×1 convolution."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT 11: HIERARCHY & RECEPTIVE FIELDS ============================ -->
+<section>
+    <section data-sources='[{"text": "Field (1987) - The organization of horizontal connections in the cat visual cortex", "url": "https://d2l.ai/chapter_convolutional-neural-networks/why-conv.html"}]'>
+        <h2 class="truncate-title">Hierarchical Representations</h2>
+        <p style="font-size: 0.8em;">Stack many convolutional layers and something powerful emerges: each layer's neurons see a larger and larger region of the original image — its <span class="tooltip">receptive field<span class="tooltiptext">The region of the input image that can influence a given neuron's activation</span></span>.</p>
+        <div class="fragment mt-md text-center">
+            <img src="images/field-visual-cortex.jpg" alt="Visual cortex hierarchical processing" style="max-width: 22%; max-height: 220px; border-radius: 6px;">
+        </div>
+        <div class="fragment emphasis-box mt-sm" style="font-size: 0.75em;">
+            <p>This mirrors the mammalian visual cortex: simple cells detect edges, complex cells combine them into shapes, further layers combine those into objects — a hierarchy CNNs learn end-to-end rather than by hand.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Interactive: Receptive Field Growth</h2>
+        <div id="receptive-growth-demo" class="growth-viz">
+            <div class="demo-controls">
+                <label>Network Depth:
+                    <input type="range" id="depth-slider" min="1" max="5" value="1">
+                    <span id="depth-value">1 layer</span>
+                </label>
+            </div>
+            <svg id="receptive-growth-svg" width="750" height="400"></svg>
+        </div>
+        <div class="fragment mt-md" style="font-size: 0.7em;">
+            <p>With 3&times;3 kernels: layer 1 sees 3&times;3 pixels, layer 2 sees 5&times;5, layer 3 sees 7&times;7, layer $n$ sees $(2n{+}1)\times(2n{+}1)$ — receptive fields grow linearly with depth, without any single kernel ever getting large.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "Why do CNNs achieve a large effective receptive field by stacking many small (e.g. 3×3) kernels rather than using one huge kernel?",
+            "type": "multiple",
+            "options": [
+                {
+                    "text": "Stacking small kernels uses far fewer parameters for the same receptive field size",
+                    "correct": true,
+                    "explanation": "Correct! A single 7×7 kernel has 49 weights per channel; two stacked 3×3 kernels reach the same 7×7-ish receptive field with only 2×9=18."
+                },
+                {
+                    "text": "Stacking small kernels inserts more nonlinearities (activation functions) between layers",
+                    "correct": true,
+                    "explanation": "Correct! Each extra 3×3 layer adds another activation function, letting the network represent more complex functions than a single large linear kernel could."
+                },
+                {
+                    "text": "Small kernels can only detect edges, never larger shapes",
+                    "correct": false,
+                    "explanation": "It is exactly the stacking that lets small kernels build up to detecting larger shapes — a single 3×3 kernel is limited, but many stacked together are not."
+                },
+                {
+                    "text": "Large kernels are mathematically impossible to implement",
+                    "correct": false,
+                    "explanation": "Large kernels are perfectly implementable — they are just less parameter- and compute-efficient than an equivalent stack of small ones."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT 12: LENET ============================ -->
+<section>
+    <section data-sources='[{"text": "LeCun et al. (1998) - Gradient-Based Learning Applied to Document Recognition", "url": "https://d2l.ai/chapter_convolutional-neural-networks/lenet.html"}]'>
+        <h2 class="truncate-title">LeNet: The First Convolutional Network</h2>
+        <p style="font-size: 0.8em;">In 1998, LeCun combined everything we've derived — convolutions, pooling, and a small classifier head — into LeNet-5, trained to recognize handwritten digits for reading bank checks.</p>
+        <div class="fragment mt-md emphasis-box" style="font-size: 0.8em;">
+            <p>&#128176; Some ATMs still ran the original 1990s LeNet code decades later — a testament to how well-designed the architecture was.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Problem Context: Handwritten Digit Recognition</h2>
+        <div class="demo-container">
+            <p style="font-size: 0.8em;">MNIST: 28&times;28 grayscale images of handwritten digits (0&ndash;9)</p>
+            <div id="mnist-samples-container" style="display: flex; justify-content: center; gap: 20px; margin: 30px 0;">
+                <canvas id="mnist-canvas" width="280" height="280" style="border: 2px solid #10099F; border-radius: 5px;"></canvas>
+                <div style="text-align: left; font-size: 0.75em;">
+                    <h4>Challenges:</h4>
+                    <ul><li>Varying handwriting styles</li><li>Different stroke widths</li><li>Rotation and scaling</li></ul>
+                    <p class="mt-md"><strong>Traditional approaches:</strong></p>
+                    <ul><li>Hand-crafted features</li><li>Template matching</li><li>Support Vector Machines</li></ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">LeNet-5 Architecture</h2>
+        <img src="images/lenet.svg" alt="LeNet-5 Architecture" style="width: 85%; max-width: 850px;">
+        <div class="two-column-layout mt-md" style="font-size: 0.6em;">
+            <div>
+                <h4>Convolutional Encoder</h4>
+                <ul><li>Conv (6@5&times;5, pad=2) &rarr; AvgPool</li><li>Conv (16@5&times;5) &rarr; AvgPool</li><li>Sigmoid activation throughout</li></ul>
+            </div>
+            <div>
+                <h4>Dense Classifier</h4>
+                <ul><li>3 fully connected layers</li><li>120 &rarr; 84 &rarr; 10 neurons</li><li>10-class digit output</li></ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">LeNet's Legacy: The Template for Everything Since</h2>
+        <p style="font-size: 0.8em;">Alternate convolution (extract features) and pooling (downsample), increase channel depth while decreasing spatial size, end with a small classifier — every architecture in Part 2 follows this same skeleton.</p>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.8em;">
+            <p>Swap LeNet's sigmoid for ReLU, average pooling for max pooling, and scale up the data and compute by orders of magnitude — and you get AlexNet, next.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "Which structural pattern, first established by LeNet-5, is still used by essentially every modern CNN?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "Sigmoid activations throughout the network",
+                    "correct": false,
+                    "explanation": "Sigmoid was a limitation of the 1998 hardware/theory of the time — modern networks almost universally replaced it with ReLU and its variants."
+                },
+                {
+                    "text": "Alternating convolution and pooling to extract features, increasing channels while decreasing spatial size, ending in a small classifier",
+                    "correct": true,
+                    "explanation": "Correct! This overall skeleton — convolutional feature extractor with growing depth and shrinking spatial size, followed by a classification head — is exactly what AlexNet, VGG, and every architecture since reuses."
+                },
+                {
+                    "text": "Using exactly 5 layers total",
+                    "correct": false,
+                    "explanation": "Modern networks range from a handful to over a hundred layers; the specific layer count of LeNet was not the lasting contribution."
+                },
+                {
+                    "text": "Average pooling instead of max pooling",
+                    "correct": false,
+                    "explanation": "Average pooling was LeNet&#39;s original choice, but max pooling became the dominant choice in the architectures that followed it."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ================================================================
+     PART 2: Modern Convolutional Architectures (Chapter 8)
+     ================================================================ -->
+<section>
+    <h2 class="truncate-title">Part 2: Modern Convolutional Architectures</h2>
+    <p>Chapter 8 — From AlexNet to ResNet</p>
+    <div class="fragment mt-lg">
+        <p>LeNet worked in 1998. It took until 2012 for CNNs to dominate computer vision. We'll trace the sequence of architectural ideas that made that leap possible — and made networks with hundreds of layers trainable.</p>
+    </div>
+    <div class="fragment emphasis-box mt-lg">
+        <p>Each architecture in this part fixes a specific limitation of the one before it — this is a story of incremental, well-motivated engineering, not one big leap.</p>
+    </div>
+</section>
+
+<!-- ============================ BEAT 13: THE IMAGENET MOMENT ============================ -->
+<section>
+    <section data-sources='[{"text": "Krizhevsky et al. (2012) - ImageNet Classification with Deep CNNs", "url": "https://papers.nips.cc/paper/2012/file/c399862d3b9d6b76c8436e924a68c45b-Paper.pdf"}, {"text": "He et al. (2016) - Deep Residual Learning", "url": "https://arxiv.org/abs/1512.03385"}]'>
+        <h2 class="truncate-title">The ImageNet Moment</h2>
+        <p style="font-size: 0.8em;">Before 2012, computer vision meant hand-engineered features (SIFT, SURF, HOG) fed into a shallow classifier. ImageNet — 1.2 million labeled images across 1000 categories — created a benchmark large enough to reward learning features instead of designing them.</p>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.8em;">
+            <p>In 2012, a CNN (AlexNet) beat the next-best entry by more than 10 percentage points. Every winning entry since has been a CNN — until Vision Transformers, which we'll preview at the very end.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">A Tour of Groundbreaking Architectures</h2>
+        <div class="architecture-timeline">
+            <div id="architecture-timeline-viz" style="margin-top: 20px;">
+                <svg width="800" height="400" style="display: block; margin: 0 auto;"></svg>
+            </div>
+            <div class="timeline-legend fragment" style="font-size: 0.5em; margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="legend-item"><span class="dot alexnet"></span> AlexNet (2012): First deep CNN to win ImageNet</div>
+                <div class="legend-item"><span class="dot vgg"></span> VGG (2014): Showed that depth matters</div>
+                <div class="legend-item"><span class="dot nin"></span> NiN (2013): 1&times;1 convolutions replace FC layers</div>
+                <div class="legend-item"><span class="dot googlenet"></span> GoogLeNet (2015): Inception modules</div>
+                <div class="legend-item"><span class="dot resnet"></span> ResNet (2016): Residual connections &mdash; 152 layers!</div>
+                <div class="legend-item"><span class="dot densenet"></span> DenseNet (2017): Dense connections</div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "What made 2012 the turning point for CNNs in computer vision, rather than the underlying convolution idea itself (which existed since the 1990s)?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "Convolution was mathematically reformulated to be more powerful",
+                    "correct": false,
+                    "explanation": "The convolution operation itself was unchanged — the breakthrough was about scale of data and compute, not new mathematics."
+                },
+                {
+                    "text": "A large labeled dataset (ImageNet) and GPU compute finally made training deep CNNs at scale feasible",
+                    "correct": true,
+                    "explanation": "Correct! LeNet-style CNNs already existed; what changed by 2012 was the availability of millions of labeled images and GPUs fast enough to train much larger networks on them."
+                },
+                {
+                    "text": "Fully connected networks were banned from the ImageNet competition",
+                    "correct": false,
+                    "explanation": "There was no such rule — fully connected and other approaches competed freely; CNNs simply won decisively on merit."
+                },
+                {
+                    "text": "Hand-engineered features like SIFT were found to be mathematically incorrect",
+                    "correct": false,
+                    "explanation": "SIFT and similar features were not \"incorrect\" — they were simply outperformed once learned features had enough data and compute to be trained end-to-end."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT 14: ALEXNET ============================ -->
+<section>
+    <section data-sources='[{"text": "Dive into Deep Learning - Section 8.1", "url": "https://d2l.ai/chapter_convolutional-modern/alexnet.html"}]'>
+        <h2 class="truncate-title">AlexNet: Deep Learning's Breakthrough</h2>
+        <p style="font-size: 0.75em;">Architecturally, AlexNet is "a bigger, deeper LeNet": 5 convolutional layers plus 3 fully connected layers, trained on 224&times;224 ImageNet images across 1000 classes — about 60 million parameters, roughly 250&times; more than LeNet.</p>
+        <table style="font-size: 0.55em; margin: 15px auto;">
+            <thead><tr><th></th><th>LeNet (1998)</th><th>AlexNet (2012)</th></tr></thead>
+            <tbody>
+                <tr><td>Depth</td><td>2 conv + 3 FC</td><td>5 conv + 3 FC</td></tr>
+                <tr><td>Activation</td><td>Sigmoid</td><td>ReLU</td></tr>
+                <tr><td>Dataset</td><td>MNIST (60K)</td><td>ImageNet (1.2M)</td></tr>
+                <tr><td>Compute</td><td>CPU</td><td>2 GPUs</td></tr>
+                <tr><td>Regularization</td><td>&mdash;</td><td>Dropout + data augmentation</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Learned First-Layer Filters</h2>
+        <div class="text-center">
+            <img src="images/alexnet_filters.jpg" alt="AlexNet first layer learned filters" style="max-width: 320px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        </div>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.8em;">
+            <p>These edge- and color-blob detectors were <em>learned</em> from data via gradient descent, not hand-designed — remarkably similar to what neuroscientists find in the early visual cortex.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "Architecturally, what is the most accurate one-sentence description of AlexNet relative to LeNet?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "A completely different architecture with no relation to LeNet",
+                    "correct": false,
+                    "explanation": "AlexNet follows the exact same convolution-then-classifier skeleton as LeNet — it is an evolution, not a break from it."
+                },
+                {
+                    "text": "A deeper, wider version of LeNet trained with more data, more compute, ReLU, and stronger regularization",
+                    "correct": true,
+                    "explanation": "Correct! AlexNet keeps LeNet&#39;s basic recipe (conv+pool stages feeding a classifier) but scales everything up and modernizes the components — this is the throughline the whole chapter tells."
+                },
+                {
+                    "text": "A network that removes convolutional layers entirely in favor of attention",
+                    "correct": false,
+                    "explanation": "AlexNet is built almost entirely from convolutional and fully connected layers; attention mechanisms come much later in the course."
+                },
+                {
+                    "text": "A network specifically designed to have fewer parameters than LeNet",
+                    "correct": false,
+                    "explanation": "AlexNet has roughly 250× more parameters than LeNet — its goal was greater capacity to exploit the much larger ImageNet dataset, not parameter efficiency."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT 15: ALEXNET INNOVATIONS ============================ -->
+<section>
+    <section data-sources='[{"text": "Krizhevsky et al. (2012) - Data Augmentation", "url": "https://papers.nips.cc/paper/2012/file/c399862d3b9d6b76c8436e924a68c45b-Paper.pdf"}]'>
+        <h2 class="truncate-title">AlexNet's Key Innovations</h2>
+        <div class="two-column" style="font-size: 0.75em;">
+            <div class="column fragment"><h5>ReLU instead of Sigmoid</h5><p>No saturation for $x>0$ &rarr; much faster, more stable training of a deeper network.</p></div>
+            <div class="column fragment"><h5>Dropout</h5><p>Randomly zero fully connected activations during training &mdash; the same regularization idea from earlier this semester's Multilayer Perceptrons lecture, now applied at scale.</p></div>
+        </div>
+        <div class="fragment mt-md emphasis-box" style="font-size: 0.75em;">
+            <p><strong>Data augmentation</strong> and <strong>GPU training</strong> (splitting the network across 2 GPUs) round out the list &mdash; together these four changes are what actually made a much bigger network trainable.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Interactive: Data Augmentation</h2>
+        <div class="augmentation-demo" style="margin: 20px 0;">
+            <div class="demo-controls" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 15px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
+                <button class="aug-btn" data-aug="original" style="padding: 6px 12px; border: 1px solid #10099F; background: #10099F; color: white; border-radius: 5px; cursor: pointer;">Original</button>
+                <button class="aug-btn" data-aug="flip" style="padding: 6px 12px; border: 1px solid #10099F; background: white; border-radius: 5px; cursor: pointer;">Vertical Flip</button>
+                <button class="aug-btn" data-aug="crop" style="padding: 6px 12px; border: 1px solid #10099F; background: white; border-radius: 5px; cursor: pointer;">Random Crop</button>
+                <button class="aug-btn" data-aug="color" style="padding: 6px 12px; border: 1px solid #10099F; background: white; border-radius: 5px; cursor: pointer;">Color Jitter</button>
+                <button class="aug-btn" data-aug="pca" style="padding: 6px 12px; border: 1px solid #10099F; background: white; border-radius: 5px; cursor: pointer;">PCA Color</button>
+            </div>
+            <div id="augmentation-viz" style="background: white; padding: 20px; border-radius: 8px;"></div>
+        </div>
+        <div class="fragment mt-sm" style="font-size: 0.7em;">
+            <p>Random crops, flips, and color jitter multiply the effective training set size for free &mdash; a cheap, powerful regularizer that's still standard practice today.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "Which combination of techniques was most responsible for making AlexNet&#39;s much larger network actually trainable and generalizable?",
+            "type": "multiple",
+            "options": [
+                {
+                    "text": "ReLU activation, avoiding the vanishing-gradient-prone saturation of sigmoid",
+                    "correct": true,
+                    "explanation": "Correct! ReLU&#39;s non-saturating gradient for positive inputs let gradients flow through a much deeper stack of layers than sigmoid could support."
+                },
+                {
+                    "text": "Dropout and data augmentation, controlling overfitting on a network with ~60 million parameters",
+                    "correct": true,
+                    "explanation": "Correct! With so many parameters, strong regularization (dropout in the FC layers, augmented training images) was essential to generalize rather than memorize."
+                },
+                {
+                    "text": "Replacing all convolutions with fully connected layers",
+                    "correct": false,
+                    "explanation": "The opposite is true — AlexNet is still fundamentally convolutional; it does not replace convolutions with FC layers."
+                },
+                {
+                    "text": "Training on a dataset of only a few hundred images",
+                    "correct": false,
+                    "explanation": "AlexNet relied on ImageNet&#39;s 1.2 million labeled images — a tiny dataset would have made its large parameter count catastrophically overfit."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT 16: VGG ============================ -->
+<section>
+    <section data-sources='[{"text": "Simonyan & Zisserman (2014) - Very Deep Convolutional Networks", "url": "https://d2l.ai/chapter_convolutional-modern/vgg.html"}]'>
+        <h2 class="truncate-title">VGG: Designing with Blocks</h2>
+        <p style="font-size: 0.75em;">AlexNet's design was somewhat ad hoc. VGG's insight: stop designing individual layers — design a reusable <strong>block</strong>, then stack copies of it.</p>
+        <div style="display: flex; flex-direction: column; align-items: center; font-size: 0.65em;">
+            <div class="vgg-block-structure" style="background: #f9f9f9; padding: 15px; border-radius: 10px; width: 75%;">
+                <h4 style="margin-top:0;">The VGG Block</h4>
+                <ol style="font-size: 0.9em; margin: 0;">
+                    <li>Several 3&times;3 convolutions (padding=1, same channel count)</li>
+                    <li>ReLU after each convolution</li>
+                    <li>One 2&times;2 max-pool, stride 2, at the end (halves spatial size)</li>
+                </ol>
+            </div>
+            <div id="vgg-block-animation" style="margin-top: 20px;"></div>
+            <div class="demo-controls" style="margin-top: 10px; z-index: 100;">
+                <button id="animate-vgg-block" style="background: #10099F; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;">Animate Forward Pass</button>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Why 3&times;3 Convolutions?</h2>
+        <p style="font-size: 0.75em;">Two stacked 3&times;3 convolutions cover the same 5&times;5 receptive field as one 5&times;5 convolution — but with fewer parameters ($2\times 9=18$ vs. $25$, per channel) and an extra ReLU nonlinearity in between.</p>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.8em;">
+            <p>This is exactly the receptive-field argument from Part 1's "Hierarchical Representations" beat, now put to deliberate architectural use.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">The VGG Family</h2>
+        <img src="images/vgg-architecture.svg" alt="VGG Architecture family (VGG-11/13/16/19)" style="max-width: 32%;">
+        <div class="fragment mt-sm" style="font-size: 0.75em;">
+            <p>VGG-11 through VGG-19 are literally the same block, repeated a different number of times per stage. VGG showed that scaling depth <em>uniformly</em> and <em>predictably</em> — not by ad hoc redesign — reliably improves accuracy.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "What is VGG&#39;s central architectural contribution, beyond simply having more layers than AlexNet?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "It introduced the ReLU activation function",
+                    "correct": false,
+                    "explanation": "ReLU was already introduced by AlexNet; VGG&#39;s contribution is a different, structural idea."
+                },
+                {
+                    "text": "It showed that networks can be designed by stacking a single reusable block (repeated 3×3 conv + pool) instead of hand-tuning every layer",
+                    "correct": true,
+                    "explanation": "Correct! This block-based design made depth a simple, systematic knob to turn (VGG-11/13/16/19 are all the same block, repeated differently), rather than something requiring bespoke layer-by-layer design."
+                },
+                {
+                    "text": "It eliminated the need for pooling layers",
+                    "correct": false,
+                    "explanation": "VGG blocks end with a max-pooling layer — pooling remains a core part of the design, not something removed."
+                },
+                {
+                    "text": "It replaced convolutions with fully connected layers throughout",
+                    "correct": false,
+                    "explanation": "VGG is, if anything, more convolutional than AlexNet; only the final classifier head uses fully connected layers."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT 17: NIN ============================ -->
+<section>
+    <section data-sources='[{"text": "Lin et al. (2013) - Network In Network", "url": "https://d2l.ai/chapter_convolutional-modern/nin.html"}]'>
+        <h2 class="truncate-title">Network in Network: Ditching Fully Connected Layers</h2>
+        <p style="font-size: 0.75em;">VGG's fully connected classifier head holds the vast majority of its parameters (over 100 million) and is prone to overfitting. NiN asks: can we avoid FC layers entirely?</p>
+        <div id="nin-block-viz" style="margin: 15px 0;"></div>
+        <div class="fragment mt-sm emphasis-box" style="font-size: 0.75em;">
+            <p>A <strong>NiN block</strong> = one regular convolution, followed by two $1\times1$ convolutions acting as a tiny per-pixel MLP &mdash; exactly the 1&times;1 convolution from Part 1, now used deliberately for this purpose.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Global Average Pooling Replaces the Classifier</h2>
+        <p style="font-size: 0.8em;">NiN's final layer produces exactly as many channels as classes, then applies <strong>global average pooling</strong> (the technique previewed in Part 1) to collapse each channel's whole feature map to one number — the class score. No FC layer, no flattening, far fewer parameters.</p>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.75em;">
+            <p>NiN traded raw accuracy for a dramatically smaller, less overfit-prone model — a tradeoff that shows up again and again in the rest of this story.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "How does Network in Network (NiN) avoid using fully connected layers, while VGG cannot?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "NiN uses 1×1 convolutions as a per-pixel MLP inside each block, then Global Average Pooling to turn the final feature maps directly into class scores",
+                    "correct": true,
+                    "explanation": "Correct! By making the last convolutional stage output exactly one channel per class, and using GAP to reduce each channel&#39;s spatial map to a single number, NiN gets a class-score vector without ever needing a flatten-and-FC step."
+                },
+                {
+                    "text": "NiN simply has fewer convolutional layers than VGG",
+                    "correct": false,
+                    "explanation": "Layer count is not the mechanism — the key change is replacing the classifier head&#39;s structure (FC layers) with 1×1 convolutions and GAP."
+                },
+                {
+                    "text": "NiN uses larger images so flattening becomes unnecessary",
+                    "correct": false,
+                    "explanation": "Image size is unrelated; the fix is architectural (GAP + 1×1 convs), not a change to input resolution."
+                },
+                {
+                    "text": "NiN removes all nonlinear activation functions",
+                    "correct": false,
+                    "explanation": "NiN still uses ReLU throughout, including after its 1×1 convolutions — nonlinearity is preserved, not removed."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT 18: GOOGLENET ============================ -->
+<section>
+    <section data-sources='[{"text": "Szegedy et al. (2015) - Going Deeper with Convolutions", "url": "https://d2l.ai/chapter_convolutional-modern/googlenet.html"}]'>
+        <h2 class="truncate-title">GoogLeNet: Going Wide with Inception</h2>
+        <p style="font-size: 0.75em;">Which kernel size is "right" — 1&times;1, 3&times;3, 5&times;5? GoogLeNet's answer: stop choosing. Run several kernel sizes <strong>in parallel</strong> and let the network learn how to weigh them.</p>
+        <div class="branch-details fragment mt-md" style="font-size: 0.65em;">
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                <div style="background: #f9f9f9; padding: 10px; border-radius: 5px;"><strong>Branch 1:</strong> 1&times;1 conv</div>
+                <div style="background: #f9f9f9; padding: 10px; border-radius: 5px;"><strong>Branch 2:</strong> 1&times;1 &rarr; 3&times;3 conv</div>
+                <div style="background: #f9f9f9; padding: 10px; border-radius: 5px;"><strong>Branch 3:</strong> 1&times;1 &rarr; 5&times;5 conv</div>
+                <div style="background: #f9f9f9; padding: 10px; border-radius: 5px;"><strong>Branch 4:</strong> 3&times;3 max pool &rarr; 1&times;1 conv</div>
+            </div>
+        </div>
+        <div class="fragment emphasis-box mt-sm" style="font-size: 0.7em;">
+            <p>The 1&times;1 convolutions before the expensive 3&times;3/5&times;5 branches aren't incidental &mdash; they're a cheap <strong>dimension-reduction</strong> trick (yet another job for the 1&times;1 conv) that keeps the whole block computationally affordable.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Interactive: GoogLeNet Architecture</h2>
+        <div class="googlenet-architecture">
+            <div id="googlenet-full-arch" style="margin: 20px auto;"></div>
+            <div class="demo-controls" style="display: flex; justify-content: center; gap: 15px; margin-top: 15px;">
+                <button id="explore-stages" style="background: #10099F; color: white; padding: 6px 14px; border: none; border-radius: 5px;">Explore Stages</button>
+                <button id="show-dimensions" style="background: #2DD2C0; color: white; padding: 6px 14px; border: none; border-radius: 5px;">Show Dimensions</button>
+            </div>
+        </div>
+        <div class="fragment mt-sm" style="font-size: 0.7em;">
+            <p>Stem (initial convs) &rarr; body of 9 stacked Inception blocks &rarr; global average pooling head (NiN's trick again) &mdash; a three-part pattern that became standard.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "What problem does the Inception block&#39;s multi-branch design (1×1, 3×3, 5×5, pooling in parallel) solve?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "It removes the need to choose a single \"best\" kernel size, letting the network combine multiple scales of features at once",
+                    "correct": true,
+                    "explanation": "Correct! Different objects and features in an image appear at different spatial scales; running several kernel sizes in parallel and concatenating lets the network use whichever scale (or combination) works best for a given input, learned automatically."
+                },
+                {
+                    "text": "It reduces the total number of layers needed",
+                    "correct": false,
+                    "explanation": "GoogLeNet is actually deeper than VGG in terms of building blocks (9 Inception blocks) — the innovation is about breadth per block, not fewer layers overall."
+                },
+                {
+                    "text": "It removes the need for any pooling",
+                    "correct": false,
+                    "explanation": "One of the four Inception branches is itself a pooling branch, and GoogLeNet still uses a global average pooling head — pooling remains essential."
+                },
+                {
+                    "text": "It guarantees the network never overfits",
+                    "correct": false,
+                    "explanation": "No architectural choice guarantees zero overfitting; Inception blocks address feature-scale flexibility and compute efficiency, not overfitting per se."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT 19: COMPUTATIONAL COST ============================ -->
+<section>
+    <section data-sources='[{"text": "Dive into Deep Learning - Chapters 8.1-8.4", "url": "https://d2l.ai/chapter_convolutional-modern/index.html"}]'>
+        <h2 class="truncate-title">Computational Cost: Comparing the Architectures</h2>
+        <p style="font-size: 0.75em;">Each architecture we've seen made a different tradeoff between accuracy, parameter count, and compute:</p>
+        <table style="font-size: 0.55em; margin: 15px auto;">
+            <thead><tr><th>Architecture</th><th>Key Idea</th><th>Parameters</th><th>Where They Live</th></tr></thead>
+            <tbody>
+                <tr><td>AlexNet</td><td>Scale + ReLU + Dropout</td><td>~60M</td><td>Mostly FC layers</td></tr>
+                <tr><td>VGG-16</td><td>Uniform 3&times;3 blocks</td><td>~138M</td><td>Almost all in FC layers</td></tr>
+                <tr><td>NiN</td><td>1&times;1 conv + GAP</td><td>~8M</td><td>No FC layers at all</td></tr>
+                <tr><td>GoogLeNet</td><td>Parallel multi-scale blocks</td><td>~7M</td><td>Spread across conv layers</td></tr>
+            </tbody>
+        </table>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.75em;">
+            <p>The trend across this whole story: fully connected layers are parameter-hungry and prone to overfitting; every later architecture finds a way to shrink or eliminate them, mainly via 1&times;1 convolutions and global average pooling.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "Looking at the architecture progression AlexNet → VGG → NiN → GoogLeNet, what is the clearest overall trend in parameter count and where those parameters live?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "Parameter count keeps increasing, and stays concentrated in the fully connected layers",
+                    "correct": false,
+                    "explanation": "NiN and GoogLeNet dramatically cut total parameters compared to AlexNet and VGG — the trend is a sharp decrease, not a continued increase."
+                },
+                {
+                    "text": "Later architectures shrink total parameters substantially, largely by replacing large FC classifier heads with 1×1 convolutions and global average pooling",
+                    "correct": true,
+                    "explanation": "Correct! VGG-16&#39;s ~138M parameters mostly live in its FC layers; NiN and GoogLeNet cut parameters by roughly an order of magnitude by eliminating or shrinking that FC head via 1×1 convs and GAP."
+                },
+                {
+                    "text": "Every architecture after AlexNet removes convolutional layers entirely",
+                    "correct": false,
+                    "explanation": "Convolutional layers remain the backbone of every one of these architectures — what changes is the classifier head at the end, not the convolutional body."
+                },
+                {
+                    "text": "Parameter count is unrelated to which layers use fully connected vs. convolutional structure",
+                    "correct": false,
+                    "explanation": "The relationship is very direct: FC layers connect every input to every output and are far more parameter-dense per unit than convolutional layers, which is exactly why replacing them cuts parameter counts so much."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT 20: BATCH NORMALIZATION ============================ -->
+<section>
+    <section data-sources='[{"text": "Ioffe & Szegedy (2015) - Batch Normalization", "url": "https://d2l.ai/chapter_convolutional-modern/batch-norm.html"}]'>
+        <h2 class="truncate-title">Batch Normalization: Stabilizing Deep Training</h2>
+        <p style="font-size: 0.75em;">As networks get deeper, each layer's input distribution keeps shifting as earlier layers' weights update during training — making later layers chase a moving target. Batch Norm normalizes each layer's activations, then lets the network re-scale and re-shift them with learned parameters:</p>
+        <div class="fragment mt-md emphasis-box">
+            <p style="font-size: 0.85em;">$$\text{BN}(\mathbf{x}) = \gamma \odot \frac{\mathbf{x} - \hat{\mu}_{\mathcal{B}}}{\hat{\sigma}_{\mathcal{B}}} + \beta$$</p>
+            <p style="font-size: 0.7em;">$\hat\mu_\mathcal{B}, \hat\sigma_\mathcal{B}$: mean/std over the current minibatch. $\gamma,\beta$: learned scale and shift.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">BN for Convolutional Layers &amp; Train vs. Inference</h2>
+        <p style="font-size: 0.75em;">For conv layers, statistics are computed <strong>per channel</strong>, over both the batch and all spatial positions — consistent with translation invariance: every spatial position of a channel is treated as "the same feature."</p>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.75em;">
+            <p>At test time there's no "batch" to normalize against — BN instead uses a running average of $\mu,\sigma$ collected during training. This train/inference distinction is a common source of bugs; frameworks handle it via a model.eval() flag.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Performance Impact</h2>
+        <div class="performance-impact">
+            <div id="performance-comparison-viz" style="height: 350px; background: #f5f5f5; border-radius: 8px;"></div>
+            <div class="metrics-grid fragment" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; font-size: 0.6em;">
+                <div style="background: #e3f2fd; padding: 12px; border-radius: 8px; text-align: center;"><div style="font-size: 1.8em; color: #10099F; font-weight: bold;">10&times;</div><p>Faster convergence</p></div>
+                <div style="background: #f3e5f5; padding: 12px; border-radius: 8px; text-align: center;"><div style="font-size: 1.8em; color: #7b1fa2; font-weight: bold;">100&times;</div><p>Larger learning rates tolerable</p></div>
+                <div style="background: #e8f5e9; padding: 12px; border-radius: 8px; text-align: center;"><div style="font-size: 1.8em; color: #2e7d32; font-weight: bold;">&darr;</div><p>Mild regularization effect</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "Why does Batch Normalization compute separate statistics per channel (rather than one global statistic) for convolutional layers?",
+            "type": "multiple",
+            "options": [
+                {
+                    "text": "Each channel represents a distinct learned feature, and different features can have very different activation scales",
+                    "correct": true,
+                    "explanation": "Correct! One channel might be an edge detector with small activations, another a color-blob detector with large ones — normalizing them jointly would distort both."
+                },
+                {
+                    "text": "It is consistent with translation invariance: every spatial position within a channel is treated as the same feature",
+                    "correct": true,
+                    "explanation": "Correct! Since a convolutional channel&#39;s weights are shared across all spatial positions, it makes sense to pool statistics over the batch AND spatial positions within that one channel, but keep channels separate."
+                },
+                {
+                    "text": "Per-channel statistics remove the need for a bias term entirely",
+                    "correct": false,
+                    "explanation": "Batch Norm&#39;s own learned shift parameter β effectively subsumes the bias role for that layer, but this is a side effect, not the reason for per-channel statistics."
+                },
+                {
+                    "text": "It is required so the network can be evaluated with a batch size of exactly 1",
+                    "correct": false,
+                    "explanation": "Batch size 1 is actually the hardest case for Batch Norm (no meaningful batch statistics) — per-channel statistics don&#39;t solve that; running averages at inference time do."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT 21: RESNET DEGRADATION + RESIDUAL BLOCK ============================ -->
+<section>
+    <section data-sources='[{"text": "He et al. (2016) - Deep Residual Learning for Image Recognition", "url": "https://d2l.ai/chapter_convolutional-modern/resnet.html"}]'>
+        <h2 class="truncate-title">ResNet: The Degradation Problem</h2>
+        <p style="font-size: 0.8em;">Common sense says a deeper network should do at least as well as a shallow one — it could just learn the identity function on its extra layers. In practice, researchers found the opposite:</p>
+        <div class="fragment mt-md" style="background: #ffebee; padding: 15px; border-radius: 8px; font-size: 0.75em;">
+            <h5 style="color: #d32f2f; margin-top: 0;">Counterintuitive Observation</h5>
+            <ul><li>A 56-layer plain network has <strong>higher training error</strong> than a 20-layer one</li><li>Not overfitting — training error itself is worse</li><li>It's an <strong>optimization</strong> problem: deep plain networks are hard to train, not fundamentally hard to represent well</li></ul>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">The Fix: Learn the Residual, Not the Full Mapping</h2>
+        <p style="font-size: 0.75em;">Instead of asking a block to learn a full mapping $f(\mathbf{x})$, ask it to learn the <strong>residual</strong> $g(\mathbf{x}) = f(\mathbf{x}) - \mathbf{x}$, and add the input back:</p>
+        <div class="fragment mt-md emphasis-box">
+            <p style="font-size: 1.1em; text-align: center;">$$f(\mathbf{x}) = \mathbf{x} + g(\mathbf{x})$$</p>
+        </div>
+        <div class="fragment mt-sm" style="font-size: 0.75em;">
+            <p>If identity really is the best choice for this block, the network just has to learn $g(\mathbf{x})=0$ — trivial for gradient descent — rather than painstakingly learning to copy $\mathbf{x}$ through nonlinear layers.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Regular vs. Bottleneck Residual Blocks</h2>
+        <img src="images/resnet-block.svg" style="width: 48%; margin: auto; display: block;" alt="ResNet Block Types">
+        <div class="fragment mt-md two-column" style="font-size: 0.7em;">
+            <div class="column"><h5>Regular Block</h5><ul><li>Two 3&times;3 convolutions</li><li>Used in ResNet-18/34</li></ul></div>
+            <div class="column"><h5>Bottleneck Block</h5><ul><li>1&times;1 &rarr; 3&times;3 &rarr; 1&times;1 convolutions</li><li>Cheaper; used in ResNet-50/101/152</li></ul></div>
+        </div>
+        <div class="fragment emphasis-box mt-sm" style="font-size: 0.7em;">
+            <p>When the skip connection needs to change the channel count or spatial size, a $1\times1$ convolution on the shortcut path handles it &mdash; yet another job for our now-familiar 1&times;1 convolution.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "What was the \"degradation problem\" that motivated ResNet, and why is it surprising?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "Deeper plain networks had higher training error than shallower ones — surprising because a deep network could in principle always match a shallow one by learning identity on its extra layers",
+                    "correct": true,
+                    "explanation": "Correct! Since a deep network&#39;s function class contains the shallow one&#39;s as a special case (extra layers set to identity), it should never do strictly worse on training error — yet in practice, plain deep networks were harder to optimize and did worse."
+                },
+                {
+                    "text": "Deeper networks had lower training error but much higher test error, indicating overfitting",
+                    "correct": false,
+                    "explanation": "That would be a generalization gap (overfitting), which is a different, well-understood phenomenon — degradation specifically means training error itself got worse."
+                },
+                {
+                    "text": "Deeper networks ran out of GPU memory during training",
+                    "correct": false,
+                    "explanation": "Degradation is an optimization difficulty, not a hardware memory limitation — the network fit in memory but simply trained worse."
+                },
+                {
+                    "text": "Deeper networks could not be implemented in existing deep learning frameworks",
+                    "correct": false,
+                    "explanation": "Plain deep networks were straightforward to implement; the issue was that training them to low error was much harder, not that they were impossible to build."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT 22: WHY RESNET WORKS ============================ -->
+<section>
+    <section data-sources='[{"text": "He et al. (2016) - Deep Residual Learning for Image Recognition", "url": "https://arxiv.org/abs/1512.03385"}]'>
+        <h2 class="truncate-title">Why Skip Connections Work: The Gradient View</h2>
+        <p style="font-size: 0.8em;">Recall backpropagation from earlier this semester: gradients flowing back through $L$ stacked layers are a <em>product</em> of $L$ Jacobians, which can vanish. In a residual block, the gradient with respect to the block's input is:</p>
+        <div class="fragment mt-md emphasis-box">
+            <p style="font-size: 0.9em; text-align: center;">$$\frac{\partial L}{\partial \mathbf{x}} = \frac{\partial L}{\partial f(\mathbf{x})}\left(1 + \frac{\partial g(\mathbf{x})}{\partial \mathbf{x}}\right)$$</p>
+        </div>
+        <div class="fragment mt-sm" style="font-size: 0.75em;">
+            <p>The "$1$" is a direct, unimpeded highway for the gradient — an <strong>additive</strong> term that can't vanish, no matter how small $\partial g/\partial \mathbf{x}$ gets. Stack hundreds of these blocks and gradients still reach the earliest layers.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Impact: From 152 Layers to Everywhere</h2>
+        <p style="font-size: 0.8em;">ResNet won ImageNet 2015 with 152 layers — an order of magnitude deeper than VGG — and the skip-connection idea proved essential far beyond computer vision: Transformers (later in this course), and nearly every very deep network since, use residual connections as standard scaffolding.</p>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.8em;">
+            <p>Together with Batch Normalization, residual connections are the two ideas that took "deep learning" from networks with a handful of layers to networks with hundreds — arguably the two most consequential architectural ideas in this entire chapter.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "In a residual block f(x) = x + g(x), why does the skip connection help gradients survive backpropagation through very deep networks?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "The gradient with respect to x contains an additive \"1 +\" term from the identity path, which cannot vanish even if ∂g/∂x becomes very small",
+                    "correct": true,
+                    "explanation": "Correct! Without the skip connection, the gradient is purely a chained product of per-layer Jacobians, which can shrink toward zero across many layers. The identity shortcut adds a constant term that guarantees a minimum gradient signal gets through."
+                },
+                {
+                    "text": "It removes the need to compute gradients for the function g(x) at all",
+                    "correct": false,
+                    "explanation": "Gradients still need to be computed for g(x) — the skip connection adds an extra path, it does not eliminate the need to backpropagate through the learned function."
+                },
+                {
+                    "text": "It converts the network from using gradient descent to using a closed-form analytic solution",
+                    "correct": false,
+                    "explanation": "ResNets are still trained end-to-end with gradient descent; there is no analytic solution involved."
+                },
+                {
+                    "text": "It doubles the learning rate automatically",
+                    "correct": false,
+                    "explanation": "The learning rate is a separate hyperparameter choice; skip connections affect the gradient computation itself, not the optimizer&#39;s step size."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ============================ BEAT 23: DENSENET & BEYOND ============================ -->
+<section>
+    <section data-sources='[{"text": "Huang et al. (2017) - Densely Connected Convolutional Networks", "url": "https://d2l.ai/chapter_convolutional-modern/densenet.html"}]'>
+        <h2 class="truncate-title">DenseNet: One Step Further</h2>
+        <p style="font-size: 0.8em;">ResNet adds the input back: $f(\mathbf{x}) = \mathbf{x} + g(\mathbf{x})$. DenseNet instead <strong>concatenates</strong> it, and does so with the outputs of <em>every</em> preceding layer in the block:</p>
+        <div class="fragment mt-md text-center">
+            <img src="images/densenet-block.svg" alt="ResNet vs DenseNet connection patterns" style="width: 42%;">
+        </div>
+        <div class="fragment mt-sm" style="font-size: 0.75em;">
+            <p>Each layer receives every earlier layer's feature maps as input; a "growth rate" controls how many new channels each layer contributes, kept small since channels accumulate fast.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Dense Blocks and Transition Layers</h2>
+        <img src="images/densenet.svg" alt="Full DenseNet architecture" style="width: 55%; margin: 0 auto; display: block;">
+        <div class="fragment mt-sm emphasis-box" style="font-size: 0.75em;">
+            <p><strong>Transition layers</strong> (a $1\times1$ conv + pooling, between dense blocks) periodically compress the ever-growing channel count back down — otherwise concatenation would explode memory use.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">The Road Ahead: Beyond Convolutions</h2>
+        <p style="font-size: 0.8em;">From LeNet to DenseNet, every idea here shares one assumption: convolution's translation invariance and locality are the right inductive bias for images. Vision Transformers (much later in this course) drop that assumption entirely, learning spatial relationships from data instead — at the cost of needing far more data to do it.</p>
+        <div class="fragment emphasis-box mt-md" style="font-size: 0.8em;">
+            <p>Both families remain in active use today — CNNs' efficiency and strong inductive bias make them hard to beat when data or compute is limited.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding</h2>
+        <div data-mcq='{
+            "question": "What is the key structural difference between a ResNet residual connection and a DenseNet dense connection?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "ResNet adds the earlier feature map to the current one (same number of channels); DenseNet concatenates feature maps from all previous layers, growing the channel count",
+                    "correct": true,
+                    "explanation": "Correct! Addition (ResNet) requires matching dimensions and keeps channel count fixed; concatenation (DenseNet) stacks channels together, so the channel count keeps growing with depth unless periodically compressed by transition layers."
+                },
+                {
+                    "text": "ResNet uses no skip connections at all, while DenseNet introduced the very first skip connection",
+                    "correct": false,
+                    "explanation": "It is the opposite — ResNet is defined by its skip (residual) connections; DenseNet extends that same idea to connect every layer to every later one."
+                },
+                {
+                    "text": "DenseNet removes the need for any pooling layers",
+                    "correct": false,
+                    "explanation": "DenseNet still uses pooling inside its transition layers to control spatial size, alongside the 1×1 convolutions that control channel count."
+                },
+                {
+                    "text": "ResNet is only usable for classification, while DenseNet works for any task",
+                    "correct": false,
+                    "explanation": "Both architectures are general-purpose feature extractors usable across many vision tasks — this is not a distinguishing property between them."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+<!-- ========================= LECTURE SUMMARY ========================= -->
+<section>
+    <section>
+        <h2 class="truncate-title">Putting It All Together</h2>
+        <p style="font-size:0.85em">From a hand-derived operation to a 152-layer network</p>
+        <div class="fragment mt-md" style="overflow-x: auto;">
+            <table style="margin: 0 auto; font-size: 0.6em;">
+                <thead><tr><th>Architecture</th><th>Core Idea</th><th>Problem It Solved</th></tr></thead>
+                <tbody>
+                    <tr><td>Convolution</td><td>Weight-shared, local MLP</td><td>Parameter explosion on images</td></tr>
+                    <tr><td>LeNet</td><td>Conv + pool + classifier</td><td>First working recipe (1998)</td></tr>
+                    <tr><td>AlexNet</td><td>Scale + ReLU + Dropout</td><td>Made deep CNNs trainable at scale (2012)</td></tr>
+                    <tr><td>VGG</td><td>Repeated 3&times;3 blocks</td><td>Systematic, predictable depth</td></tr>
+                    <tr><td>NiN / GoogLeNet</td><td>1&times;1 convs + GAP; parallel branches</td><td>FC-layer bloat; single-scale kernels</td></tr>
+                    <tr><td>Batch Norm</td><td>Normalize activations per layer</td><td>Unstable, slow training of deep nets</td></tr>
+                    <tr><td>ResNet / DenseNet</td><td>Additive / concatenated skip connections</td><td>Degradation problem in very deep nets</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="fragment emphasis-box mt-md">
+            <p style="font-size:0.85em">Everything still to come this semester — RNNs, Transformers — reuses ideas from this chapter: skip connections, normalization, and learned rather than hand-designed feature extraction.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Key Takeaways</h2>
+        <ul style="font-size:0.85em">
+            <li class="fragment">Convolution isn't a given formula — it's the unique MLP consequence of translation invariance plus locality</li>
+            <li class="fragment">Channels, padding, stride, and pooling are the knobs that turn that one operation into a full feature extractor</li>
+            <li class="fragment">AlexNet &rarr; VGG &rarr; NiN &rarr; GoogLeNet each fixed a specific limitation of the last, not a wholesale redesign</li>
+            <li class="fragment">Batch Normalization and residual connections are what actually made networks with hundreds of layers trainable</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2 class="truncate-title">Test Your Understanding: The Big Picture</h2>
+        <div data-mcq='{
+            "question": "If you had to name the SINGLE idea that recurs most often across this entire chapter — showing up in translation invariance, 1×1 convolutions, GAP, and skip connections alike — what would it be?",
+            "type": "single",
+            "options": [
+                {
+                    "text": "Constrain or reuse a general-purpose operation (weights, or the identity function) rather than learning everything from an unconstrained, maximally flexible model",
+                    "correct": true,
+                    "explanation": "Correct! Convolution reuses one small kernel everywhere instead of learning independent weights per pixel; GAP and 1×1 convs reuse structure instead of a huge FC layer; skip connections give the network a free, reusable identity path instead of forcing it to learn one. Well-chosen constraints, not raw flexibility, are what make these networks both trainable and effective."
+                },
+                {
+                    "text": "Always make the network as deep as possible, regardless of the task",
+                    "correct": false,
+                    "explanation": "The chapter&#39;s story is precisely that naive depth alone caused problems (the degradation problem) — it had to be paired with ideas like Batch Norm and residual connections to help, not simply piled on."
+                },
+                {
+                    "text": "Replace every fully connected layer with a convolution",
+                    "correct": false,
+                    "explanation": "This is one specific tactic (used in NiN&#39;s classifier head), not the general principle running through the whole chapter&#39;s architectural choices."
+                },
+                {
+                    "text": "Use the largest possible kernel size in every layer",
+                    "correct": false,
+                    "explanation": "The chapter&#39;s architectures consistently favor small kernels (3×3, 1×1) stacked or combined cleverly, rather than large ones — the opposite of this claim."
+                }
+            ]
+        }'></div>
+    </section>
+</section>
+
+        </div>
+    </div>
+
+    <!-- Reveal.js Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/math/math.js"></script>
+
+    <!-- Shared Scripts -->
+    <script src="../shared/js/title-handler.js"></script>
+    <script src="../shared/js/tooltip-modal.js"></script>
+    <script src="../shared/js/source-modal-v2.js"></script>
+    <script src="../shared/js/multiple-choice.js"></script>
+
+    <!-- D3.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+
+    <!-- Part 1: From FC Layers to Convolutions (Ch. 7) -->
+    <script src="js/invariance-viz.js"></script>
+    <script src="js/convolution-demo.js"></script>
+    <script src="js/cross-correlation-calculator.js"></script>
+    <script src="js/edge-detection-demo.js"></script>
+    <script src="js/output-channels-viz.js"></script>
+    <script src="js/padding-stride-demo.js"></script>
+    <script src="js/stride-animator.js"></script>
+    <script src="js/pooling-demo.js"></script>
+    <script src="js/locality-viz.js"></script>
+    <script src="js/mnist-samples.js"></script>
+
+    <!-- Part 2: Modern Architectures (Ch. 8) -->
+    <script src="js/architecture-timeline.js"></script>
+    <script src="js/alexnet-visualizations.js"></script>
+    <script src="js/vgg-visualizations.js"></script>
+    <script src="js/nin-visualizations.js"></script>
+    <script src="js/googlenet-visualizations.js"></script>
+    <script src="js/batch-norm-visualizations.js"></script>
+
+    <script>
+        // Global animation tracking system: demos that create intervals/rAF loops
+        // register into this so we can stop them on slide change and avoid
+        // accumulating dangling animations.
+        window.activeAnimations = {
+            animationFrames: [],
+            intervals: [],
+            clearAll: function() {
+                this.animationFrames.forEach(id => cancelAnimationFrame(id));
+                this.intervals.forEach(id => clearInterval(id));
+                this.animationFrames = [];
+                this.intervals = [];
+            }
+        };
+
+        // Initialize Reveal.js
+        Reveal.initialize({
+            hash: true,
+            controls: true,
+            progress: true,
+            center: true,
+            transition: 'slide',
+            math: {
+                mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js',
+                config: 'TeX-AMS_SVG-full'
+            },
+            plugins: [ RevealMath, RevealHighlight, RevealNotes, RevealMarkdown ]
+        });
+    </script>
+</body>
+</html>

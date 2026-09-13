@@ -1,0 +1,1018 @@
+/* Custom styles for CNN slides */
+
+/* Convolution demo containers */
+.conv-visualization {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.conv-visualization .demo-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    position: relative;
+    z-index: 100;
+}
+
+.conv-visualization .demo-controls label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #262626;
+}
+
+.conv-visualization .demo-controls select,
+.conv-visualization .demo-controls input[type="range"] {
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+}
+
+.ui-button {
+    background: #10099F;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.ui-button:hover {
+    background: #0d0780;
+}
+
+.ui-button.secondary {
+    background: #6c757d;
+}
+
+.ui-button.secondary:hover {
+    background: #5a6268;
+}
+
+/* Parameter comparison styles */
+.parameter-demo {
+    text-align: center;
+    padding: 20px;
+}
+
+.calculation-steps {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.calculation-steps p {
+    margin: 10px 0;
+    padding: 10px;
+    background: #f5f5f5;
+    border-left: 4px solid #10099F;
+    border-radius: 4px;
+}
+
+.highlight {
+    color: #10099F;
+    font-weight: bold;
+}
+
+/* Timeline styles */
+.timeline-container {
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.timeline {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #10099F;
+    z-index: 0;
+}
+
+.timeline-item {
+    position: relative;
+    text-align: center;
+    z-index: 1;
+    background: white;
+    padding: 10px;
+}
+
+.timeline-item .year {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #10099F;
+    margin-bottom: 5px;
+}
+
+.timeline-item .event {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.timeline-item .description {
+    font-size: 0.8em;
+    color: #666;
+}
+
+/* Two column layout */
+.two-column {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.two-column .column {
+    flex: 1;
+    padding: 0 15px;
+}
+
+.two-column h4 {
+    color: #10099F;
+    margin-bottom: 15px;
+}
+
+.two-column ul {
+    text-align: left;
+    list-style-position: inside;
+}
+
+/* Waldo demo styles */
+.waldo-demo {
+    text-align: center;
+    padding: 20px;
+}
+
+.waldo-demo img {
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Visualization container */
+.visualization-container {
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    margin: 20px auto;
+    max-width: 800px;
+}
+
+.visualization-container .demo-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.visualization-container svg {
+    display: block;
+    margin: 0 auto;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Principles grid */
+.principles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 30px auto;
+    max-width: 900px;
+}
+
+.principle {
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.principle:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(16, 9, 159, 0.2);
+}
+
+.principle .icon {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.principle h4 {
+    color: #10099F;
+    margin-bottom: 10px;
+}
+
+.principle p {
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Math progression styles */
+.math-progression {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.math-progression h4 {
+    color: #10099F;
+    margin-bottom: 10px;
+}
+
+.math-progression p {
+    margin: 10px 0;
+}
+
+.math-progression .annotation {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+/* Constraint demo */
+.constraint-demo {
+    padding: 20px;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.constraint-demo h4 {
+    color: #10099F;
+    margin-bottom: 15px;
+}
+
+/* Parameter comparison table */
+.comparison-table {
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.comparison-table thead {
+    background: #10099F;
+    color: white;
+}
+
+.comparison-table th,
+.comparison-table td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.comparison-table tbody tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+/* Channel visualization */
+.channels-intro {
+    padding: 20px;
+}
+
+.channel-grid {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 20px 0;
+}
+
+.channel {
+    text-align: center;
+}
+
+.channel-viz {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+    font-weight: bold;
+    color: white;
+    border-radius: 8px;
+    margin: 0 auto 10px;
+}
+
+.channel.red .channel-viz {
+    background: linear-gradient(135deg, #ff6b6b, #ff3333);
+}
+
+.channel.green .channel-viz {
+    background: linear-gradient(135deg, #51cf66, #2ecc40);
+}
+
+.channel.blue .channel-viz {
+    background: linear-gradient(135deg, #339af0, #1971c2);
+}
+
+/* Feature maps demo */
+.feature-viz {
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    margin: 20px auto;
+    max-width: 900px;
+}
+
+.feature-viz h4 {
+    color: #10099F;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.feature-viz .demo-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+}
+
+#feature-maps-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    padding: 20px;
+}
+
+/* Hierarchy visualization */
+.hierarchy-viz {
+    padding: 20px;
+}
+
+.layer-progression {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+}
+
+.layer {
+    display: flex;
+    align-items: center;
+}
+
+.layer-box {
+    padding: 15px 20px;
+    border-radius: 8px;
+    text-align: center;
+    min-width: 120px;
+}
+
+.layer-box h5 {
+    margin: 0 0 5px 0;
+    color: white;
+    font-size: 0.9em;
+}
+
+.layer-box p {
+    margin: 0;
+    font-size: 0.8em;
+    color: white;
+}
+
+.layer1 {
+    background: linear-gradient(135deg, #10099F, #1e0fc7);
+}
+
+.layer2 {
+    background: linear-gradient(135deg, #2DD2C0, #23b5a5);
+}
+
+.layer3 {
+    background: linear-gradient(135deg, #FFA05F, #ff8533);
+}
+
+.layer4 {
+    background: linear-gradient(135deg, #FC8484, #fa5252);
+}
+
+.arrow {
+    font-size: 1.5em;
+    color: #10099F;
+    margin: 0 10px;
+}
+
+/* Calculator demo */
+.calculator-demo {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.input-grid,
+.kernel-grid,
+.output-grid {
+    text-align: center;
+}
+
+.input-grid h4,
+.kernel-grid h4,
+.output-grid h4 {
+    color: #10099F;
+    margin-bottom: 10px;
+}
+
+#input-matrix,
+#kernel-matrix,
+#output-matrix {
+    display: inline-block;
+    background: white;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+}
+
+.calculator-demo .demo-controls {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* Architecture summary */
+.architecture-summary {
+    padding: 20px;
+}
+
+.component-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.component {
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border-left: 4px solid #10099F;
+}
+
+.component h5 {
+    color: #10099F;
+    margin-bottom: 8px;
+    font-size: 1em;
+}
+
+.component p {
+    font-size: 0.85em;
+    color: #666;
+    margin: 0;
+}
+
+/* Applications grid */
+.applications-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.application {
+    text-align: center;
+    padding: 20px;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.application:hover {
+    border-color: #10099F;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(16, 9, 159, 0.15);
+}
+
+.application .icon {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.application h5 {
+    color: #10099F;
+    margin-bottom: 8px;
+}
+
+.application p {
+    font-size: 0.85em;
+    color: #666;
+    margin: 0;
+}
+
+/* Why CNNs work list */
+.why-cnns-work {
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.why-cnns-work ol {
+    padding-left: 30px;
+}
+
+.why-cnns-work li {
+    margin: 15px 0;
+    line-height: 1.6;
+}
+
+/* Next topics */
+.next-topics {
+    max-width: 500px;
+    margin: 20px auto;
+    text-align: left;
+}
+
+.next-topics h4 {
+    color: #10099F;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.next-topics ul {
+    list-style-position: inside;
+}
+
+.next-topics li {
+    margin: 10px 0;
+}
+
+/* Closing slide */
+.closing-slide {
+    text-align: center;
+}
+
+/* Growth visualization */
+.growth-viz {
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+.growth-viz .demo-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* Comparison visualization */
+.comparison-viz {
+    padding: 20px;
+}
+
+.comparison-viz .two-column {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Formula progression */
+.formula-progression {
+    background: #f5f5f5;
+    padding: 20px;
+    border-radius: 8px;
+    font-family: 'Source Code Pro', monospace;
+}
+
+.formula-progression p {
+    margin: 10px 0;
+    color: #262626;
+}
+
+/* Multichannel math */
+.multichannel-math {
+    padding: 20px;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.multichannel-math h4 {
+    color: #10099F;
+    margin-bottom: 15px;
+}
+
+/* Composition demo */
+.composition-demo {
+    padding: 20px;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.composition-demo h4 {
+    color: #10099F;
+    margin-bottom: 15px;
+}
+
+/* Math definition */
+.math-definition {
+    padding: 20px;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.math-definition h4 {
+    color: #10099F;
+    margin-bottom: 10px;
+}
+
+.math-definition .annotation {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .principles-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .channel-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .calculator-demo {
+        grid-template-columns: 1fr;
+    }
+    
+    .component-grid,
+    .applications-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .two-column {
+        flex-direction: column;
+    }
+    
+    .layer-progression {
+        flex-direction: column;
+    }
+    
+    .arrow {
+        transform: rotate(90deg);
+    }
+}
+
+/* Additional styles for new content sections */
+
+/* Interactive Demo Containers */
+.interactive-demo {
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    margin: 20px auto;
+}
+
+/* Output size demo */
+.output-size-demo {
+    padding: 20px;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Formula box */
+.formula-box {
+    background: white;
+    border: 2px solid #10099F;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 20px auto;
+    max-width: 600px;
+}
+
+/* Code implementation styles */
+.code-implementation pre,
+.conv2d-implementation pre {
+    background: #f4f4f4;
+    border-left: 4px solid #10099F;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+/* Framework comparison */
+.framework-comparison {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Edge detection sections */
+.edge-detection-intro,
+.edge-kernel-explanation {
+    padding: 20px;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Learning setup */
+.learning-setup,
+.training-code {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Why not matter section */
+.why-not-matter {
+    padding: 20px;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Feature maps explanation */
+.feature-maps-explanation {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.feature-map-grid {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.feature-box {
+    text-align: center;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    margin: 10px;
+    min-width: 150px;
+}
+
+.feature-box .icon {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.feature-box h5 {
+    color: #10099F;
+    margin: 10px 0;
+}
+
+/* Receptive field explanation */
+.receptive-field-explanation {
+    padding: 20px;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Biological connection */
+.biological-connection {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.biological-connection .caption {
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+    margin-top: 10px;
+}
+
+/* Exercises list */
+.exercises-list {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.exercises-list ol {
+    margin-left: 20px;
+}
+
+.exercises-list li {
+    margin: 15px 0;
+}
+
+.exercises-list details {
+    background: white;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.exercises-list summary {
+    cursor: pointer;
+    color: #10099F;
+    font-weight: bold;
+}
+
+/* Advanced exercise */
+.advanced-exercise {
+    background: #fff3cd;
+    border: 2px solid #FAC55B;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 800px;
+}
+
+.advanced-exercise h4 {
+    color: #856404;
+    margin-bottom: 15px;
+}
+
+/* Kernel workshop */
+.kernel-workshop {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.kernel-workshop > div {
+    text-align: center;
+}
+
+.kernel-workshop h5 {
+    color: #10099F;
+    margin-bottom: 10px;
+}
+
+/* Learning visualization */
+.learning-visualization {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.learning-visualization > div {
+    text-align: center;
+}
+
+.learning-visualization h4 {
+    color: #10099F;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+/* Edge visualization */
+.edge-visualization {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.edge-visualization > div {
+    text-align: center;
+}
+
+.edge-visualization h4 {
+    color: #10099F;
+    margin-bottom: 10px;
+}
+
+/* Convolution comparison */
+.convolution-comparison {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.convolution-comparison .two-column {
+    display: flex;
+    justify-content: space-around;
+    gap: 30px;
+}
+
+.convolution-comparison .column {
+    flex: 1;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+/* Size visualization */
+#size-visualization {
+    background: white;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-align: center;
+}
+
+/* Loss curve */
+#loss-curve {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Canvas elements */
+#edge-input-canvas,
+#edge-output-canvas,
+#test-image-canvas,
+#result-canvas {
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 4px;
+}
+
+/* RF visualization */
+.rf-visualization {
+    text-align: center;
+}
+
+#receptive-field-svg {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Correlation grids */
+.correlation-grids {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.correlation-grids > div {
+    text-align: center;
+}
+
+.correlation-grids h4 {
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: #10099F;
+}
+
+.correlation-grids table {
+    margin: 0 auto;
+    border-collapse: collapse;
+}
+
+.correlation-grids td {
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    text-align: center;
+    min-width: 40px;
+    min-height: 40px;
+    background: white;
+}
