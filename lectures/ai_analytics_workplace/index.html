@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI in the analytics workplace</title>
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%2310099F'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%232DD2C0'/%3E%3C/svg%3E">
+
+    <!-- Reveal.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+    <link rel="stylesheet" href="../shared/css/reveal-theme.css">
+    <link rel="stylesheet" href="../shared/css/common.css">
+    <link rel="stylesheet" href="css/lecture-custom.css">
+
+    <!-- Code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.css">
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- ==========================================================
+                 1. Title
+                 ========================================================== -->
+            <section class="title-slide">
+                <img src="../shared/images/uoi_logo_blue.png" alt="University of Iceland Logo" class="ui-logo">
+                <h1>AI in the analytics workplace</h1>
+                <p>How analysis work is changing, and where it sits in an organization</p>
+                <p class="mt-lg">
+                    <small>Guðmundur Einarsson</small><br>
+                    <small>Statistician, TM Insurance · Lecturer, University of Iceland</small>
+                </p>
+            </section>
+
+            <!-- ==========================================================
+                 2. Thank you for the invitation
+                 ========================================================== -->
+            <section>
+                <h2 class="truncate-title">Thank you for the invitation</h2>
+                <p style="font-size: 0.9em;">
+                    It is a genuine pleasure to be here. Thank you for having me.
+                </p>
+                <div class="emphasis-box fragment" style="font-size: 0.8em; text-align: left; max-width: 900px; margin: 1em auto;">
+                    <p style="margin: 0;">
+                        I am not here to sell you a tool, and I am not here to tell you
+                        your job is disappearing. I want to talk about something more
+                        useful: <strong>what analysis work actually is inside an
+                        organization</strong>, and what changes when a very capable
+                        assistant is sitting next to you.
+                    </p>
+                </div>
+                <p class="fragment" style="font-size: 0.8em;">
+                    Please interrupt me. The middle of this talk is a discussion,
+                    and it only works if you talk.
+                </p>
+            </section>
+
+            <!-- ==========================================================
+                 3. Know your audience
+                 ========================================================== -->
+            <section>
+                <h2 class="truncate-title">First: let me know my audience</h2>
+                <p style="font-size: 0.76em; text-align: left; margin-bottom: 0.3em;">
+                    Hands up — I will adjust the rest of the lecture based on this.
+                </p>
+                <ul style="font-size: 0.70em; text-align: left;" class="tight">
+                    <li class="fragment">Who is doing a <strong>BSc</strong>? Who is doing an <strong>MSc</strong>? Anyone further along?</li>
+                    <li class="fragment">Which <strong>engineering discipline</strong> — software, industrial, mechanical, electrical, civil?</li>
+                    <li class="fragment">Who comes from <strong>computer science</strong>? From <strong>mathematics or statistics</strong>? From somewhere else entirely?</li>
+                    <li class="fragment">Who writes code regularly? <strong>Python, R, SQL, MATLAB</strong>, something else?</li>
+                    <li class="fragment">Who has worked in <strong>industry</strong> — internship, summer job, full time?</li>
+                    <li class="fragment">Has anyone ever had a <strong>decision made</strong> on the back of an analysis you produced?</li>
+                    <li class="fragment">Who uses an <strong>AI assistant</strong> most days? Who has more or less stopped using one?</li>
+                </ul>
+                <p class="fragment emphasis-box" style="font-size: 0.66em; margin-top: 0.5em;">
+                    The last two questions matter most. Everything after this slide is about
+                    the gap between <em>producing an analysis</em> and <em>an organization acting on it</em>.
+                </p>
+            </section>
+
+            <!-- ==========================================================
+                 4. About me
+                 ========================================================== -->
+            <section data-sources='[{"text": "About — Guðmundur Einarsson", "url": "https://gumeo.github.io/about/"}]'>
+                <h2 class="truncate-title">About me</h2>
+                <div class="columns" style="font-size: 0.70em; text-align: left;">
+                    <div class="column">
+                        <h4 style="color: var(--ui-primary);">Background</h4>
+                        <ul class="tight">
+                            <li class="fragment">BSc mathematics (CS emphasis) and MSc mathematics (statistics), University of Iceland</li>
+                            <li class="fragment">PhD in applied mathematics, DTU — sparse classification in high dimensions</li>
+                            <li class="fragment">Applied mathematics, genetics and machine learning, roughly in that order</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h4 style="color: var(--ui-primary);">Where I have worked</h4>
+                        <ul class="tight">
+                            <li class="fragment"><strong>deCODE Genetics</strong> — six years of genome-wide association studies</li>
+                            <li class="fragment"><strong>Oqton</strong> — employee 42, geometry processing for 3D printing and robotics; acquired by 3D Systems</li>
+                            <li class="fragment"><strong>TM Insurance</strong> — statistician, since autumn 2025</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="fragment emphasis-box" style="font-size: 0.66em; margin-top: 0.6em;">
+                    A startup, a research-heavy company and a regulated incumbent. The analysis
+                    was similar in all three. <strong>What happened to the analysis afterwards was not.</strong>
+                    That difference is what this talk is about.
+                </p>
+            </section>
+
+            <!-- ==========================================================
+                 5. Roadmap
+                 ========================================================== -->
+            <section>
+                <h2 class="truncate-title">Where we are going</h2>
+                <ol style="font-size: 0.78em; text-align: left;" class="tight">
+                    <li class="fragment"><strong>The two loops</strong> — why competent people fail to get heard, and where AI lands</li>
+                    <li class="fragment"><strong>Alone or in a group</strong> — the real cost of the one-person team</li>
+                    <li class="fragment"><strong>Discussion</strong> — is the AI part of the team?</li>
+                    <li class="fragment"><strong>37,000 employees</strong> — what a swarm of agents managed to do</li>
+                    <li class="fragment"><strong>Prompt engineering is dead</strong> — and what replaced it</li>
+                </ol>
+                <p class="fragment mt-lg" style="font-size: 0.75em; color: var(--color-text-secondary);">
+                    Two of these sections lean heavily on other people's writing.
+                    I will name them, and the sources are one click away on every slide
+                    that carries the 📚 icon.
+                </p>
+            </section>
+
+            <!-- ==========================================================
+                 SECTION 1 — THE TWO LOOPS
+                 ========================================================== -->
+            <section class="section-divider">
+                <p class="section-kicker">Part one</p>
+                <h2 class="truncate-title">The two loops</h2>
+                <div class="section-rule"></div>
+                <p class="section-sub">
+                    Why the most competent person in the room is often the one who
+                    cannot get anyone to listen.
+                </p>
+                <p class="credit-strip">
+                    This section follows Tuhin Nair,
+                    <a href="https://www.nair.sh/guides-and-opinions/communicating-your-expertise/why-senior-developers-fail-to-communicate-their-expertise" target="_blank" rel="noopener">
+                        “Why senior developers fail to communicate their expertise”</a>
+                </p>
+            </section>
+
+            <!-- 7. Situation 1 -->
+            <section data-sources='[{"text": "Tuhin Nair — Why senior developers fail to communicate their expertise", "url": "https://www.nair.sh/guides-and-opinions/communicating-your-expertise/why-senior-developers-fail-to-communicate-their-expertise"}]'>
+                <h2 class="truncate-title">A conversation you have had</h2>
+                <div class="columns" style="font-size: 0.72em; text-align: left; margin-top: 0.4em;">
+                    <div class="column card card-neutral">
+                        <h4>The business asks</h4>
+                        <p style="margin: 0.3em 0;">“Can we have the churn model by Friday?”</p>
+                    </div>
+                    <div class="column card card-con">
+                        <h4>The analyst answers</h4>
+                        <p style="margin: 0.3em 0;">
+                            “The feature pipeline has three undocumented joins, the labels
+                            leak, and nobody has validated the segment definitions since 2023.
+                            If we ship this it will be wrong and we will not know it is wrong.”
+                        </p>
+                    </div>
+                </div>
+                <p class="fragment" style="font-size: 0.78em; margin-top: 0.8em;">
+                    Every word of that answer is <strong>true</strong>. It is also
+                    <strong>completely ineffective</strong>.
+                </p>
+                <p class="fragment emphasis-box" style="font-size: 0.72em;">
+                    What the business hears is not “here are the risks.” What it hears is
+                    <em>“no”</em>, delivered with a long list of reasons that are not its problem.
+                </p>
+            </section>
+
+            <!-- 8. Situation 2 -->
+            <section data-sources='[{"text": "Tuhin Nair — Why senior developers fail to communicate their expertise", "url": "https://www.nair.sh/guides-and-opinions/communicating-your-expertise/why-senior-developers-fail-to-communicate-their-expertise"}]'>
+                <h2 class="truncate-title">Two different monsters</h2>
+                <div class="pro-con" style="margin-top: 0.5em;">
+                    <div class="card card-con fragment">
+                        <h4>The business fights <em>uncertainty</em></h4>
+                        <ul class="tight">
+                            <li>Is there a market for this?</li>
+                            <li>Will anyone pay?</li>
+                            <li>Are we too late?</li>
+                        </ul>
+                        <p class="smaller" style="margin-top: 0.5em;">
+                            The only cure is <strong>contact with reality</strong>, fast and often.
+                        </p>
+                    </div>
+                    <div class="card card-neutral fragment">
+                        <h4>The expert fights <em>complexity</em></h4>
+                        <ul class="tight">
+                            <li>Will this still hold in six months?</li>
+                            <li>Who maintains it when I am gone?</li>
+                            <li>What breaks silently?</li>
+                        </ul>
+                        <p class="smaller" style="margin-top: 0.5em;">
+                            The only cure is <strong>restraint</strong>: fewer moving parts, slower change.
+                        </p>
+                    </div>
+                </div>
+                <p class="fragment" style="font-size: 0.75em; margin-top: 0.8em;">
+                    Nair's diagnosis: experts frame everything as <strong>complexity management</strong>,
+                    while the rest of the business speaks in <strong>uncertainty reduction</strong>.
+                    Both are rational. They are simply not the same language.
+                </p>
+            </section>
+
+            <!-- 9. Situation 3 -->
+            <section data-sources='[{"text": "Tuhin Nair — Why senior developers fail to communicate their expertise", "url": "https://www.nair.sh/guides-and-opinions/communicating-your-expertise/why-senior-developers-fail-to-communicate-their-expertise"}]'>
+                <h2 class="truncate-title">The sentence worth remembering</h2>
+                <blockquote class="pull-quote">
+                    “You can't explain away someone else's problem using your own problems.”
+                    <cite>— Tuhin Nair</cite>
+                </blockquote>
+                <ul class="fragment" style="font-size: 0.75em; text-align: left; max-width: 880px; margin: 0.8em auto;">
+                    <li class="fragment">Your technical debt is not the product manager's problem.</li>
+                    <li class="fragment">Their launch date is not your data quality problem.</li>
+                    <li class="fragment">Answering one with the other reads as obstruction, not expertise.</li>
+                </ul>
+                <p class="fragment emphasis-box" style="font-size: 0.75em;">
+                    So the question becomes: <strong>where do these two problems come from?</strong>
+                    They are not personality clashes. They come from two machines the
+                    business is running at the same time.
+                </p>
+            </section>
+
+            <!-- 10. Loop 1 -->
+            <section data-sources='[{"text": "Tuhin Nair — Why senior developers fail to communicate their expertise", "url": "https://www.nair.sh/guides-and-opinions/communicating-your-expertise/why-senior-developers-fail-to-communicate-their-expertise"}]'>
+                <h2 class="truncate-title">Loop 1 — the discovery loop</h2>
+                <figure class="diagram-figure">
+                    <img src="images/INS_0.png" alt="A loop: the Company makes an offer to the Market, and the Market returns feedback to the Company.">
+                    <figcaption>
+                        Diagram by Tuhin Nair, from
+                        <a href="https://www.nair.sh/guides-and-opinions/communicating-your-expertise/why-senior-developers-fail-to-communicate-their-expertise" target="_blank" rel="noopener">nair.sh</a>
+                    </figcaption>
+                </figure>
+                <p class="fragment" style="font-size: 0.72em; margin-top: 0.6em;">
+                    Marketers, salespeople, product managers and the CEO take an idea to
+                    market and feed back what they learn. <strong>Speed is the whole point.</strong>
+                    A slow loop learns nothing before the money runs out.
+                </p>
+            </section>
+
+            <!-- 11. Loop 2 -->
+            <section data-sources='[{"text": "Tuhin Nair — Why senior developers fail to communicate their expertise", "url": "https://www.nair.sh/guides-and-opinions/communicating-your-expertise/why-senior-developers-fail-to-communicate-their-expertise"}]'>
+                <h2 class="truncate-title">Loop 2 — the service loop</h2>
+                <figure class="diagram-figure">
+                    <img src="images/INS_1.png" alt="A loop: the Company delivers service to the User, and the User returns payment to the Company.">
+                    <figcaption>
+                        Diagram by Tuhin Nair, from
+                        <a href="https://www.nair.sh/guides-and-opinions/communicating-your-expertise/why-senior-developers-fail-to-communicate-their-expertise" target="_blank" rel="noopener">nair.sh</a>
+                    </figcaption>
+                </figure>
+                <p class="fragment" style="font-size: 0.72em; margin-top: 0.6em;">
+                    Paying customers use the thing that already exists, and the team keeps it
+                    running. <strong>Continuation and guarantee of service.</strong>
+                    This loop pays for everything, including loop 1.
+                </p>
+            </section>
+
+            <!-- 12. Both loops -->
+            <section data-sources='[{"text": "Tuhin Nair — Why senior developers fail to communicate their expertise", "url": "https://www.nair.sh/guides-and-opinions/communicating-your-expertise/why-senior-developers-fail-to-communicate-their-expertise"}]'>
+                <h2 class="truncate-title">Both loops run at once</h2>
+                <figure class="diagram-figure">
+                    <img src="images/INS_2.png" alt="Two loops sharing the Company in the middle: on the left, service to Users and payment back; on the right, offers to the Market and feedback back.">
+                    <figcaption>
+                        The business's two loops running side by side. Diagram by Tuhin Nair, from
+                        <a href="https://www.nair.sh/guides-and-opinions/communicating-your-expertise/why-senior-developers-fail-to-communicate-their-expertise" target="_blank" rel="noopener">nair.sh</a>
+                    </figcaption>
+                </figure>
+                <p class="fragment" style="font-size: 0.72em; margin-top: 0.5em;">
+                    <span class="loop-chip loop-1">Loop 1 wants speed</span>
+                    &nbsp;·&nbsp;
+                    <span class="loop-chip loop-2">Loop 2 wants stability</span>
+                    &nbsp;— and they share the <strong>same codebase, same data, same people</strong>.
+                </p>
+                <p class="fragment" style="font-size: 0.72em;">
+                    The argument on slide seven is not two personalities disagreeing.
+                    It is two loops pulling on one system.
+                </p>
+            </section>
+
+            <!-- 13. Which loop is your analysis in -->
+            <section>
+                <h2 class="truncate-title">Which loop is your analysis in?</h2>
+                <p style="font-size: 0.74em; text-align: left;">
+                    Analysts sit in both, often on the same day, and usually without saying which.
+                </p>
+                <div class="pro-con">
+                    <div class="card card-con fragment">
+                        <h4>Loop 1 analysis</h4>
+                        <ul class="tight">
+                            <li>“Is this segment even worth pursuing?”</li>
+                            <li>A quick sizing before a pricing decision</li>
+                            <li>An exploratory notebook nobody will rerun</li>
+                            <li>Success = <strong>a decision made sooner</strong></li>
+                        </ul>
+                    </div>
+                    <div class="card card-neutral fragment">
+                        <h4>Loop 2 analysis</h4>
+                        <ul class="tight">
+                            <li>The reserving model the regulator reads</li>
+                            <li>The dashboard the whole company steers by</li>
+                            <li>The pipeline that runs every night at 03:00</li>
+                            <li>Success = <strong>still correct in two years</strong></li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="fragment emphasis-box" style="font-size: 0.72em; margin-top: 0.7em;">
+                    Most conflict I have seen comes from one side treating a loop-1 question as
+                    loop-2 work, or shipping loop-1 work into a loop-2 position.
+                    <strong>Say out loud which one you are doing.</strong>
+                </p>
+            </section>
+
+            <!-- 14. How AI fits in (1) -->
+            <section data-sources='[{"text": "Tuhin Nair — Why senior developers fail to communicate their expertise", "url": "https://www.nair.sh/guides-and-opinions/communicating-your-expertise/why-senior-developers-fail-to-communicate-their-expertise"}]'>
+                <h2 class="truncate-title">How AI fits in: the asymmetry</h2>
+                <figure class="diagram-figure" style="max-width: 900px;">
+                    <img src="images/INS_6.png" style="max-height: 215px;" alt="The two loops with a large red AI arrow pointing into the company's software. The market-facing loop is drawn with thick, repeated, accelerated arrows while the user-facing service loop is drawn as a thin, broken line.">
+                    <figcaption>
+                        AI accelerating the first loop while destabilising the second.
+                        Diagram by Tuhin Nair, from
+                        <a href="https://www.nair.sh/guides-and-opinions/communicating-your-expertise/why-senior-developers-fail-to-communicate-their-expertise" target="_blank" rel="noopener">nair.sh</a>
+                    </figcaption>
+                </figure>
+                <p class="fragment" style="font-size: 0.72em; margin-top: 0.4em;">
+                    AI is <strong>spectacular</strong> at loop 1. Ten variants of an analysis before lunch,
+                    a prototype dashboard in an afternoon, a first pass at any dataset in minutes.
+                </p>
+                <p class="fragment" style="font-size: 0.72em;">
+                    Loop 2 gets the bill: more code than anyone read, more pipelines than anyone owns,
+                    more numbers in circulation than anyone can reconcile.
+                    <strong>Output went up. Understanding did not.</strong>
+                </p>
+            </section>
+
+            <!-- 15. How AI fits in (2) -->
+            <section data-sources='[{"text": "Tuhin Nair — Why senior developers fail to communicate their expertise", "url": "https://www.nair.sh/guides-and-opinions/communicating-your-expertise/why-senior-developers-fail-to-communicate-their-expertise"}]'>
+                <h2 class="truncate-title">How AI fits in: the way out</h2>
+                <figure class="diagram-figure" style="max-width: 760px;">
+                    <img src="images/INS_8.png" style="max-height: 215px;" alt="Two boxes side by side: a developer-edited Scale system providing service on the left, and an AI-written Speed system used for experimentation on the right. Usage patterns flow right to left; stabilized functions flow left to right.">
+                    <figcaption>
+                        A Speed version for rapid market learning, and a Scale version for service.
+                        Diagram by Tuhin Nair, from
+                        <a href="https://www.nair.sh/guides-and-opinions/communicating-your-expertise/why-senior-developers-fail-to-communicate-their-expertise" target="_blank" rel="noopener">nair.sh</a>
+                    </figcaption>
+                </figure>
+                <p class="fragment" style="font-size: 0.64em; margin-top: 0.3em;">
+                    Stop arguing about how fast to go. <strong>Split the system instead.</strong>
+                    Let AI write freely in the Speed half; promote only what survives contact
+                    with reality into the Scale half, edited by someone accountable.
+                </p>
+                <p class="fragment" style="font-size: 0.64em;">
+                    Nair's phrasing: the expert stops being a <em>writer</em> and becomes an
+                    <strong>editor</strong>. And the sentence that unlocks the conversation is
+                    <em>“Can we try something quicker?”</em> — it grants the business its speed
+                    while keeping the durable system out of the blast radius.
+                </p>
+            </section>
+
+            <!-- 16. Interactive: the AI dial -->
+            <section data-state="loop-demo">
+                <h2 class="truncate-title">Turn up the dial and watch</h2>
+                <div class="viz-controls">
+                    <label>
+                        AI poured into the middle:
+                        <input type="range" id="loop-ai-slider" min="0" max="10" step="1" value="0">
+                    </label>
+                    <span>Loop 1 throughput: <span class="viz-readout" id="loop-readout-speed">1.0×</span></span>
+                    <span>Loop 2 stability: <span class="viz-readout" id="loop-readout-stability">100%</span></span>
+                    <button class="button" id="loop-toggle" style="font-size: 1em; padding: 6px 14px;">Pause</button>
+                </div>
+                <div class="viz-stage" id="loop-demo-stage">
+                    <p class="smaller" style="color: var(--color-text-secondary);">Interactive applet in web based slides</p>
+                </div>
+                <p class="viz-caption fragment">
+                    Nothing here is measured — it is a cartoon. But the shape is the honest part:
+                    the gain and the cost land in <strong>different loops</strong>, and usually on
+                    <strong>different people</strong>.
+                </p>
+            </section>
+
+            <!-- ==========================================================
+                 SECTION 2 — ALONE OR IN A GROUP
+                 ========================================================== -->
+            <section class="section-divider">
+                <p class="section-kicker">Part two</p>
+                <h2 class="truncate-title">Alone, or together</h2>
+                <div class="section-rule"></div>
+                <p class="section-sub">
+                    The one-person team was always tempting. AI makes it far more tempting.
+                </p>
+                <p class="credit-strip">
+                    This section follows Edmond Lau,
+                    <a href="https://effectiveengineer.com/blog/beware-the-one-person-team" target="_blank" rel="noopener">
+                        “Beware the One-Person Team”</a>
+                </p>
+            </section>
+
+            <!-- 18. The setup -->
+            <section data-sources='[{"text": "Edmond Lau — Beware the One-Person Team", "url": "https://effectiveengineer.com/blog/beware-the-one-person-team"}, {"text": "Fitzpatrick & Collins-Sussman — Team Geek / Debugging Teams", "url": "https://www.oreilly.com/library/view/debugging-teams/9781491932049/"}]'>
+                <h2 class="truncate-title">Why one-person teams happen</h2>
+                <p style="font-size: 0.76em; text-align: left;">
+                    Nobody sets out to isolate people. It happens through a reasonable chain of decisions:
+                </p>
+                <ol style="font-size: 0.74em; text-align: left;" class="tight">
+                    <li class="fragment">Big teams are visibly inefficient — meetings, coordination, arguments.</li>
+                    <li class="fragment">There are more worthwhile projects than there are people.</li>
+                    <li class="fragment">So split them up: one owner per project, maximum surface covered.</li>
+                    <li class="fragment">On paper, throughput went up. Five projects instead of two.</li>
+                </ol>
+                <blockquote class="fragment pull-quote" style="font-size: 0.95em; margin-top: 0.7em;">
+                    “Software development is a team sport.”
+                    <cite>— Fitzpatrick &amp; Collins-Sussman, quoted by Edmond Lau</cite>
+                </blockquote>
+                <p class="fragment" style="font-size: 0.72em;">
+                    Lau's recommendation is blunt: keep a <strong>minimum team size of two</strong>.
+                </p>
+            </section>
+
+            <!-- 19. Cons of solo -->
+            <section data-sources='[{"text": "Edmond Lau — Beware the One-Person Team", "url": "https://effectiveengineer.com/blog/beware-the-one-person-team"}]'>
+                <h2 class="truncate-title">The hidden costs of solo work</h2>
+                <ul style="font-size: 0.7em; text-align: left; max-width: 950px; margin: 0 auto;" class="tight">
+                    <li class="fragment"><strong>No design feedback.</strong> You can spend three weeks on the wrong approach and nothing stops you.</li>
+                    <li class="fragment"><strong>Less learning.</strong> Nobody else holds the context, so nobody can teach you inside it.</li>
+                    <li class="fragment"><strong>Lower motivation.</strong> No peer pressure, no shared accountability, no one noticing.</li>
+                    <li class="fragment"><strong>Bus factor of one.</strong> You get sick, you take a job elsewhere — the work stops dead.</li>
+                    <li class="fragment"><strong>Progress looks slow.</strong> Even when it is not. Stakeholders lose patience with a silent project.</li>
+                    <li class="fragment"><strong>A stall halts everything.</strong> With two people, one is still moving while the other is stuck.</li>
+                    <li class="fragment"><strong>The tedium is lonely.</strong> Someone has to do the grim data cleaning either way — it is worse alone.</li>
+                    <li class="fragment"><strong>No one to celebrate with.</strong> A milestone you announce to an empty room barely registers.</li>
+                </ul>
+                <p class="fragment emphasis-box" style="font-size: 0.7em; margin-top: 0.6em;">
+                    Notice how many of these are about <strong>morale and correction</strong>, not throughput.
+                    They are invisible on a project plan, which is exactly why they get cut.
+                </p>
+            </section>
+
+            <!-- 20. Pros and cons of groups -->
+            <section data-sources='[{"text": "Edmond Lau — Beware the One-Person Team", "url": "https://effectiveengineer.com/blog/beware-the-one-person-team"}]'>
+                <h2 class="truncate-title">Groups: the gain and the cost</h2>
+                <div class="pro-con">
+                    <div class="card card-pro fragment">
+                        <h4>✔ What you gain</h4>
+                        <ul class="tight">
+                            <li>Wrong approaches get caught in days, not weeks</li>
+                            <li>Knowledge spreads; practice gets standardised</li>
+                            <li>Momentum survives one person being stuck</li>
+                            <li>Someone shares the bad weeks with you</li>
+                            <li>Milestones are actually celebrated</li>
+                            <li>Real review — the thing that makes work trustworthy</li>
+                        </ul>
+                    </div>
+                    <div class="card card-con fragment">
+                        <h4>✘ What you pay</h4>
+                        <ul class="tight">
+                            <li>Coordination overhead: meetings, syncs, hand-offs</li>
+                            <li>Fewer projects can run in parallel</li>
+                            <li>Consensus is slower than a decision</li>
+                            <li>Diffuse ownership — “someone else will check it”</li>
+                            <li>Onboarding cost before anyone is productive</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="fragment" style="font-size: 0.6em; margin-top: 0.4em;">
+                    Lau's fix is not “bigger teams”. It is to <strong>serialize priorities</strong>:
+                    group related work thematically so two or three people share context,
+                    rather than staffing five isolated projects at once.
+                </p>
+            </section>
+
+            <!-- 21. The honest case for solo -->
+            <section data-sources='[{"text": "Edmond Lau — Beware the One-Person Team", "url": "https://effectiveengineer.com/blog/beware-the-one-person-team"}]'>
+                <h2 class="truncate-title">The case for working alone</h2>
+                <p style="font-size: 0.62em; text-align: left;">
+                    It would be dishonest to present solo work as simply worse. It has real advantages:
+                </p>
+                <div class="pro-con">
+                    <div class="card card-pro fragment">
+                        <h4>✔ Genuinely better alone</h4>
+                        <ul class="tight">
+                            <li>Deep focus, no interruptions, long uninterrupted thinking</li>
+                            <li>Decisions in seconds instead of a meeting</li>
+                            <li>One coherent mental model, no translation loss</li>
+                            <li>Unambiguous ownership and accountability</li>
+                            <li>Ideal for short, exploratory, throwaway work — <span class="loop-chip loop-1">loop 1</span></li>
+                        </ul>
+                    </div>
+                    <div class="card card-con fragment">
+                        <h4>✘ Where it breaks down</h4>
+                        <ul class="tight">
+                            <li>Anything long-lived, load-bearing or regulated</li>
+                            <li>Anything where being wrong is expensive</li>
+                            <li>Anything that must outlive your employment — <span class="loop-chip loop-2">loop 2</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="fragment emphasis-box" style="font-size: 0.6em; margin-top: 0.35em;">
+                    The variable is not team size. It is <strong>which loop the work lives in</strong>,
+                    and <strong>how expensive it is to be quietly wrong</strong>.
+                </p>
+            </section>
+
+            <!-- 22. One-person teams in the age of AI -->
+            <section>
+                <h2 class="truncate-title">The AI-era one-person team</h2>
+                <ul style="font-size: 0.58em; text-align: left; max-width: 950px; margin: 0 auto;" class="tight">
+                    <li class="fragment">One analyst with a good assistant now visibly produces what a small team used to.<br>
+                        <span class="smaller">Managers see the output and draw the obvious conclusion.</span></li>
+                    <li class="fragment">The assistant covers several of Lau's complaints — sort of.
+                        It reviews your design, explains unfamiliar code, keeps you moving when you stall,
+                        and never gets bored of the tedious part.</li>
+                    <li class="fragment">So the visible symptoms of isolation disappear, while
+                        <strong>the actual isolation gets worse</strong>.</li>
+                </ul>
+                <div class="pro-con" style="margin-top: 0.5em;">
+                    <div class="card card-con fragment">
+                        <h4>✘ What it does not replace</h4>
+                        <ul class="tight">
+                            <li>Bus factor — still one. The model does not remember your project next year</li>
+                            <li>An independent stake in being right</li>
+                            <li>Someone who will escalate when you are wrong</li>
+                            <li>Shared organizational memory and credibility</li>
+                        </ul>
+                    </div>
+                    <div class="card card-neutral fragment">
+                        <h4>The uncomfortable part</h4>
+                        <ul class="tight">
+                            <li>A model will agree with you far more readily than a colleague will</li>
+                            <li>You can now be confidently wrong <strong>faster</strong>, and with better formatting</li>
+                            <li>Nobody in the building has read what you shipped</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==========================================================
+                 DISCUSSION
+                 ========================================================== -->
+            <section class="section-divider">
+                <p class="section-kicker">Over to you</p>
+                <h2 class="truncate-title">Is the AI part of the team?</h2>
+                <div class="section-rule"></div>
+                <p class="section-sub">
+                    Not a rhetorical question. I would like to hear actual answers.
+                </p>
+            </section>
+
+            <section>
+                <h2 class="truncate-title">Discussion</h2>
+                <div class="discussion-box">
+                    <h3 style="font-size: 0.92em;">If a team of two beats a team of one…</h3>
+                    <p style="font-size: 0.66em; margin: 0;">
+                        …does you-plus-an-agent count as two?
+                    </p>
+                </div>
+                <ul style="font-size: 0.60em; text-align: left; max-width: 950px; margin: 0.5em auto;" class="tight">
+                    <li class="fragment">Which of Lau's benefits does an agent <strong>actually</strong> deliver, and which does it only imitate?</li>
+                    <li class="fragment">Can something be a teammate if it has <strong>no stake</strong> in the outcome and no memory of last quarter?</li>
+                    <li class="fragment">A colleague who disagrees with you costs you time. Is a model's agreeableness a <strong>feature or a defect</strong>?</li>
+                    <li class="fragment">If the agent writes it and you approve it — <strong>who is accountable</strong> when it is wrong?</li>
+                    <li class="fragment">Would you sign off on an analysis you did not write and do not fully understand? Have you already?</li>
+                    <li class="fragment">Does your answer change between <span class="loop-chip loop-1">loop 1</span> and <span class="loop-chip loop-2">loop 2</span> work?</li>
+                </ul>
+                <p class="fragment" style="font-size: 0.6em; color: var(--color-text-secondary);">
+                    Hold on to your answer. The next section is what happens if you answer
+                    “yes, and let's have 37,000 of them.”
+                </p>
+            </section>
+
+            <!-- ==========================================================
+                 SECTION 3 — THE 37,000-EMPLOYEE BIOTECH
+                 ========================================================== -->
+            <section class="section-divider">
+                <p class="section-kicker">Part three</p>
+                <h2 class="truncate-title">The biotech with 37,000 staff</h2>
+                <div class="section-rule"></div>
+                <p class="section-sub">
+                    What happens when the agents are given an org chart.
+                </p>
+                <p class="credit-strip">
+                    Reported at
+                    <a href="https://artificialscience.org/2026/09/the-ai-biotech-with-37000-employees/" target="_blank" rel="noopener">artificialscience.org</a>
+                    · original work by James Zou and colleagues, published in <em>Science</em>, 17 September 2026
+                </p>
+            </section>
+
+            <!-- 26. What it is -->
+            <section data-sources='[{"text": "The AI Biotech with 37,000 Employees — artificialscience.org", "url": "https://artificialscience.org/2026/09/the-ai-biotech-with-37000-employees/"}]'>
+                <h2 class="truncate-title">The Virtual Biotech</h2>
+                <p style="font-size: 0.76em; text-align: left;">
+                    A Stanford-led system that does not look like a model. It looks like a
+                    <strong>company</strong>.
+                </p>
+                <ul style="font-size: 0.72em; text-align: left;" class="tight">
+                    <li class="fragment">A <strong>chief scientific officer agent</strong> at the top, delegating downward</li>
+                    <li class="fragment">Divisions beneath it: <strong>target discovery, molecule design, safety assessment, clinical-trial analysis</strong></li>
+                    <li class="fragment">Beneath those, specialist workers — up to <strong>37,075 agents</strong> on a single task</li>
+                    <li class="fragment">For the trial analysis, <strong>one agent per clinical trial</strong>: 37,075 agents, 55,984 trials</li>
+                    <li class="fragment">Built on Claude models, though the authors note the approach is not tied to one model family</li>
+                </ul>
+                <p class="fragment emphasis-box" style="font-size: 0.72em;">
+                    The interesting claim is not “bigger model”. It is that
+                    <strong>organizational structure itself was the useful ingredient</strong> —
+                    the same hierarchy humans invented to make many limited workers into one capable firm.
+                </p>
+            </section>
+
+            <!-- 27. Interactive swarm -->
+            <section data-state="swarm-demo" data-sources='[{"text": "The AI Biotech with 37,000 Employees — artificialscience.org", "url": "https://artificialscience.org/2026/09/the-ai-biotech-with-37000-employees/"}]'>
+                <h2 class="truncate-title">Scale the org chart</h2>
+                <div class="viz-controls">
+                    <label>
+                        Agents:
+                        <input type="range" id="swarm-slider" min="1" max="100" step="1" value="1">
+                    </label>
+                    <span>Headcount: <span class="viz-readout" id="swarm-readout" style="min-width: 5em;">8</span></span>
+                    <button class="button" id="swarm-toggle" style="font-size: 1em; padding: 6px 14px;">Pause</button>
+                </div>
+                <div class="viz-stage" id="swarm-demo-stage">
+                    <p class="smaller" style="color: var(--color-text-secondary);">Interactive applet in web based slides</p>
+                </div>
+                <p class="viz-caption fragment">
+                    Drag it from a small team to 37,075. The dots flowing upward are findings being
+                    escalated. Notice what the structure is for: <strong>nothing at the bottom needs to
+                    understand the whole problem.</strong>
+                </p>
+            </section>
+
+            <!-- 28. What it found -->
+            <section data-sources='[{"text": "The AI Biotech with 37,000 Employees — artificialscience.org", "url": "https://artificialscience.org/2026/09/the-ai-biotech-with-37000-employees/"}]'>
+                <h2 class="truncate-title">What it actually found</h2>
+                <div class="stat-row">
+                    <div class="stat-tile fragment">
+                        <div class="stat-value">55,984</div>
+                        <div class="stat-label">published clinical trials read and analysed, in hours to days</div>
+                    </div>
+                    <div class="stat-tile tile-teal fragment">
+                        <div class="stat-value">+48%</div>
+                        <div class="stat-label">more likely to reach the market, for drugs targeting cell-type-specific genes</div>
+                    </div>
+                    <div class="stat-tile tile-orange fragment">
+                        <div class="stat-value">+40%</div>
+                        <div class="stat-label">more likely to progress from Phase I to Phase II</div>
+                    </div>
+                    <div class="stat-tile tile-coral fragment">
+                        <div class="stat-value">−32%</div>
+                        <div class="stat-label">fewer serious side effects</div>
+                    </div>
+                </div>
+                <p class="fragment" style="font-size: 0.64em; margin-top: 0.4em;">
+                    And a concrete proposal: restricted to data from before January 2025, the system
+                    independently suggested an <strong>antibody–drug conjugate targeting CD276</strong>
+                    for lung cancer. External reviewers judged it credible.
+                </p>
+                <p class="fragment" style="font-size: 0.64em;">
+                    Merck and Daiichi Sankyo were pursuing the same strategy at the same time —
+                    ifinatamab deruxtecan received FDA Breakthrough Therapy Designation in August 2025.
+                </p>
+            </section>
+
+            <!-- 29. How it works -->
+            <section data-sources='[{"text": "The AI Biotech with 37,000 Employees — artificialscience.org", "url": "https://artificialscience.org/2026/09/the-ai-biotech-with-37000-employees/"}]'>
+                <h2 class="truncate-title">How 37,000 agents cooperate</h2>
+                <ul style="font-size: 0.72em; text-align: left; max-width: 950px; margin: 0 auto;" class="tight">
+                    <li class="fragment"><strong>Hierarchy.</strong> Information flows from specialists up through divisional chiefs to the executive agent. Nobody holds the whole problem — exactly like a real firm.</li>
+                    <li class="fragment"><strong>Narrow scope per worker.</strong> One agent, one clinical trial. A small, checkable job is a job you can do 37,000 times without it degrading.</li>
+                    <li class="fragment"><strong>Data engineering, not context stuffing.</strong> A tool called <em>Paperclip</em> converts messy human-formatted material into a structured file system the agents can search — rather than dumping raw PDFs into a context window.</li>
+                    <li class="fragment"><strong>Debate as quality control.</strong> The authors report that debate among many agents produced <em>“more robust answers than a single large model working alone.”</em></li>
+                </ul>
+                <p class="fragment emphasis-box" style="font-size: 0.72em; margin-top: 0.6em;">
+                    Three of those four are <strong>organizational design</strong> and <strong>data engineering</strong>.
+                    That is the part of this you can copy on Monday. It is also, not coincidentally,
+                    the part that looks like your job.
+                </p>
+            </section>
+
+            <!-- 30. Caveats -->
+            <section data-sources='[{"text": "The AI Biotech with 37,000 Employees — artificialscience.org", "url": "https://artificialscience.org/2026/09/the-ai-biotech-with-37000-employees/"}]'>
+                <h2 class="truncate-title">The caveats are the lesson</h2>
+                <ul style="font-size: 0.73em; text-align: left; max-width: 950px; margin: 0 auto;" class="tight">
+                    <li class="fragment">The authors themselves call it <strong>“an early demonstration, not a validated drug discovery pipeline.”</strong></li>
+                    <li class="fragment"><strong>Nothing has been tested</strong> in a lab or a clinic. Not one proposal.</li>
+                    <li class="fragment">The CD276 result is <strong>retrospective validation, not prediction</strong> — the related drug already had breakthrough designation before publication.</li>
+                    <li class="fragment">The trial findings are <strong>associations across published trials</strong>, with all the publication bias that implies.</li>
+                </ul>
+                <p class="fragment emphasis-box" style="font-size: 0.73em; margin-top: 0.7em;">
+                    This is a textbook <span class="loop-chip loop-1">loop 1</span> artefact: a fast,
+                    wide-ranging generator of promising hypotheses. Enormously valuable —
+                    and <strong>not yet</strong> something you would bet a patient on.
+                </p>
+                <p class="fragment" style="font-size: 0.7em;">
+                    Someone still has to do the loop-2 work. That someone is the person
+                    who can read the caveats and still tell you what to believe.
+                </p>
+            </section>
+
+            <!-- 31. What to take from it -->
+            <section>
+                <h2 class="truncate-title">So what does this mean for you?</h2>
+                <div class="pro-con">
+                    <div class="card card-neutral fragment">
+                        <h4>The work that shrinks</h4>
+                        <ul class="tight">
+                            <li>Reading 50,000 documents by hand</li>
+                            <li>Writing the tenth variant of a script</li>
+                            <li>The first pass over an unfamiliar dataset</li>
+                            <li>Boilerplate, glue, translation between formats</li>
+                        </ul>
+                    </div>
+                    <div class="card card-pro fragment">
+                        <h4>The work that grows</h4>
+                        <ul class="tight">
+                            <li>Deciding what question is worth 37,000 agents</li>
+                            <li>Building the data substrate they work on</li>
+                            <li>Designing the checks, the debate, the review</li>
+                            <li>Reading the caveats and saying what holds</li>
+                            <li>Being the person who signs their name to it</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="fragment emphasis-box" style="font-size: 0.74em; margin-top: 0.7em;">
+                    The scarce thing was never the analysis. It is
+                    <strong>someone who can be held responsible for a conclusion.</strong>
+                </p>
+            </section>
+
+            <!-- ==========================================================
+                 SECTION 4 — CLOSING
+                 ========================================================== -->
+            <section class="section-divider">
+                <p class="section-kicker">Part four</p>
+                <h2 class="truncate-title">Prompt engineering is dead</h2>
+                <div class="section-rule"></div>
+                <p class="section-sub">
+                    Which is good news. What replaced it is more interesting, and harder.
+                </p>
+            </section>
+
+            <!-- 33. Prompt engineering is dead -->
+            <section>
+                <h2 class="truncate-title">Prompt engineering is dead</h2>
+                <ul style="font-size: 0.74em; text-align: left; max-width: 920px; margin: 0 auto;" class="tight">
+                    <li class="fragment">The incantations are gone. “You are a world-class expert…”, “take a deep breath”,
+                        elaborate role-play scaffolding — the models outgrew all of it.</li>
+                    <li class="fragment">Clear writing now beats clever prompting. If you can brief a competent new
+                        colleague, you can brief a model.</li>
+                    <li class="fragment">The leverage moved <strong>outward</strong>: to context, tools, data structure,
+                        verification, and the loop you put around the model.</li>
+                </ul>
+                <blockquote class="fragment pull-quote" style="font-size: 1em;">
+                    The skill was never phrasing. It was knowing what a good answer
+                    would look like <em>before</em> you asked.
+                </blockquote>
+                <p class="fragment" style="font-size: 0.74em;">
+                    So here are four things that did <strong>not</strong> get automated away.
+                </p>
+            </section>
+
+            <!-- 34. The four -->
+            <section>
+                <h2 class="truncate-title">Four things that still matter</h2>
+                <ol style="font-size: 0.8em; text-align: left; max-width: 900px; margin: 0.6em auto;" class="tight">
+                    <li class="fragment"><strong>Know what you are doing.</strong> If you do not know, you cannot be accountable.</li>
+                    <li class="fragment"><strong>Make it convince you.</strong> Play devil's advocate against it, on purpose.</li>
+                    <li class="fragment"><strong>Ask it to explain.</strong> Make it build artifacts that create understanding.</li>
+                    <li class="fragment"><strong>Point it at old code.</strong> The best low-risk place to start using it seriously.</li>
+                </ol>
+                <p class="fragment emphasis-box" style="font-size: 0.75em; margin-top: 0.8em;">
+                    Every one of these is a habit, not a technique. None of them are about the prompt.
+                </p>
+            </section>
+
+            <!-- 35. One -->
+            <section>
+                <div class="practice-head">
+                    <span class="practice-num">1</span>
+                    <h2 class="truncate-title" style="margin: 0;">Know what you are doing</h2>
+                </div>
+                <blockquote class="pull-quote" style="font-size: 0.95em;">
+                    If you don't know what you are doing, you cannot be accountable for it.
+                </blockquote>
+                <ul style="font-size: 0.7em; text-align: left; max-width: 940px; margin: 0.6em auto;" class="tight">
+                    <li class="fragment">Accountability is not a formality. It is the thing the organization is actually
+                        buying from you. The model cannot hold it — it has no stake, no licence, no career.</li>
+                    <li class="fragment">Before you accept an answer: could you <strong>defend it in a meeting</strong> with
+                        someone who wants it to be wrong? Could you reproduce the reasoning without the model?</li>
+                    <li class="fragment">This does not mean write everything yourself. It means never sign off on
+                        a step you could not, in principle, have taken.</li>
+                    <li class="fragment">The failure mode is specific and common: <strong>fluent output you do not
+                        understand, arriving faster than your ability to check it.</strong></li>
+                </ul>
+                <p class="fragment" style="font-size: 0.7em; color: var(--color-text-secondary);">
+                    Corollary: this is also the strongest argument for still learning the fundamentals
+                    properly, in the degree you are currently doing.
+                </p>
+            </section>
+
+            <!-- 36. Two -->
+            <section>
+                <div class="practice-head">
+                    <span class="practice-num">2</span>
+                    <h2 class="truncate-title" style="margin: 0;">Make it convince you</h2>
+                </div>
+                <p style="font-size: 0.74em; text-align: left;">
+                    A model will agree with you. That is the single most dangerous thing about it.
+                    So make agreement <strong>expensive</strong>.
+                </p>
+                <ul style="font-size: 0.68em; text-align: left; max-width: 950px; margin: 0 auto;" class="tight">
+                    <li class="fragment">“Argue the <strong>opposite</strong> of what you just told me, as strongly as you can.”</li>
+                    <li class="fragment">“What would have to be true for this to be <strong>wrong</strong>? How would I detect it?”</li>
+                    <li class="fragment">“Give me the <strong>three strongest objections</strong> a sceptical reviewer would raise.”</li>
+                    <li class="fragment">Ask the same question in a <strong>fresh session, framed differently</strong>, and see whether the answer survives.</li>
+                    <li class="fragment">Ask for the <strong>assumption it is least confident about</strong> — then go check that one yourself.</li>
+                    <li class="fragment">Never ask “is this right?”. Ask “<strong>how is this wrong?</strong>”</li>
+                </ul>
+                <p class="fragment emphasis-box" style="font-size: 0.7em; margin-top: 0.6em;">
+                    You are deliberately reconstructing the <strong>colleague who disagrees with you</strong> —
+                    the thing the one-person team lost.
+                </p>
+            </section>
+
+            <!-- 37. Three -->
+            <section>
+                <div class="practice-head">
+                    <span class="practice-num">3</span>
+                    <h2 class="truncate-title" style="margin: 0;">Ask it to explain</h2>
+                </div>
+                <p style="font-size: 0.74em; text-align: left;">
+                    Do not only ask for output. Ask for things that <strong>leave you smarter</strong> than you were.
+                </p>
+                <ul style="font-size: 0.68em; text-align: left; max-width: 950px; margin: 0 auto;" class="tight">
+                    <li class="fragment">“Explain this to me as if I have to <strong>present it to the board on Thursday</strong>.”</li>
+                    <li class="fragment">Ask for a <strong>diagram</strong> of the data flow, a <strong>worked example</strong> with real numbers, a <strong>small simulation</strong> that demonstrates the effect.</li>
+                    <li class="fragment">Ask for a <strong>one-page memo</strong> stating the assumptions, the method and the limitations — then check whether you agree with every line.</li>
+                    <li class="fragment">Ask for the <strong>same idea three ways</strong>: the formal version, the intuition, and the version for a non-technical stakeholder.</li>
+                    <li class="fragment">These artifacts are not decoration. They are how loop-1 output becomes something
+                        loop 2 can actually accept.</li>
+                </ul>
+                <p class="fragment emphasis-box" style="font-size: 0.7em; margin-top: 0.6em;">
+                    Test of whether it worked: <strong>can you now explain it without the model in the room?</strong>
+                    If not, you have a document, not an understanding.
+                </p>
+            </section>
+
+            <!-- 38. Four -->
+            <section>
+                <div class="practice-head">
+                    <span class="practice-num">4</span>
+                    <h2 class="truncate-title" style="margin: 0;">Point it at old code</h2>
+                </div>
+                <p style="font-size: 0.68em; text-align: left;">
+                    If you want one concrete place to start on Monday, start here. It is
+                    <strong>low risk, high information</strong>, and immediately useful.
+                </p>
+                <ul style="font-size: 0.62em; text-align: left; max-width: 950px; margin: 0 auto;" class="tight">
+                    <li class="fragment">Take the script nobody wants to touch. Ask for a plain-language walkthrough of what it does.</li>
+                    <li class="fragment">“Where are the <strong>silent failure modes</strong>? What happens on empty input, on a missing column, on a duplicate key?”</li>
+                    <li class="fragment">“Which of these joins can <strong>change the row count</strong>, and under what conditions?”</li>
+                    <li class="fragment">“Write the tests this code should have had.” Then run them and watch what breaks.</li>
+                    <li class="fragment">“What is this file <strong>implicitly assuming</strong> about the data that is never stated?”</li>
+                </ul>
+                <div class="pro-con" style="margin-top: 0.6em;">
+                    <div class="card card-pro fragment">
+                        <h4>Why start here</h4>
+                        <ul class="tight">
+                            <li>Ground truth exists — the code either runs or it does not</li>
+                            <li>You learn the model's failure modes on something you can verify</li>
+                            <li>The output is documentation and tests: pure <span class="loop-chip loop-2">loop 2</span> value</li>
+                            <li>Nothing is shipped to a customer while you learn</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 39. Recap -->
+            <section>
+                <h2 class="truncate-title">If you remember five things</h2>
+                <ol style="font-size: 0.66em; text-align: left; max-width: 940px; margin: 0.4em auto;" class="tight">
+                    <li class="fragment">Your organization runs <strong>two loops</strong>. Know which one your analysis is in, and say it out loud.</li>
+                    <li class="fragment">AI accelerates loop 1 and quietly bills loop 2. <strong>The gain and the cost land on different people.</strong></li>
+                    <li class="fragment">The one-person team was already risky. AI hides the symptoms without removing the risk.</li>
+                    <li class="fragment">Structure and data engineering are what turned 37,000 agents into something useful — <strong>not a bigger model</strong>.</li>
+                    <li class="fragment">Prompt engineering is dead. <strong>Judgement, scepticism, explanation and accountability are not.</strong></li>
+                </ol>
+                <blockquote class="fragment pull-quote" style="font-size: 0.85em; margin-top: 0.6em;">
+                    The job was never producing the number.
+                    It was being the person who can stand behind it.
+                </blockquote>
+            </section>
+
+            <!-- 40. Thank you -->
+            <section class="section-divider">
+                <img src="../shared/images/uoi_logo_blue.png" alt="University of Iceland Logo" style="width: 260px; margin-bottom: 0.4em;">
+                <h2 class="truncate-title">Thank you for attending</h2>
+                <div class="section-rule"></div>
+                <p style="font-size: 0.85em;">Questions, disagreements and counterexamples all very welcome.</p>
+                <p class="mt-lg" style="font-size: 0.7em; color: var(--color-text-secondary);">
+                    Guðmundur Einarsson ·
+                    <a href="https://gumeo.github.io/about/" target="_blank" rel="noopener">gumeo.github.io</a>
+                </p>
+                <p class="credit-strip">
+                    Sources: Tuhin Nair
+                    (<a href="https://www.nair.sh/guides-and-opinions/communicating-your-expertise/why-senior-developers-fail-to-communicate-their-expertise" target="_blank" rel="noopener">nair.sh</a>)
+                    · Edmond Lau
+                    (<a href="https://effectiveengineer.com/blog/beware-the-one-person-team" target="_blank" rel="noopener">effectiveengineer.com</a>)
+                    · Zou et al., <em>Science</em> 2026
+                    (<a href="https://artificialscience.org/2026/09/the-ai-biotech-with-37000-employees/" target="_blank" rel="noopener">artificialscience.org</a>)
+                </p>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <!-- Shared utilities -->
+    <script src="../shared/js/d3-utils.js"></script>
+    <script src="../shared/js/animation-lib.js"></script>
+    <script src="../shared/js/tooltip-modal.js"></script>
+    <script src="../shared/js/source-modal-v2.js"></script>
+    <script src="../shared/js/title-handler.js"></script>
+
+    <!-- Presentation specific -->
+    <script src="js/lecture-visuals.js"></script>
+
+    <script>
+        Reveal.initialize({
+            hash: true,
+            controls: true,
+            progress: true,
+            center: true,
+            transition: 'slide',
+            plugins: [ RevealHighlight, RevealNotes ]
+        });
+
+        // Lazily start each demo the first time its slide is reached.
+        const demoInitializers = {
+            'loop-demo': () => {
+                if (!window.loopDemoInitialized) window.initializeLoopDemo();
+            },
+            'swarm-demo': () => {
+                if (!window.swarmDemoInitialized) window.initializeSwarmDemo();
+            }
+        };
+
+        function runDemoFor(slide) {
+            if (!slide) return;
+            const state = slide.getAttribute('data-state');
+            const init = demoInitializers[state];
+            if (!init) return;
+            setTimeout(() => {
+                init();
+                // The SVG changes the slide's height, so re-centre it.
+                Reveal.layout();
+            }, 100);
+        }
+
+        Reveal.on('slidechanged', (event) => runDemoFor(event.currentSlide));
+        Reveal.on('ready', () => runDemoFor(Reveal.getCurrentSlide()));
+    </script>
+</body>
+</html>

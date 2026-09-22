@@ -1,0 +1,458 @@
+/* AI in the analytics workplace - presentation specific styles */
+
+/* Title slide logo positioning */
+.title-slide .ui-logo {
+  position: absolute;
+  top: 110px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 330px;
+  z-index: 10;
+}
+
+.title-slide h1 {
+  margin-top: 230px;
+}
+
+/* ---------------------------------------------------------------
+   Section dividers
+   --------------------------------------------------------------- */
+.reveal section.section-divider h2 {
+  font-size: 2.1em;
+  margin-bottom: 0.2em;
+}
+
+.reveal section.section-divider .section-kicker {
+  font-size: 0.8em;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ui-teal);
+  font-weight: bold;
+  margin-bottom: 0.4em;
+}
+
+.reveal section.section-divider .section-rule {
+  width: 180px;
+  height: 5px;
+  background: linear-gradient(90deg, var(--ui-primary), var(--ui-teal));
+  border-radius: 3px;
+  margin: 0.8em auto;
+}
+
+.reveal section.section-divider p.section-sub {
+  font-size: 0.85em;
+  color: var(--color-text-secondary);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* ---------------------------------------------------------------
+   Diagram figures (blog images)
+   --------------------------------------------------------------- */
+.reveal .diagram-figure {
+  margin: 0 auto;
+  max-width: 1000px;
+}
+
+.reveal .diagram-figure img {
+  width: 100%;
+  height: auto;
+  background: #FFFFFF;
+  border: 1px solid var(--ui-light-gray);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  margin: 0;
+}
+
+.reveal .diagram-figure figcaption {
+  font-size: 0.6em;
+  color: var(--color-text-secondary);
+  margin-top: 0.6em;
+  line-height: 1.4;
+}
+
+.reveal .diagram-figure figcaption a {
+  color: var(--ui-primary);
+}
+
+/* ---------------------------------------------------------------
+   Attribution strip for a source that a whole section leans on
+   --------------------------------------------------------------- */
+.reveal .credit-strip {
+  display: inline-block;
+  font-size: 0.55em;
+  color: var(--color-text-secondary);
+  background: var(--ui-lighter-gray);
+  border: 1px solid var(--ui-light-gray);
+  border-radius: 20px;
+  padding: 6px 16px;
+  margin-top: 0.8em;
+}
+
+.reveal .credit-strip a {
+  color: var(--ui-primary);
+  text-decoration: none;
+}
+
+.reveal .credit-strip a:hover {
+  text-decoration: underline;
+}
+
+/* ---------------------------------------------------------------
+   Pro / con cards
+   --------------------------------------------------------------- */
+.reveal .pro-con {
+  display: flex;
+  gap: 1.2em;
+  align-items: stretch;
+  margin-top: 0.6em;
+}
+
+.reveal .pro-con .card {
+  flex: 1;
+  border-radius: 8px;
+  padding: 0.9em 1.1em;
+  text-align: left;
+}
+
+.reveal .pro-con .card h4 {
+  margin: 0 0 0.4em 0;
+  font-size: 0.95em;
+}
+
+.reveal .pro-con .card ul {
+  font-size: 0.72em;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.reveal .card.card-pro {
+  background: rgba(45, 210, 192, 0.12);
+  border: 2px solid var(--ui-teal);
+}
+
+.reveal .card.card-pro h4 { color: #0d8b7e; }
+
+.reveal .card.card-con {
+  background: rgba(252, 132, 132, 0.12);
+  border: 2px solid var(--ui-coral);
+}
+
+.reveal .card.card-con h4 { color: #c74a4a; }
+
+.reveal .card.card-neutral {
+  background: rgba(16, 9, 159, 0.06);
+  border: 2px solid var(--ui-primary);
+}
+
+.reveal .card.card-neutral h4 { color: var(--ui-primary); }
+
+/* ---------------------------------------------------------------
+   Loop labels used in the two-loops section
+   --------------------------------------------------------------- */
+.reveal .loop-chip {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 14px;
+  font-size: 0.75em;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.reveal .loop-chip.loop-1 {
+  background: rgba(252, 132, 132, 0.18);
+  color: #b83b3b;
+  border: 1px solid var(--ui-coral);
+}
+
+.reveal .loop-chip.loop-2 {
+  background: rgba(16, 9, 159, 0.08);
+  color: var(--ui-primary);
+  border: 1px solid var(--ui-primary);
+}
+
+/* ---------------------------------------------------------------
+   Big pull quote
+   --------------------------------------------------------------- */
+.reveal .pull-quote {
+  font-size: 1.15em;
+  line-height: 1.4;
+  color: var(--ui-primary);
+  font-style: italic;
+  max-width: 900px;
+  margin: 0.6em auto;
+  padding: 0.6em 1.2em;
+  border-left: 5px solid var(--ui-teal);
+  border-right: 5px solid var(--ui-teal);
+  text-align: center;
+}
+
+.reveal .pull-quote cite {
+  display: block;
+  font-style: normal;
+  font-size: 0.5em;
+  color: var(--color-text-secondary);
+  margin-top: 0.6em;
+}
+
+/* ---------------------------------------------------------------
+   Numbered practice items in the closing section
+   --------------------------------------------------------------- */
+.reveal .practice-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  justify-content: center;
+  margin-bottom: 0.5em;
+}
+
+.reveal .practice-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  flex: 0 0 58px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--ui-primary), var(--ui-teal));
+  color: #FFFFFF;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+/* ---------------------------------------------------------------
+   Discussion slide
+   --------------------------------------------------------------- */
+.reveal .discussion-box {
+  background: rgba(250, 197, 91, 0.15);
+  border: 3px dashed var(--ui-yellow);
+  border-radius: 12px;
+  padding: 1em 1.4em;
+  max-width: 950px;
+  margin: 0.6em auto;
+}
+
+.reveal .discussion-box h3 {
+  color: #9a6d0a;
+  margin-top: 0;
+}
+
+/* ---------------------------------------------------------------
+   Stat tiles (biotech numbers)
+   --------------------------------------------------------------- */
+.reveal .stat-row {
+  display: flex;
+  gap: 1em;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 0.8em 0;
+}
+
+.reveal .stat-tile {
+  flex: 1 1 200px;
+  max-width: 260px;
+  background: var(--ui-lighter-gray);
+  border: 1px solid var(--ui-light-gray);
+  border-top: 5px solid var(--ui-primary);
+  border-radius: 8px;
+  padding: 0.7em 0.8em;
+}
+
+.reveal .stat-tile .stat-value {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: var(--ui-primary);
+  line-height: 1.1;
+}
+
+.reveal .stat-tile .stat-label {
+  font-size: 0.6em;
+  color: var(--color-text-secondary);
+  line-height: 1.35;
+  margin-top: 0.35em;
+}
+
+.reveal .stat-tile.tile-teal { border-top-color: var(--ui-teal); }
+.reveal .stat-tile.tile-teal .stat-value { color: #0d8b7e; }
+.reveal .stat-tile.tile-coral { border-top-color: var(--ui-coral); }
+.reveal .stat-tile.tile-coral .stat-value { color: #c74a4a; }
+.reveal .stat-tile.tile-orange { border-top-color: var(--ui-orange); }
+.reveal .stat-tile.tile-orange .stat-value { color: #c97016; }
+
+/* ---------------------------------------------------------------
+   Interactive demo containers
+   --------------------------------------------------------------- */
+.reveal .viz-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  padding: 10px 16px;
+  background: var(--ui-lighter-gray);
+  border: 1px solid var(--ui-light-gray);
+  border-radius: 6px;
+  position: relative;
+  z-index: 100;
+  font-size: 0.6em;
+}
+
+.reveal .viz-controls label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reveal .viz-controls input[type="range"] {
+  width: 170px;
+  z-index: 101;
+  position: relative;
+}
+
+.reveal .viz-controls .viz-readout {
+  font-family: var(--font-code), monospace;
+  font-weight: bold;
+  color: var(--ui-primary);
+  min-width: 3.2em;
+  text-align: right;
+}
+
+.reveal .viz-stage {
+  position: relative;
+  z-index: 1;
+  background: #FFFFFF;
+  border: 1px solid var(--ui-light-gray);
+  border-radius: 8px;
+  padding: 8px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.reveal .viz-stage svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.reveal .viz-caption {
+  font-size: 0.6em;
+  color: var(--color-text-secondary);
+  margin-top: 0.5em;
+}
+
+/* Print / PDF export: show all fragments at once */
+.reveal .fragment.visible { animation: slideInFade 0.4s ease-out; }
+
+@keyframes slideInFade {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Tighter lists for dense slides */
+.reveal ul.tight li { margin-bottom: 0.25em; }
+.reveal .small { font-size: 0.78em; }
+.reveal .smaller { font-size: 0.68em; }
+
+/* ---------------------------------------------------------------
+   Vertical budget
+   Reveal's canvas is 960x700. These rules keep dense slides inside
+   it without dropping to unreadable font sizes.
+   --------------------------------------------------------------- */
+.reveal .slides section h2 {
+  margin-bottom: 0.45em;
+}
+
+.reveal ul.tight li,
+.reveal ol.tight li {
+  margin-bottom: 0.14em;
+  line-height: 1.34;
+}
+
+.reveal .emphasis-box {
+  padding: 0.7em 0.95em;
+  margin: 0.7em 0;
+}
+
+.reveal .pull-quote {
+  padding: 0.45em 1em;
+  margin: 0.45em auto;
+}
+
+/* Figures: bound by height, not width, so tall slides stay on canvas */
+.reveal .diagram-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.reveal .diagram-figure img {
+  width: auto;
+  max-width: 100%;
+  max-height: 258px;
+}
+
+.reveal .diagram-figure figcaption {
+  margin-top: 0.45em;
+}
+
+.reveal .pro-con .card {
+  padding: 0.6em 0.85em;
+}
+
+.reveal .pro-con .card h4 {
+  margin-bottom: 0.25em;
+  font-size: 0.8em;
+}
+
+.reveal .pro-con .card ul {
+  font-size: 0.58em;
+  line-height: 1.36;
+}
+
+.reveal .pro-con .card ul li {
+  margin-bottom: 0.12em;
+}
+
+.reveal .stat-tile {
+  padding: 0.5em 0.65em;
+  flex-basis: 0;
+  max-width: 215px;
+}
+
+.reveal .stat-tile .stat-value { font-size: 1.3em; }
+.reveal .stat-tile .stat-label { font-size: 0.55em; }
+
+.reveal .stat-row {
+  margin: 0.6em 0;
+  gap: 0.7em;
+  flex-wrap: nowrap;   /* four tiles stay on one line at 960px */
+}
+
+.reveal .discussion-box {
+  padding: 0.7em 1.2em;
+  margin: 0.4em auto;
+}
+
+/* ---------------------------------------------------------------
+   PDF handout
+   title-handler.js shrinks long titles to fit one line on the web, but
+   export-pdf.js clears its sizing. Without this, a title over ~20
+   characters wraps to two lines and pushes the last paragraph down over
+   the source footnote. The export marks the document with .print-pdf.
+   --------------------------------------------------------------- */
+html.print-pdf .reveal h2,
+html.print-pdf .reveal h2.truncate-title {
+  font-size: 1.15em !important;
+}
+
+html.print-pdf .reveal section.section-divider h2 {
+  font-size: 1.6em !important;
+}
+
+/* Keep clear of the "Sources:" footnote that export-pdf.js pins to the
+   bottom of the slide box. */
+html.print-pdf .reveal .slides section[data-sources] {
+  padding-bottom: 42px !important;
+}
